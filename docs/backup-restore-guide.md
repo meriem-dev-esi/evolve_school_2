@@ -7,10 +7,12 @@ This guide establishes the operating procedures for safeguarding Evolve Academy'
 ## 1. Automated Daily Backups
 
 ### Supabase Managed Backups
+
 - **Daily Physical Backups:** Maintained automatically by Supabase for 7 to 30 days depending on project tier.
 - **Point-in-Time Recovery (PITR):** Enables restoring database state to any minute in the past 7 days.
 
 ### Offsite Logical Dumps (Recommended Cron)
+
 Run a nightly cron job on a secure maintenance runner:
 
 ```bash
@@ -33,6 +35,7 @@ bash scripts/test_backup_restore.sh
 ```
 
 What the script verifies:
+
 1. `pg_dump` connects with read permissions without locking critical tables.
 2. The output archive has valid table-of-contents (`TOC`) entries.
 3. No transaction is left dangling.
@@ -43,10 +46,13 @@ What the script verifies:
 ## 3. Emergency Restoration Procedure
 
 ### Step 1: Put Application in Maintenance Mode
+
 Prevent student payments or modifications during restore:
+
 - Set maintenance flag in `.env.local` or route middleware.
 
 ### Step 2: Provision or Prepare Target Postgres
+
 ```bash
 # Example restoring into target database
 pg_restore \
@@ -59,7 +65,9 @@ pg_restore \
 ```
 
 ### Step 3: Verify Integrity After Restore
+
 Execute verification queries:
+
 ```sql
 SELECT count(*) FROM courses WHERE is_published = true;
 SELECT count(*) FROM enrollments;
@@ -68,5 +76,6 @@ SELECT count(*) FROM community_projects;
 ```
 
 ### Step 4: Resume Traffic & Health Verification
+
 1. Call `/api/health` to confirm latency and database connectivity.
 2. Re-enable user access and monitor error logs.

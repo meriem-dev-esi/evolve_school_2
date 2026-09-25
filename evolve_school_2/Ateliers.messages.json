@@ -1,0 +1,147 @@
+{
+  "_instructions": "Fusionne chaque bloc sous la clé \"Ateliers\" de messages/fr.json, messages/ar.json et messages/en.json. Supprime ce champ.",
+  "fr": {
+    "ateliers": {
+      "search": {
+        "placeholder": "Rechercher un atelier, sujet, technologie...",
+        "label": "Rechercher un atelier",
+        "clear": "Effacer",
+        "resultsFor": "Résultats pour"
+      },
+      "filters": {
+        "title": "Spécialités",
+        "all": "Tous les ateliers",
+        "allShort": "Tous"
+      },
+      "list": {
+        "titleAll": "Ateliers pratiques disponibles",
+        "count": "{count, plural, =0 {Aucun atelier} one {# atelier intensif} other {# ateliers intensifs}}",
+        "reset": "Réinitialiser les filtres"
+      },
+      "empty": {
+        "title": "Aucun atelier trouvé",
+        "text": "Nous n'avons trouvé aucun atelier correspondant à votre recherche. Essayez d'autres termes ou une autre catégorie.",
+        "cta": "Voir tous les ateliers"
+      },
+      "card": {
+        "badge": "Session pratique",
+        "defaultDuration": "Atelier intensif",
+        "projectIncluded": "Projet inclus",
+        "participation": "Participation",
+        "free": "Gratuit",
+        "currency": "DA",
+        "join": "Participer"
+      },
+      "page": {
+        "hero": {
+          "badge": "Ateliers pratiques & masterclasses",
+          "title": "Les Ateliers",
+          "brand": "Evolve",
+          "text": "Pratiquez en direct avec des experts du secteur. Des sessions intensives et interactives conçues pour accélérer votre maîtrise des outils du futur."
+        },
+        "community": {
+          "eyebrow": "Rejoignez le réseau",
+          "title": "Proposez un atelier ou partagez vos travaux",
+          "text": "Vous êtes formateur ou expert ? Rejoignez l'équipe d'animateurs d'ateliers Evolve ou proposez une masterclass à notre communauté.",
+          "cta": "Rejoindre la communauté"
+        }
+      }
+    }
+  },
+  "en": {
+    "ateliers": {
+      "search": {
+        "placeholder": "Search a workshop, topic, technology...",
+        "label": "Search workshops",
+        "clear": "Clear",
+        "resultsFor": "Results for"
+      },
+      "filters": {
+        "title": "Specialties",
+        "all": "All workshops",
+        "allShort": "All"
+      },
+      "list": {
+        "titleAll": "Available hands-on workshops",
+        "count": "{count, plural, =0 {No workshops} one {# intensive workshop} other {# intensive workshops}}",
+        "reset": "Reset filters"
+      },
+      "empty": {
+        "title": "No workshop found",
+        "text": "We couldn't find any workshop matching your search. Try other terms or another category.",
+        "cta": "View all workshops"
+      },
+      "card": {
+        "badge": "Hands-on session",
+        "defaultDuration": "Intensive workshop",
+        "projectIncluded": "Project included",
+        "participation": "Participation",
+        "free": "Free",
+        "currency": "DZD",
+        "join": "Join"
+      },
+      "page": {
+        "hero": {
+          "badge": "Hands-on workshops & masterclasses",
+          "title": "Workshops by",
+          "brand": "Evolve",
+          "text": "Practice live with industry experts. Intensive, interactive sessions designed to speed up your mastery of tomorrow's tools."
+        },
+        "community": {
+          "eyebrow": "Join the network",
+          "title": "Propose a workshop or share your work",
+          "text": "Are you a trainer or an expert? Join Evolve's team of workshop hosts or pitch a masterclass to our community.",
+          "cta": "Join the community"
+        }
+      }
+    }
+  },
+  "ar": {
+    "ateliers": {
+      "search": {
+        "placeholder": "ابحث عن ورشة، موضوع، تقنية...",
+        "label": "البحث في الورش",
+        "clear": "مسح",
+        "resultsFor": "نتائج البحث عن"
+      },
+      "filters": {
+        "title": "التخصصات",
+        "all": "جميع الورش",
+        "allShort": "الكل"
+      },
+      "list": {
+        "titleAll": "الورش التطبيقية المتاحة",
+        "count": "{count, plural, zero {لا توجد ورش} one {ورشة مكثفة واحدة} two {ورشتان مكثفتان} few {# ورش مكثفة} many {# ورشة مكثفة} other {# ورشة مكثفة}}",
+        "reset": "إعادة ضبط الفلاتر"
+      },
+      "empty": {
+        "title": "لم يتم العثور على ورشة",
+        "text": "لم نجد أي ورشة تطابق بحثك. جرّب كلمات أخرى أو فئة مختلفة.",
+        "cta": "عرض جميع الورش"
+      },
+      "card": {
+        "badge": "جلسة تطبيقية",
+        "defaultDuration": "ورشة مكثفة",
+        "projectIncluded": "مشروع مضمّن",
+        "participation": "المشاركة",
+        "free": "مجاني",
+        "currency": "دج",
+        "join": "شارك"
+      },
+      "page": {
+        "hero": {
+          "badge": "ورش تطبيقية وماستر كلاس",
+          "title": "ورش عمل",
+          "brand": "Evolve",
+          "text": "تدرّب مباشرة مع خبراء القطاع. جلسات مكثفة وتفاعلية مصمّمة لتسريع إتقانك لأدوات المستقبل."
+        },
+        "community": {
+          "eyebrow": "انضم إلى الشبكة",
+          "title": "اقترح ورشة أو شارك أعمالك",
+          "text": "هل أنت مدرّب أو خبير؟ انضم إلى فريق مُيسّري ورش Evolve أو اقترح ماستر كلاس على مجتمعنا.",
+          "cta": "انضم إلى المجتمع"
+        }
+      }
+    }
+  }
+}

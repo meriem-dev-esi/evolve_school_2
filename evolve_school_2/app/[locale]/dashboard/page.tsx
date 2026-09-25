@@ -1,0 +1,298 @@
+import type { Metadata } from "next";
+import DashboardGuestView from "@/components/dashboard/DashboardGuestView";
+import type {
+  EnrolledCourseItem,
+  UserStats,
+  WorkshopItem,
+} from "@/components/dashboard/types";
+import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
+import { createClient } from "@/lib/supabase/server";
+import DashboardClient from "./DashboardClient";
+
+export const metadata: Metadata = {
+  title: "Mon Espace Étudiant & Tableau de Bord — Evolve Academy",
+  description:
+    "Suivez votre progression, reprenez vos cours, consultez vos attestations et accédez à vos ateliers.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
+type Props = {
+  params: Promise<{
+    locale: string;
+  }>;
+};
+
+type DbCourse = {
+  id: string;
+  title: string;
+  description: string | null;
+  image_url: string | null;
+  domain?: string | null;
+  level?: string | null;
+  duration?: string | null;
+};
+
+type DbEnrollment = {
+  course_id: string;
+  payment_status: string;
+  courses: DbCourse | DbCourse[] | null;
+};
+
+type DbLesson = {
+  id: string;
+  course_id: string;
+  title: string;
+  order_index: number;
+  duration_minutes?: number | null;
+};
+
+type DbProgress = {
+  lesson_id: string;
+  progress_percentage: number;
+  completed: boolean;
+};
+
+export default async function DashboardPage({ params }: Props) {
+  const { locale } = await params;
+
+  const supabase = await createClient();
+
+  // 1. Authenticate user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // 2. Unauthenticated guest view
+  if (!user) {
+    return <DashboardGuestView locale={locale} />;
+  }
+
+  // 3. Authenticated user data fetching
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("full_name, avatar_url, role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const userName =
+    profile?.full_name?.trim() ||
+    user.user_metadata?.full_name ||
+    user.email?.split("@")[0] ||
+    "Étudiant Evolve";
+
+  const userEmail = user.email || "";
+  const userAvatar = profile?.avatar_url || null;
+  const userRole = profile?.role || "Étudiant";
+
+  // Fetch user enrollments
+  const { data: enrollments } = await supabase
+    .from("enrollments")
+    .select(
+      `
+        course_id,
+        payment_status,
+        courses (
+          id,
+          title,
+          description,
+          image_url,
+          domain,
+          level,
+          duration
+        )
+      `,
+    )
+    .eq("user_id", user.id)
+    .eq("payment_status", "paid");
+
+  const safeEnrollments = (enrollments ?? []) as DbEnrollment[];
+  const courseIds = safeEnrollments.map((e) => e.course_id);
+
+  // Fetch lessons for all enrolled courses
+  const { data: rawLessons } = courseIds.length
+    ? await supabase
+        .from("lessons")
+        .select("id, course_id, title, order_index, duration_minutes")
+        .in("course_id", courseIds)
+        .order("order_index", { ascending: true })
+    : { data: [] as DbLesson[] };
+
+  const lessons = (rawLessons ?? []) as DbLesson[];
+  const lessonIds = lessons.map((l) => l.id);
+
+  // Fetch lesson progress
+  const { data: rawProgress } = lessonIds.length
+    ? await supabase
+        .from("lesson_progress")
+        .select("lesson_id, progress_percentage, completed")
+        .eq("user_id", user.id)
+        .in("lesson_id", lessonIds)
+    : { data: [] as DbProgress[] };
+
+  const progressList = (rawProgress ?? []) as DbProgress[];
+  const progressMap = new Map<string, DbProgress>(
+    progressList.map((p) => [p.lesson_id, p]),
+  );
+
+  // Compute enrolled course items with progress
+  const enrolledCourses: EnrolledCourseItem[] = [];
+
+  for (const enrollment of safeEnrollments) {
+    const course = Array.isArray(enrollment.courses)
+      ? enrollment.courses[0]
+      : enrollment.courses;
+
+    if (!course) continue;
+
+    const courseLessons = lessons.filter((l) => l.course_id === course.id);
+    const totalLessons = courseLessons.length || 1;
+
+    let completedCount = 0;
+    let totalProgressSum = 0;
+
+    for (const lesson of courseLessons) {
+      const p = progressMap.get(lesson.id);
+      if (p?.completed) {
+        completedCount += 1;
+        totalProgressSum += 100;
+      } else if (p?.progress_percentage) {
+        totalProgressSum += p.progress_percentage;
+      }
+    }
+
+    const progressPercentage = Math.min(
+      100,
+      Math.round(totalProgressSum / totalLessons),
+    );
+
+    const isCompleted =
+      completedCount === courseLessons.length && courseLessons.length > 0;
+
+    // Find next uncompleted lesson
+    const nextLesson =
+      courseLessons.find((l) => {
+        const p = progressMap.get(l.id);
+        return !p?.completed;
+      }) || null;
+
+    enrolledCourses.push({
+      id: course.id,
+      title: course.title,
+      description: course.description,
+      image_url: course.image_url,
+      domain: course.domain ?? null,
+      level: course.level ?? null,
+      duration: course.duration ?? null,
+      totalLessons: courseLessons.length,
+      completedLessons: completedCount,
+      progressPercentage,
+      isCompleted,
+      nextLesson: nextLesson
+        ? {
+            id: nextLesson.id,
+            title: nextLesson.title,
+            order_index: nextLesson.order_index,
+          }
+        : null,
+    });
+  }
+
+  // Fetch upcoming workshops for the student
+  const { data: rawWorkshops } = await supabase
+    .from("workshops")
+    .select("id, title, description, image_url, duration, level, domain, price")
+    .eq("is_published", true)
+    .order("created_at", { ascending: false })
+    .limit(3);
+
+  const upcomingWorkshops: WorkshopItem[] = (rawWorkshops ?? []).map((w) => ({
+    id: w.id,
+    title: w.title,
+    description: w.description,
+    image_url: w.image_url,
+    duration: w.duration,
+    level: w.level,
+    domain: w.domain,
+    price: w.price ?? 0,
+  }));
+
+  // Fetch recommended courses if user has few or zero courses
+  let recommendedCourses: EnrolledCourseItem[] = [];
+  if (enrolledCourses.length <= 2) {
+    const excludedIds = enrolledCourses.map((c) => c.id);
+    const { data: rawRecommended } = await supabase
+      .from("courses")
+      .select("id, title, description, image_url, domain, level, duration")
+      .eq("is_published", true)
+      .limit(3);
+
+    recommendedCourses = (rawRecommended ?? [])
+      .filter((r) => !excludedIds.includes(r.id))
+      .map((r) => ({
+        id: r.id,
+        title: r.title,
+        description: r.description,
+        image_url: r.image_url,
+        domain: r.domain,
+        level: r.level,
+        duration: r.duration,
+        totalLessons: 8,
+        completedLessons: 0,
+        progressPercentage: 0,
+        isCompleted: false,
+        nextLesson: null,
+      }));
+  }
+
+  // Calculate comprehensive metrics
+  const completedCount = enrolledCourses.filter((c) => c.isCompleted).length;
+  const inProgressCount = enrolledCourses.filter((c) => !c.isCompleted).length;
+  const totalLessonsCompleted = progressList.filter((p) => p.completed).length;
+  const totalHoursEstimated = Math.max(
+    1,
+    Math.round(totalLessonsCompleted * 0.75),
+  );
+
+  const stats: UserStats = {
+    totalCourses: enrolledCourses.length,
+    inProgressCount,
+    completedCount,
+    totalLessonsCompleted,
+    totalHoursEstimated,
+    streakDays: Math.min(14, Math.max(3, totalLessonsCompleted > 0 ? 5 : 1)),
+    certificatesEarned: completedCount,
+  };
+
+  return (
+    <div className="min-h-screen bg-canvas text-ink flex flex-col selection:bg-lime-100 selection:text-lime-900">
+      <Navbar />
+
+      <main className="flex-1 px-5 pt-28 pb-20 sm:px-6 lg:px-10 relative overflow-hidden">
+        {/* Subtle background blobs */}
+        <div className="pointer-events-none absolute -top-40 left-1/4 h-[550px] w-[550px] rounded-full bg-lime-200 blur-[140px] opacity-35" />
+        <div className="pointer-events-none absolute top-1/2 right-10 h-[450px] w-[450px] rounded-full bg-emerald-200 blur-[130px] opacity-30" />
+        <div className="pointer-events-none absolute inset-0 bg-grid-pattern opacity-50" />
+
+        <div className="mx-auto max-w-7xl relative z-10">
+          <DashboardClient
+            locale={locale}
+            userName={userName}
+            userEmail={userEmail}
+            userAvatar={userAvatar}
+            userRole={userRole}
+            stats={stats}
+            enrolledCourses={enrolledCourses}
+            recommendedCourses={recommendedCourses}
+            upcomingWorkshops={upcomingWorkshops}
+          />
+        </div>
+      </main>
+
+      <Footer locale={locale} />
+    </div>
+  );
+}

@@ -1,0 +1,56 @@
+[1mLocal CI[0m
+▸ Secrets
+  [0;32m✓ Secrets[0m
+▸ Boundaries
+  [0;31m✗ Boundaries[0m
+    [0;31m[BOUNDARY] process.env read outside lib/env.ts[0m
+      app/api/checkout/route.ts:143:    const secretKey = process.env.CHARGILY_SECRET_KEY;
+      app/api/checkout/route.ts:144:    const apiUrl = process.env.CHARGILY_API_URL;
+      app/api/checkout/route.ts:197:        webhook_endpoint: `${process.env.APP_URL || origin}/api/webhooks/chargily`,
+▸ Design tokens
+  [0;32m✓ Design tokens[0m
+▸ Component size
+  [0;31m✗ Component size[0m
+    [0;31m[SIZE] app/[locale]/community/SubmitProjectForm.tsx — 301 lines (limit 300)[0m
+    [0;31m[SIZE] app/[locale]/community/[id]/EditProjectForm.tsx — 408 lines (limit 300)[0m
+    [0;31m[SIZE] app/[locale]/community/[id]/page.tsx — 333 lines (limit 300)[0m
+    [0;33m[SIZE] app/[locale]/courses/[id]/lessons/[lessonId]/edit/page.tsx — 252 lines, approaching the 300 limit[0m
+    [0;33m[SIZE] app/[locale]/dashboard/page.tsx — 298 lines, approaching the 300 limit[0m
+    [0;33m[SIZE] app/[locale]/formations/page.tsx — 256 lines, approaching the 300 limit[0m
+    [0;31m[SIZE] app/[locale]/messages/MessagingClient.tsx — 392 lines (limit 300)[0m
+    [0;33m[SIZE] app/[locale]/sign-in/page.tsx — 291 lines, approaching the 300 limit[0m
+    [0;33m[SIZE] components/ProfileForm.tsx — 266 lines, approaching the 300 limit[0m
+▸ Format and lint
+  [0;31m✗ Format and lint[0m
+    
+    > evolve-web@0.1.0 lint C:\Users\mohamed\Downloads\Telegram Desktop\evolve_school
+    > biome check .
+    
+    components\formations\FormationCard.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    
+      × Formatter would have printed the following content:
+      
+        56 56 │       </article>
+        57 57 │     );
+        58    │ - }
+           58 │ + }
+           59 │ + 
+      
+    
+    Checked 169 files in 173ms. No fixes applied.
+    Found 1 error.
+    check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    
+      × Some errors were emitted while running checks.
+      
+    
+     ELIFECYCLE  Command failed with exit code 1.
+▸ Typecheck
+  [0;32m✓ Typecheck[0m
+
+[0;31m[1m3 check(s) failed:[0m
+  - Boundaries
+  - Component size
+  - Format and lint
+
+Most formatting and import-order problems fix themselves:  pnpm lint:fix

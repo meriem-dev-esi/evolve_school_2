@@ -70,4 +70,3 @@ i18n/         locale routing and message loading
 messages/     fr.json · ar.json · en.json
 scripts/      the guards; `make ci-local` runs them all
 ```
-

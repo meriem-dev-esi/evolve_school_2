@@ -4,190 +4,39 @@ import {
   AlertCircle,
   CheckCircle2,
   FileText,
-  Github,
-  Globe,
   Sparkles,
   Tag,
-  Upload,
 } from "lucide-react";
-import { useState } from "react";
-import { compressImage, validateUploadFile } from "@/lib/imageCompressor";
-import { createClient } from "@/lib/supabase/client";
+import ProjectImageUploader from "@/components/community/ProjectImageUploader";
+import ProjectTechSuggestions from "@/components/community/ProjectTechSuggestions";
+import ProjectUrlInputs from "@/components/community/ProjectUrlInputs";
+import { useSubmitProjectForm } from "./useSubmitProjectForm";
 
 type Props = {
   locale: string;
 };
 
 export default function SubmitProjectForm({ locale }: Props) {
-  const supabase = createClient();
-
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
-  const [technologies, setTechnologies] = useState("");
-  const [githubUrl, setGithubUrl] = useState("");
-  const [demoUrl, setDemoUrl] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{
-    text: string;
-    type: "success" | "error";
-  } | null>(null);
-
-  const handleImageChange = (file: File | null) => {
-    setImageFile(file);
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-    } else {
-      setPreviewUrl(null);
-    }
-  };
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
-    if (loading) return;
-
-    setLoading(true);
-    setMessage(null);
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      setMessage({
-        text:
-          locale === "ar"
-            ? "يجب تسجيل الدخول لنشر مشروع"
-            : "Vous devez être connecté pour publier un projet.",
-        type: "error",
-      });
-      setLoading(false);
-      return;
-    }
-
-    // Check duplicate
-    const { data: duplicate } = await supabase
-      .from("community_projects")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("title", title.trim())
-      .maybeSingle();
-
-    if (duplicate) {
-      setMessage({
-        text: "Vous avez déjà publié un projet avec ce titre.",
-        type: "error",
-      });
-      setLoading(false);
-      return;
-    }
-
-    let imageUrl: string | null = null;
-
-    if (imageFile) {
-      const validation = validateUploadFile(imageFile);
-      if (!validation.valid) {
-        setMessage({
-          text: validation.error || "Fichier image invalide.",
-          type: "error",
-        });
-        setLoading(false);
-        return;
-      }
-
-      const fileToUpload = await compressImage(imageFile);
-      const fileName = `${crypto.randomUUID()}.webp`;
-      const filePath = `${user.id}/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("community-projects")
-        .upload(filePath, fileToUpload, {
-          cacheControl: "3600",
-          upsert: false,
-          contentType: "image/webp",
-        });
-
-      if (uploadError) {
-        console.error("[Image Upload]", uploadError);
-        setMessage({ text: uploadError.message, type: "error" });
-        setLoading(false);
-        return;
-      }
-
-      const { data: publicUrlData } = supabase.storage
-        .from("community-projects")
-        .getPublicUrl(filePath);
-
-      imageUrl = publicUrlData.publicUrl;
-    }
-
-    const { error } = await supabase.from("community_projects").insert({
-      user_id: user.id,
-      title,
-      description,
-      category: category || null,
-      technologies: technologies
-        .split(",")
-        .map((item) => item.trim())
-        .filter(Boolean),
-      github_url: githubUrl || null,
-      demo_url: demoUrl || null,
-      image_url: imageUrl,
-    });
-
-    if (error) {
-      console.error("[Project Create]", error);
-      setMessage({ text: error.message, type: "error" });
-      setLoading(false);
-      return;
-    }
-
-    setTitle("");
-    setDescription("");
-    setCategory("");
-    setTechnologies("");
-    setGithubUrl("");
-    setDemoUrl("");
-    setImageFile(null);
-    setPreviewUrl(null);
-
-    setMessage({
-      text: "Félicitations ! Votre projet a été publié avec succès dans la communauté.",
-      type: "success",
-    });
-
-    setLoading(false);
-  }
-
-  const suggestedTechs = [
-    "React",
-    "Next.js",
-    "Tailwind CSS",
-    "Figma",
-    "Flutter",
-    "Three.js",
-    "Supabase",
-    "Python",
-    "Blender",
-  ];
-
-  const addTech = (t: string) => {
-    const list = technologies
-      ? technologies
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean)
-      : [];
-    if (!list.includes(t)) {
-      list.push(t);
-      setTechnologies(list.join(", "));
-    }
-  };
+  const {
+    title,
+    setTitle,
+    description,
+    setDescription,
+    category,
+    setCategory,
+    technologies,
+    setTechnologies,
+    githubUrl,
+    setGithubUrl,
+    demoUrl,
+    setDemoUrl,
+    previewUrl,
+    loading,
+    message,
+    addTech,
+    handleImageChange,
+    handleSubmit,
+  } = useSubmitProjectForm(locale);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -199,14 +48,14 @@ export default function SubmitProjectForm({ locale }: Props) {
         <div className="relative">
           <FileText
             size={15}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40"
+            className="absolute start-3.5 top-1/2 -translate-y-1/2 text-white/40"
           />
           <input
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Ex: SaaS Dashboard UI, Application Mobile Ecommerce..."
-            className="w-full rounded-2xl border border-white/10 bg-white/5 pl-10 pr-4 py-3 text-xs text-white placeholder:text-white/30 outline-none transition focus:border-brand/50 focus:bg-white/[0.08]"
+            className="w-full rounded-2xl border border-white/10 bg-white/5 ps-10 pe-4 py-3 text-xs text-white placeholder:text-white/30 outline-none transition focus:border-brand/50 focus:bg-white/[0.08]"
           />
         </div>
       </div>
@@ -235,13 +84,13 @@ export default function SubmitProjectForm({ locale }: Props) {
           <div className="relative">
             <Tag
               size={15}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40"
+              className="absolute start-3.5 top-1/2 -translate-y-1/2 text-white/40"
             />
             <input
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               placeholder="Ex: UI/UX Design, Web Dev, Mobile..."
-              className="w-full rounded-2xl border border-white/10 bg-white/5 pl-10 pr-4 py-3 text-xs text-white placeholder:text-white/30 outline-none transition focus:border-brand/50"
+              className="w-full rounded-2xl border border-white/10 bg-white/5 ps-10 pe-4 py-3 text-xs text-white placeholder:text-white/30 outline-none transition focus:border-brand/50"
             />
           </div>
         </div>
@@ -259,102 +108,22 @@ export default function SubmitProjectForm({ locale }: Props) {
         </div>
       </div>
 
-      {/* Quick Add Tech Badges */}
-      <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-        <span className="text-[10px] text-white/40">Suggestions rapides :</span>
-        {suggestedTechs.map((t) => (
-          <button
-            key={t}
-            type="button"
-            onClick={() => addTech(t)}
-            className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[10px] text-white/70 transition hover:border-brand/40 hover:text-brand"
-          >
-            + {t}
-          </button>
-        ))}
-      </div>
+      {/* Quick Add Tech Suggestions */}
+      <ProjectTechSuggestions onAddTech={addTech} />
 
       {/* URLs (GitHub & Demo) */}
-      <div className="grid gap-4 sm:grid-cols-2 pt-1">
-        <div>
-          <label className="mb-1.5 block text-xs font-semibold text-white/80">
-            Lien Code Source / GitHub
-          </label>
-          <div className="relative">
-            <Github
-              size={15}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40"
-            />
-            <input
-              type="url"
-              value={githubUrl}
-              onChange={(e) => setGithubUrl(e.target.value)}
-              placeholder="https://github.com/..."
-              className="w-full rounded-2xl border border-white/10 bg-white/5 pl-10 pr-4 py-3 text-xs text-white placeholder:text-white/30 outline-none transition focus:border-brand/50"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="mb-1.5 block text-xs font-semibold text-white/80">
-            Lien Démo / Prototype
-          </label>
-          <div className="relative">
-            <Globe
-              size={15}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40"
-            />
-            <input
-              type="url"
-              value={demoUrl}
-              onChange={(e) => setDemoUrl(e.target.value)}
-              placeholder="https://mon-projet.dz ou Figma"
-              className="w-full rounded-2xl border border-white/10 bg-white/5 pl-10 pr-4 py-3 text-xs text-white placeholder:text-white/30 outline-none transition focus:border-brand/50"
-            />
-          </div>
-        </div>
-      </div>
+      <ProjectUrlInputs
+        githubUrl={githubUrl}
+        setGithubUrl={setGithubUrl}
+        demoUrl={demoUrl}
+        setDemoUrl={setDemoUrl}
+      />
 
       {/* Image File Upload */}
-      <div>
-        <label className="mb-1.5 block text-xs font-semibold text-white/80">
-          Capture d'écran / Aperçu visuel
-        </label>
-        <div className="relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/15 bg-white/[0.02] p-6 text-center transition hover:border-brand/40 hover:bg-white/[0.04]">
-          <input
-            id="project-image"
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            onChange={(e) => handleImageChange(e.target.files?.[0] ?? null)}
-            className="absolute inset-0 cursor-pointer opacity-0"
-          />
-
-          {previewUrl ? (
-            <div className="relative aspect-video w-full max-w-xs overflow-hidden rounded-xl border border-white/20">
-              <img
-                src={previewUrl}
-                alt="Aperçu"
-                className="h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition text-xs font-bold text-white">
-                Changer l'image
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-white/5 text-white/60">
-                <Upload size={18} className="text-brand" />
-              </div>
-              <p className="text-xs font-medium text-white/80">
-                Cliquez ou glissez une image ici (PNG, JPG, WebP)
-              </p>
-              <p className="mt-1 text-[11px] text-white/40">
-                L'image sera automatiquement optimisée
-              </p>
-            </>
-          )}
-        </div>
-      </div>
+      <ProjectImageUploader
+        previewUrl={previewUrl}
+        onImageChange={handleImageChange}
+      />
 
       {/* Submit Button */}
       <div className="pt-3">

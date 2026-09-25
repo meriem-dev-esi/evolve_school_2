@@ -1,3 +1,5 @@
+import { env } from "@/lib/env";
+
 type LogLevel = "info" | "warn" | "error" | "debug";
 
 interface LogPayload {
@@ -91,7 +93,7 @@ export const logger = {
   },
 
   debug(message: string, context?: string, data?: Record<string, unknown>) {
-    if (process.env.NODE_ENV !== "production") {
+    if (!env.isProduction) {
       console.debug(
         formatLog({
           level: "debug",

@@ -1,6 +1,6 @@
-import { Link } from "@/i18n/navigation";
 import { notFound, redirect } from "next/navigation";
 import CheckoutButton from "@/components/CheckoutButton";
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {

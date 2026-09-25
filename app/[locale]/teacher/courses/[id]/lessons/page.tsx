@@ -1,5 +1,6 @@
-import Link from "next/link";
+import { setRequestLocale } from "next-intl/server";
 import DeleteLessonButton from "@/components/DeleteLessonButton";
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function TeacherLessonsPage({
@@ -11,6 +12,7 @@ export default async function TeacherLessonsPage({
   }>;
 }) {
   const { locale, id } = await params;
+  setRequestLocale(locale);
   const supabase = await createClient();
 
   const {
@@ -24,7 +26,7 @@ export default async function TeacherLessonsPage({
           <h1 className="text-3xl font-bold">Please sign in</h1>
 
           <Link
-            href={`/${locale}/sign-in`}
+            href="/sign-in"
             className="mt-6 inline-block rounded-full bg-brand px-6 py-3 font-semibold text-black"
           >
             Sign In
@@ -70,7 +72,7 @@ export default async function TeacherLessonsPage({
     <main className="min-h-dvh bg-black px-6 py-28 text-white lg:px-10">
       <div className="mx-auto max-w-6xl">
         <Link
-          href={`/${locale}/teacher/courses`}
+          href="/teacher/courses"
           className="text-sm text-white/50 transition hover:text-brand"
         >
           ← Back to Courses
@@ -92,7 +94,7 @@ export default async function TeacherLessonsPage({
           </div>
 
           <Link
-            href={`/${locale}/teacher/courses/${id}/lessons/new`}
+            href={`/teacher/courses/${id}/lessons/new`}
             className="rounded-full bg-brand px-6 py-3 font-semibold text-black transition hover:opacity-90"
           >
             + Add Lesson
@@ -114,7 +116,7 @@ export default async function TeacherLessonsPage({
             </p>
 
             <Link
-              href={`/${locale}/teacher/courses/${id}/lessons/new`}
+              href={`/teacher/courses/${id}/lessons/new`}
               className="mt-6 inline-block rounded-full bg-brand px-6 py-3 font-semibold text-black"
             >
               Add Lesson
@@ -164,7 +166,7 @@ export default async function TeacherLessonsPage({
 
                   <div className="flex flex-wrap gap-3">
                     <Link
-                      href={`/${locale}/teacher/courses/${id}/lessons/${lesson.id}/edit`}
+                      href={`/teacher/courses/${id}/lessons/${lesson.id}/edit`}
                       className="rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-black transition hover:opacity-90"
                     >
                       Edit

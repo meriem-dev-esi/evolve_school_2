@@ -6,7 +6,10 @@ export default function NotFound() {
     <main className="flex min-h-[80vh] flex-col items-center justify-center px-6 text-center">
       <div className="glass-card relative max-w-lg rounded-3xl border border-white/10 p-8 shadow-2xl sm:p-12">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-brand/30 bg-brand/10 text-brand">
-          <Compass className="h-8 w-8 animate-spin" style={{ animationDuration: "12s" }} />
+          <Compass
+            className="h-8 w-8 animate-spin"
+            style={{ animationDuration: "12s" }}
+          />
         </div>
 
         <span className="mt-6 inline-block font-mono text-xs font-bold tracking-widest text-brand uppercase">
@@ -18,7 +21,8 @@ export default function NotFound() {
         </h1>
 
         <p className="mt-4 text-sm leading-relaxed text-white/60">
-          La ressource que vous recherchez n&apos;existe pas ou a été déplacée. Vérifiez l&apos;URL ou retournez à l&apos;accueil.
+          La ressource que vous recherchez n&apos;existe pas ou a été déplacée.
+          Vérifiez l&apos;URL ou retournez à l&apos;accueil.
         </p>
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">

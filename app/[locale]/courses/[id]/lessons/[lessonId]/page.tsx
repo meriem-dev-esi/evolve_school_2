@@ -1,8 +1,8 @@
-import { Link } from "@/i18n/navigation";
 import { notFound, redirect } from "next/navigation";
 import LessonVideo from "@/components/LessonVideo";
 import MarkLessonComplete from "@/components/MarkLessonComplete";
 import UploadedLessonVideo from "@/components/UploadedLessonVideo";
+import { Link } from "@/i18n/navigation";
 import { getLessonVideoUrl } from "@/lib/data/lesson-video";
 import { createClient } from "@/lib/supabase/server";
 

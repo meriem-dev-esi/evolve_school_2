@@ -43,13 +43,13 @@ export default function CommunityFilters({ categories, technologies }: Props) {
         <div className="relative md:col-span-4">
           <Search
             size={16}
-            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40"
+            className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-white/40"
           />
           <input
             defaultValue={searchParams.get("q") ?? ""}
             onChange={(e) => updateFilter("q", e.target.value)}
             placeholder="Rechercher par titre, description, techno..."
-            className="w-full rounded-2xl border border-white/10 bg-white/5 pl-10 pr-4 py-2.5 text-xs text-white placeholder:text-white/40 outline-none transition focus:border-brand/50 focus:bg-white/[0.08]"
+            className="w-full rounded-2xl border border-white/10 bg-white/5 ps-10 pe-4 py-2.5 text-xs text-white placeholder:text-white/40 outline-none transition focus:border-brand/50 focus:bg-white/[0.08]"
           />
         </div>
 
@@ -162,7 +162,7 @@ export default function CommunityFilters({ categories, technologies }: Props) {
           <button
             type="button"
             onClick={resetAll}
-            className="text-[11px] text-white/50 hover:text-white underline transition ml-1"
+            className="text-xs text-white/50 hover:text-white underline transition ms-1"
           >
             Effacer tous les filtres
           </button>

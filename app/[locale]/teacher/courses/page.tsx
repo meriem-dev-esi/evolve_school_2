@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { setRequestLocale } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function TeacherCoursesPage({
@@ -7,6 +8,7 @@ export default async function TeacherCoursesPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const supabase = await createClient();
 
   const {
@@ -20,7 +22,7 @@ export default async function TeacherCoursesPage({
           <h1 className="text-3xl font-bold">Please sign in</h1>
 
           <Link
-            href={`/${locale}/sign-in`}
+            href="/sign-in"
             className="mt-6 inline-block rounded-full bg-brand px-6 py-3 font-semibold text-black"
           >
             Sign In
@@ -73,7 +75,7 @@ export default async function TeacherCoursesPage({
           </div>
 
           <Link
-            href={`/${locale}/teacher/courses/new`}
+            href="/teacher/courses/new"
             className="rounded-full bg-brand px-6 py-3 font-semibold text-black transition hover:opacity-90"
           >
             + Create Course
@@ -95,7 +97,7 @@ export default async function TeacherCoursesPage({
             <p className="mt-3 text-white/50">Create your first course.</p>
 
             <Link
-              href={`/${locale}/teacher/courses/new`}
+              href="/teacher/courses/new"
               className="mt-6 inline-block rounded-full bg-brand px-6 py-3 font-semibold text-black"
             >
               Create Course
@@ -210,21 +212,21 @@ export default async function TeacherCoursesPage({
                   {/* Action */}
                   <div className="mt-6 grid grid-cols-3 gap-3">
                     <Link
-                      href={`/${locale}/courses/${course.id}`}
+                      href={`/courses/${course.id}`}
                       className="rounded-full border border-white/10 px-4 py-3 text-center text-sm font-semibold transition hover:border-brand hover:text-brand"
                     >
                       View
                     </Link>
 
                     <Link
-                      href={`/${locale}/teacher/courses/${course.id}/edit`}
+                      href={`/teacher/courses/${course.id}/edit`}
                       className="rounded-full bg-brand px-4 py-3 text-center text-sm font-semibold text-black transition hover:opacity-90"
                     >
                       Edit
                     </Link>
 
                     <Link
-                      href={`/${locale}/teacher/courses/${course.id}/lessons`}
+                      href={`/teacher/courses/${course.id}/lessons`}
                       className="rounded-full border border-white/10 px-4 py-3 text-center text-sm font-semibold transition hover:border-brand hover:text-brand"
                     >
                       Lessons

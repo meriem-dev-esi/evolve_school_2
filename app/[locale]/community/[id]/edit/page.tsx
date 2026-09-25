@@ -1,8 +1,8 @@
 import { ArrowLeft, Pencil } from "lucide-react";
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import EditProjectForm from "../EditProjectForm";
 
@@ -67,7 +67,7 @@ export default async function EditProjectPage({ params }: Props) {
 
         <div className="mx-auto max-w-3xl relative z-10">
           <Link
-            href={`/${locale}/community/${id}`}
+            href={`/community/${id}`}
             className="inline-flex items-center gap-2 text-xs font-semibold text-white/60 hover:text-brand transition duration-200"
           >
             <ArrowLeft className="h-4 w-4" />

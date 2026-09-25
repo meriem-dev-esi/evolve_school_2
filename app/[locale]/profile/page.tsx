@@ -1,6 +1,7 @@
-import Link from "next/link";
+import { setRequestLocale } from "next-intl/server";
 import LearningPreferencesForm from "@/components/LearningPreferencesForm";
 import ProfileForm from "@/components/ProfileForm";
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function ProfilePage({
@@ -11,6 +12,7 @@ export default async function ProfilePage({
   }>;
 }) {
   const { locale } = await params;
+  setRequestLocale(locale);
 
   const supabase = await createClient();
 
@@ -37,7 +39,7 @@ export default async function ProfilePage({
           </p>
 
           <Link
-            href={`/${locale}/sign-in`}
+            href="/sign-in"
             className="mt-8 inline-flex rounded-full bg-lime-400 px-7 py-3 font-semibold text-black transition hover:bg-lime-300 hover:shadow-lg hover:shadow-lime-400/20"
           >
             Sign In

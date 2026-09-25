@@ -112,7 +112,7 @@ export default function ZoomGridBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed inset-0 z-0 h-full w-full bg-[#0b0b0b]"
+      className="pointer-events-none fixed inset-0 z-0 h-full w-full bg-canvas"
       style={{ width: "100vw", height: "100vh" }}
     />
   );

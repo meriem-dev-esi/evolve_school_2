@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { env } from "@/lib/env";
 import { checkRateLimit, RATE_LIMIT_TIERS } from "@/lib/rateLimiter";
 import { createClient } from "@/lib/supabase/server";
 
@@ -140,8 +141,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const secretKey = process.env.CHARGILY_SECRET_KEY;
-    const apiUrl = process.env.CHARGILY_API_URL;
+    const secretKey = env.chargilySecretKey;
+    const apiUrl = env.chargilyApiUrl;
 
     if (!secretKey || !apiUrl) {
       // In dev/demo without Chargily keys, register demo enrollment gracefully
@@ -194,7 +195,7 @@ export async function POST(request: Request) {
         description: course.title,
         success_url: `${origin}/${locale}/courses/${course.id}?payment=success`,
         failure_url: `${origin}/${locale}/courses/${course.id}/checkout?payment=failed`,
-        webhook_endpoint: `${process.env.APP_URL || origin}/api/webhooks/chargily`,
+        webhook_endpoint: `${env.appUrl || origin}/api/webhooks/chargily`,
         metadata: {
           user_id: user.id,
           course_id: course.id,
@@ -222,7 +223,7 @@ export async function POST(request: Request) {
         payment_status: "pending",
         payment_amount: course.price,
         payment_method: "edahabia",
-        checkout_id: checkout.id,
+        chargily_checkout_id: checkout.id,
         enrolled_at: new Date().toISOString(),
       },
       { onConflict: "user_id,course_id" },

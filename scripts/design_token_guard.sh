@@ -28,8 +28,8 @@ report() {
 }
 
 # globals.css is where the tokens are defined rather than used, so it is the one
-# file allowed to contain a hex colour.
-SCAN=(app components --include=*.tsx --include=*.ts)
+# file allowed to contain a hex colour. manifest.ts is metadata config for PWA.
+SCAN=(app components --include=*.tsx --include=*.ts --exclude=manifest.ts)
 
 # A hex colour anywhere in the markup.
 hits=$(grep -rnE '#[0-9a-fA-F]{3,8}\b' "${SCAN[@]}" 2>/dev/null || true)
@@ -39,9 +39,9 @@ if [ -n "$hits" ]; then
 fi
 
 # Tailwind arbitrary values for colour, e.g. `bg-[#84cc16]` or `text-[rgb(...)]`.
-hits=$(grep -rnE '(bg|text|border|fill|stroke|ring|shadow)-\[' "${SCAN[@]}" 2>/dev/null || true)
+hits=$(grep -rnE '(bg|text|border|fill|stroke|ring|shadow)-\[(#|rgb|hsl|color:)' "${SCAN[@]}" 2>/dev/null || true)
 if [ -n "$hits" ]; then
-  report "Tailwind arbitrary value — use a token class instead"
+  report "Tailwind arbitrary colour value — use a token class instead"
   echo "$hits" | sed 's/^/  /'
 fi
 

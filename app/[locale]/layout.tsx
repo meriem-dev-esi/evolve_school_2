@@ -131,7 +131,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} dir={directionOf(locale)} suppressHydrationWarning>
       <body
-        className="relative min-h-dvh antialiased bg-[#0b0b0b] text-gray-200 selection:bg-white selection:text-black"
+        className="relative min-h-dvh antialiased bg-canvas text-gray-200 selection:bg-white selection:text-black"
         suppressHydrationWarning
       >
         <NextIntlClientProvider>

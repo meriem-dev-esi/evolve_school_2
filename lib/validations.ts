@@ -20,7 +20,10 @@ export function validateCheckoutInput(body: unknown): ValidationResult<{
   locale: "fr" | "ar" | "en";
 }> {
   if (!body || typeof body !== "object") {
-    return { success: false, error: "Corps de requête invalide (JSON attendu)." };
+    return {
+      success: false,
+      error: "Corps de requête invalide (JSON attendu).",
+    };
   }
 
   const { courseId, locale } = body as Record<string, unknown>;

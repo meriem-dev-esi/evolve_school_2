@@ -2,6 +2,8 @@
 
 import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
+import EditCourseBasicInfo from "@/components/course/EditCourseBasicInfo";
+import EditCoursePlacement from "@/components/course/EditCoursePlacement";
 import { useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -14,7 +16,6 @@ export default function EditCoursePage({
   const router = useRouter();
 
   const [courseId, setCourseId] = useState("");
-
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [domain, setDomain] = useState("");
@@ -40,7 +41,6 @@ export default function EditCoursePage({
       setCourseId(id);
 
       const supabase = createClient();
-
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -150,75 +150,33 @@ export default function EditCoursePage({
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-brand">
             Teacher Dashboard
           </p>
-
           <h1 className="mt-4 text-4xl font-bold">Edit Course</h1>
-
           <p className="mt-3 text-white/50">
             Update your course information and platform placement.
           </p>
         </div>
 
         <div className="space-y-8">
-          {/* Basic information */}
-          <section className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
-            <h2 className="text-2xl font-bold">Basic Information</h2>
+          {/* Basic Information section */}
+          <EditCourseBasicInfo
+            title={title}
+            setTitle={setTitle}
+            description={description}
+            setDescription={setDescription}
+            domain={domain}
+            setDomain={setDomain}
+            level={level}
+            setLevel={setLevel}
+            type={type}
+            setType={setType}
+            imageUrl={imageUrl}
+            setImageUrl={setImageUrl}
+          />
 
-            <div className="mt-6 space-y-5">
-              <input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Course title"
-                className="w-full rounded-2xl border border-white/10 bg-black px-5 py-4 outline-none focus:border-brand"
-              />
-
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Course description"
-                rows={5}
-                className="w-full rounded-2xl border border-white/10 bg-black px-5 py-4 outline-none focus:border-brand"
-              />
-
-              <input
-                value={domain}
-                onChange={(e) => setDomain(e.target.value)}
-                placeholder="Domain"
-                className="w-full rounded-2xl border border-white/10 bg-black px-5 py-4 outline-none focus:border-brand"
-              />
-
-              <div className="grid gap-5 md:grid-cols-2">
-                <select
-                  value={level}
-                  onChange={(e) => setLevel(e.target.value)}
-                  className="rounded-2xl border border-white/10 bg-black px-5 py-4 outline-none focus:border-brand"
-                >
-                  <option value="Beginner">Beginner</option>
-                  <option value="Intermediate">Intermediate</option>
-                  <option value="Advanced">Advanced</option>
-                </select>
-
-                <input
-                  value={type}
-                  onChange={(e) => setType(e.target.value)}
-                  placeholder="Course type"
-                  className="rounded-2xl border border-white/10 bg-black px-5 py-4 outline-none focus:border-brand"
-                />
-              </div>
-
-              <input
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="Course image URL"
-                className="w-full rounded-2xl border border-white/10 bg-black px-5 py-4 outline-none focus:border-brand"
-              />
-            </div>
-          </section>
-
-          {/* Practice */}
+          {/* Practice percentage slider */}
           <section className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold">Practice Percentage</h2>
-
               <span className="text-2xl font-bold text-brand">
                 {practicePercentage}%
               </span>
@@ -234,66 +192,21 @@ export default function EditCoursePage({
             />
           </section>
 
-          {/* Placement */}
-          <section className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
-            <h2 className="text-2xl font-bold">Platform Placement</h2>
-
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
-              <label className="flex items-center gap-3 rounded-2xl bg-black p-4">
-                <input
-                  type="checkbox"
-                  checked={isBeginner}
-                  onChange={(e) => setIsBeginner(e.target.checked)}
-                />
-                Beginner Starter Pack
-              </label>
-
-              <label className="flex items-center gap-3 rounded-2xl bg-black p-4">
-                <input
-                  type="checkbox"
-                  checked={isPartner}
-                  onChange={(e) => setIsPartner(e.target.checked)}
-                />
-                Partner Course
-              </label>
-
-              <label className="flex items-center gap-3 rounded-2xl bg-black p-4">
-                <input
-                  type="checkbox"
-                  checked={isExclusive}
-                  onChange={(e) => setIsExclusive(e.target.checked)}
-                />
-                Exclusive to Evolve
-              </label>
-
-              <label className="flex items-center gap-3 rounded-2xl bg-black p-4">
-                <input
-                  type="checkbox"
-                  checked={isTrending}
-                  onChange={(e) => setIsTrending(e.target.checked)}
-                />
-                Trending
-              </label>
-
-              <label className="flex items-center gap-3 rounded-2xl bg-black p-4">
-                <input
-                  type="checkbox"
-                  checked={isComingSoon}
-                  onChange={(e) => setIsComingSoon(e.target.checked)}
-                />
-                Coming Soon
-              </label>
-
-              <label className="flex items-center gap-3 rounded-2xl bg-black p-4">
-                <input
-                  type="checkbox"
-                  checked={isPublished}
-                  onChange={(e) => setIsPublished(e.target.checked)}
-                />
-                Published
-              </label>
-            </div>
-          </section>
+          {/* Platform Placement toggles */}
+          <EditCoursePlacement
+            isBeginner={isBeginner}
+            setIsBeginner={setIsBeginner}
+            isPartner={isPartner}
+            setIsPartner={setIsPartner}
+            isExclusive={isExclusive}
+            setIsExclusive={setIsExclusive}
+            isTrending={isTrending}
+            setIsTrending={setIsTrending}
+            isComingSoon={isComingSoon}
+            setIsComingSoon={setIsComingSoon}
+            isPublished={isPublished}
+            setIsPublished={setIsPublished}
+          />
 
           {message && (
             <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm">
@@ -305,7 +218,7 @@ export default function EditCoursePage({
             <button
               type="button"
               onClick={() => router.push(`/${locale}/teacher/courses`)}
-              className="rounded-full border border-white/10 px-6 py-3 font-semibold"
+              className="rounded-full border border-white/10 px-6 py-3 font-semibold transition hover:bg-white/5"
             >
               Cancel
             </button>
@@ -314,7 +227,7 @@ export default function EditCoursePage({
               type="button"
               onClick={() => void handleSave()}
               disabled={saving}
-              className="rounded-full bg-brand px-7 py-3 font-semibold text-black disabled:opacity-50"
+              className="rounded-full bg-brand px-7 py-3 font-semibold text-black transition hover:opacity-90 disabled:opacity-50"
             >
               {saving ? "Saving..." : "Save Changes"}
             </button>

@@ -1,5 +1,5 @@
 import { ArrowRight, Zap } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Link } from "@/i18n/navigation";
@@ -15,6 +15,7 @@ type Props = {
 
 export default async function AteliersPage({ params }: Props) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "ateliers.page" });
 
   const supabase = await createClient();

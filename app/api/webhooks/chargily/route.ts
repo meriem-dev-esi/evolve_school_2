@@ -1,10 +1,11 @@
 import crypto from "node:crypto";
 import { NextResponse } from "next/server";
+import { env } from "@/lib/env";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function POST(request: Request) {
   try {
-    const secretKey = process.env.CHARGILY_SECRET_KEY;
+    const secretKey = env.chargilySecretKey;
 
     if (!secretKey) {
       return NextResponse.json(

@@ -37,7 +37,9 @@
     "rating": "4.9 / 5",
     "reviewsCount": "(1,200+ verified reviews)",
     "practicalNotice": "100% Practical & Workshops",
-    "free": "Free"
+    "free": "Free",
+    "saveCourse": "Save",
+    "savedCourse": "Saved"
   },
   "home": {
     "title": "Evolve Academy",

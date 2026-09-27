@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import LessonVideo from "@/components/LessonVideo";
 import MarkLessonComplete from "@/components/MarkLessonComplete";
 import UploadedLessonVideo from "@/components/UploadedLessonVideo";
+import CourseLessonsList from "@/components/lesson/CourseLessonsList";
 import { Link } from "@/i18n/navigation";
 import { getLessonVideoUrl } from "@/lib/data/lesson-video";
 import { createClient } from "@/lib/supabase/server";
@@ -120,6 +121,27 @@ export default async function LessonPage({ params }: Props) {
       redirect(`/${locale}/courses/${id}`);
     }
   }
+
+  // =========================================================
+  // 📋 GET ALL LESSONS OF THIS COURSE
+  // =========================================================
+
+  const { data: allLessons } = await supabase
+    .from("lessons")
+    .select("id, title, description, duration, order_index, is_free")
+    .eq("course_id", id)
+    .order("order_index", { ascending: true });
+
+  let isEnrolled = false;
+  const { data: enrollmentCheck } = await supabase
+    .from("enrollments")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("course_id", id)
+    .eq("payment_status", "paid")
+    .maybeSingle();
+
+  isEnrolled = !!enrollmentCheck;
 
   // =========================================================
   // ▶️ FIND NEXT COURSE IN FORMATION
@@ -243,6 +265,19 @@ export default async function LessonPage({ params }: Props) {
               locale={locale}
             />
           </div>
+        )}
+
+        {/* ================================================= */}
+        {/* 📋 COURSE LESSONS LIST */}
+        {/* ================================================= */}
+
+        {allLessons && allLessons.length > 0 && (
+          <CourseLessonsList
+            lessons={allLessons}
+            courseId={id}
+            currentLessonId={lesson.id}
+            isEnrolled={isEnrolled}
+          />
         )}
       </div>
     </main>

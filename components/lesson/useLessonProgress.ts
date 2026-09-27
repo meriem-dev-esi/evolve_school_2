@@ -42,7 +42,10 @@ export function useLessonProgress({
 
       const {
         data: { user },
+        error: authError,
       } = await supabase.auth.getUser();
+
+      console.log("[Evolve DEBUG] user from client:", user, "Auth error:", authError);
 
       let lastPosition = 0;
       if (user) {
@@ -70,6 +73,8 @@ export function useLessonProgress({
             }
 
             interval = window.setInterval(async () => {
+              console.log("[Evolve DEBUG] interval tick, user:", !!user, "player:", !!playerRef.current);
+
               if (!playerRef.current || !user || cancelled) return;
 
               const currentTime = playerRef.current.getCurrentTime();
@@ -96,8 +101,12 @@ export function useLessonProgress({
                 },
               );
 
-              if (error) {
-                console.error("[Evolve] Progress save error:", error);
+                                        if (error) {
+                console.error(
+                  "[Evolve] Progress save error:",
+                  JSON.stringify(error, Object.getOwnPropertyNames(error)),
+                );
+                console.error("[Evolve] Raw error object:", error);
                 return;
               }
 

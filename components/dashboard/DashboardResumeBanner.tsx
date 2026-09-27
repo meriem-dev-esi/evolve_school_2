@@ -93,14 +93,7 @@ export default function DashboardResumeBanner({
         </div>
 
         <div className="flex flex-wrap items-center gap-3 shrink-0">
-          {resumeCourse.nextLesson ? (
-            <Link
-              href={`/${locale}/courses/${resumeCourse.id}/lessons/${resumeCourse.nextLesson.id}`}
-              className="rounded-2xl bg-lime-400 px-6 py-3 text-sm font-bold text-black transition-all hover:bg-lime-300 active:scale-95 shadow-lg shadow-lime-400/30"
-            >
-              Continuer la leçon
-            </Link>
-          ) : (
+          {resumeCourse.isCompleted ? (
             <button
               type="button"
               onClick={() => onOpenCertificate(resumeCourse)}
@@ -108,6 +101,20 @@ export default function DashboardResumeBanner({
             >
               Voir mon attestation 🎓
             </button>
+          ) : resumeCourse.nextLesson ? (
+            <Link
+              href={`/${locale}/courses/${resumeCourse.id}/lessons/${resumeCourse.nextLesson.id}`}
+              className="rounded-2xl bg-lime-400 px-6 py-3 text-sm font-bold text-black transition-all hover:bg-lime-300 active:scale-95 shadow-lg shadow-lime-400/30"
+            >
+              Continuer la leçon
+            </Link>
+          ) : (
+            <Link
+              href={`/${locale}/courses/${resumeCourse.id}`}
+              className="rounded-2xl bg-lime-400 px-6 py-3 text-sm font-bold text-black transition-all hover:bg-lime-300 active:scale-95 shadow-lg shadow-lime-400/30"
+            >
+              Ouvrir le cours
+            </Link>
           )}
 
           <Link

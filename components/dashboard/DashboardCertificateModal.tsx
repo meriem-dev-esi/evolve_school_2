@@ -22,6 +22,16 @@ export default function DashboardCertificateModal({
     window.print();
   };
 
+  const verificationCode =
+    course.certificate?.verificationCode ?? "EN ATTENTE";
+  const issuedDate = course.certificate?.issuedAt
+    ? new Date(course.certificate.issuedAt).toLocaleDateString("fr-FR", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      })
+    : null;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
       <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl border-2 border-lime-300 bg-white p-8 shadow-2xl text-gray-900">
@@ -67,15 +77,16 @@ export default function DashboardCertificateModal({
               leçons validées
             </p>
           </div>
+          {issuedDate && (
+            <p className="text-[11px] text-gray-400">Délivré le {issuedDate}</p>
+          )}
         </div>
 
         {/* Certificate Footer */}
         <div className="border-t border-gray-200 pt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs text-gray-400">
           <div>
             <p className="font-mono text-[11px] text-gray-600">
-              ID de vérification : EVOLVE-
-              {course.id.substring(0, 8).toUpperCase()}-
-              {Math.floor(Date.now() / 1000000)}
+              ID de vérification : EVOLVE-{verificationCode.toUpperCase()}
             </p>
             <p className="text-[10px] text-gray-400">
               Délivré par le Comité Académique Evolve Alger

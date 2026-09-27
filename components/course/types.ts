@@ -23,3 +23,29 @@ export interface LessonProgressItem {
   completed: boolean;
   last_position?: number;
 }
+
+export type SubmissionStatus = "submitted" | "late" | "graded";
+
+export interface AssignmentItem {
+  id: string;
+  lesson_id: string;
+  title: string;
+  instructions: string | null;
+  max_score: number;
+  due_date: string | null;
+  is_published: boolean;
+  created_at: string;
+}
+
+export interface AssignmentSubmissionItem {
+  id: string;
+  assignment_id: string;
+  user_id: string;
+  file_url: string;
+  file_name: string;
+  submitted_at: string;
+  status: SubmissionStatus;
+  grade: number | null;
+  feedback: string | null;
+  graded_at: string | null;
+}

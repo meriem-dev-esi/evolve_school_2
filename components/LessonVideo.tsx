@@ -36,9 +36,11 @@ export default function LessonVideo({
   });
 
   return (
-    <div
-      ref={containerRef}
-      className="mt-10 aspect-video overflow-hidden rounded-3xl bg-black"
-    />
+    <div className="mt-10 mx-auto w-full max-w-4xl">
+      <div
+        ref={containerRef}
+        className="aspect-video w-full overflow-hidden rounded-3xl bg-black [&>iframe]:h-full [&>iframe]:w-full"
+      />
+    </div>
   );
 }

@@ -26,9 +26,6 @@ declare global {
   }
 }
 
-/**
- * Extracts YouTube video ID from standard watch URLs, short youtu.be URLs, or embeds.
- */
 export function getYouTubeId(url: string): string | null {
   try {
     const parsed = new URL(url);
@@ -38,7 +35,14 @@ export function getYouTubeId(url: string): string | null {
     }
 
     if (parsed.hostname.includes("youtube.com")) {
-      return parsed.searchParams.get("v");
+      const vParam = parsed.searchParams.get("v");
+      if (vParam) return vParam;
+
+      const embedMatch = parsed.pathname.match(/\/embed\/([^/?]+)/);
+      if (embedMatch) return embedMatch[1] ?? null;
+
+      const shortsMatch = parsed.pathname.match(/\/shorts\/([^/?]+)/);
+      if (shortsMatch) return shortsMatch[1] ?? null;
     }
 
     return null;

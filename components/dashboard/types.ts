@@ -1,3 +1,8 @@
+export interface CourseCertificate {
+  verificationCode: string;
+  issuedAt: string;
+}
+
 export interface EnrolledCourseItem {
   id: string;
   title: string;
@@ -15,6 +20,7 @@ export interface EnrolledCourseItem {
     title: string;
     order_index: number;
   } | null;
+  certificate?: CourseCertificate | null;
 }
 
 export interface WorkshopItem {

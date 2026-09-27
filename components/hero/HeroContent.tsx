@@ -1,7 +1,8 @@
-import { ArrowRight, Award, Clock, Play } from "lucide-react";
+import { ArrowRight, Award, Clock } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import HeroSocialProof from "./HeroSocialProof";
+import SaveCourseButton from "./SaveCourseButton";
 import type { HeroCourse } from "./types";
 
 interface HeroContentProps {
@@ -77,13 +78,7 @@ export default function HeroContent({ course, locale }: HeroContentProps) {
           <ArrowRight className="h-4 w-4 transition-transform duration-300 rtl:rotate-180 group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
         </Link>
 
-        <Link
-          href="/formations"
-          className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-6 py-4 text-sm font-semibold text-white/80 transition-all duration-300 hover:border-white/30 hover:bg-white/10 hover:text-white"
-        >
-          <Play className="h-4 w-4 text-white/40" />
-          <span>{tHero("viewCatalog")}</span>
-        </Link>
+        <SaveCourseButton courseId={course.id} />
       </div>
 
       {/* Social proof strip */}

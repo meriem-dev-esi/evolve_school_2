@@ -17,6 +17,9 @@ import { useTranslations } from "next-intl";
 import { useRef } from "react";
 import CourseCard from "@/components/CourseCard";
 import LockedCourseCard from "@/components/LockedCourseCard";
+import SectionEmptyState from "@/components/SectionEmptyState";
+import SectionErrorState from "@/components/SectionErrorState";
+import SectionSkeleton from "@/components/SectionSkeleton";
 import { Link } from "@/i18n/navigation";
 
 type Course = {
@@ -37,6 +40,13 @@ type Props = {
   locale: string;
   href?: string;
   locked?: boolean;
+  loading?: boolean;
+  error?: Error | string | boolean | null;
+  emptyTitle?: string;
+  emptyDescription?: string;
+  emptyActionText?: string;
+  emptyActionHref?: string;
+  onRetry?: () => void;
 };
 
 export default function HorizontalCourseSection({
@@ -45,6 +55,13 @@ export default function HorizontalCourseSection({
   locale,
   href,
   locked = false,
+  loading = false,
+  error = null,
+  emptyTitle,
+  emptyDescription,
+  emptyActionText,
+  emptyActionHref,
+  onRetry,
 }: Props) {
   const tCommon = useTranslations("common");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -129,7 +146,7 @@ export default function HorizontalCourseSection({
                 <h2 className="text-xl font-bold tracking-tight text-white md:text-2xl">
                   {title}
                 </h2>
-                {!locked && courses.length > 0 && (
+                {!loading && !error && !locked && courses.length > 0 && (
                   <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-[11px] font-semibold text-white/60">
                     {courses.length}
                   </span>
@@ -153,45 +170,73 @@ export default function HorizontalCourseSection({
             )}
 
             {/* Desktop Left/Right Scroll Arrows */}
-            <div className="hidden items-center gap-1.5 sm:flex">
-              <button
-                type="button"
-                onClick={() => scroll("left")}
-                aria-label="Scroll left"
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/70 transition hover:border-brand/40 hover:bg-white/10 hover:text-white"
-              >
-                <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
-              </button>
-              <button
-                type="button"
-                onClick={() => scroll("right")}
-                aria-label="Scroll right"
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/70 transition hover:border-brand/40 hover:bg-white/10 hover:text-white"
-              >
-                <ChevronRight className="h-4 w-4 rtl:rotate-180" />
-              </button>
-            </div>
+            {!loading && !error && !locked && courses.length > 0 && (
+              <div className="hidden items-center gap-1.5 sm:flex">
+                <button
+                  type="button"
+                  onClick={() => scroll("left")}
+                  aria-label="Scroll left"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/70 transition hover:border-brand/40 hover:bg-white/10 hover:text-white"
+                >
+                  <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scroll("right")}
+                  aria-label="Scroll right"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/70 transition hover:border-brand/40 hover:bg-white/10 hover:text-white"
+                >
+                  <ChevronRight className="h-4 w-4 rtl:rotate-180" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Courses Horizontal List */}
-        <div
-          ref={scrollContainerRef}
-          className="flex w-full gap-5 overflow-x-auto pb-4 scroll-smooth"
-        >
-          {locked ? (
-            <>
-              <LockedCourseCard locale={locale} />
-              <LockedCourseCard locale={locale} />
-              <LockedCourseCard locale={locale} />
-              <LockedCourseCard locale={locale} />
-            </>
-          ) : courses.length === 0 ? (
+        {/* Content Area */}
+        {loading ? (
+          <SectionSkeleton />
+        ) : error ? (
+          <SectionErrorState
+            description={
+              typeof error === "string"
+                ? error
+                : error instanceof Error
+                  ? error.message
+                  : undefined
+            }
+            onRetry={onRetry}
+          />
+        ) : locked ? (
+          <div
+            ref={scrollContainerRef}
+            className="flex w-full gap-5 overflow-x-auto pb-4 scroll-smooth"
+          >
+            <LockedCourseCard locale={locale} />
+            <LockedCourseCard locale={locale} />
+            <LockedCourseCard locale={locale} />
+            <LockedCourseCard locale={locale} />
+          </div>
+        ) : courses.length === 0 ? (
+          emptyTitle ? (
+            <SectionEmptyState
+              title={emptyTitle}
+              description={emptyDescription ?? ""}
+              actionText={emptyActionText}
+              actionHref={emptyActionHref}
+              icon={getSectionIcon(title)}
+            />
+          ) : (
             <div className="flex h-36 w-full items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/[0.02] text-xs text-white/40">
               {tCommon("emptySection")}
             </div>
-          ) : (
-            courses.map((course) => (
+          )
+        ) : (
+          <div
+            ref={scrollContainerRef}
+            className="flex w-full gap-5 overflow-x-auto pb-4 scroll-smooth"
+          >
+            {courses.map((course) => (
               <div key={course.id} className="min-w-[290px] shrink-0">
                 <CourseCard course={course} locale={locale} />
 
@@ -209,9 +254,9 @@ export default function HorizontalCourseSection({
                   </div>
                 )}
               </div>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

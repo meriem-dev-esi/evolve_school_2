@@ -56,7 +56,74 @@
     "comingSoon": "Coming Soon",
     "inProgress": "In Progress",
     "progress": "Progress",
-    "continueButton": "Continue →"
+    "continueButton": "Continue →",
+    "emptyStates": {
+      "recommended": {
+        "title": "No personalized recommendations yet",
+        "description": "Complete your learning profile to receive suggestions tailored to your goals.",
+        "action": "Explore courses"
+      },
+      "enrollmentPath": {
+        "title": "No active enrollment path",
+        "description": "Enroll in a guided path to follow a structured step-by-step curriculum.",
+        "action": "Explore paths"
+      },
+      "continueLearning": {
+        "title": "No courses in progress",
+        "description": "Start a lesson today to quickly resume your learning progress here.",
+        "action": "Start a course"
+      },
+      "becauseYouCompleted": {
+        "title": "No completed courses yet",
+        "description": "Complete your first course to unlock advanced recommendations.",
+        "action": "Browse all courses"
+      },
+      "beginnerStarterPack": {
+        "title": "New beginner courses coming soon",
+        "description": "Our introductory modules are currently being updated by our mentors.",
+        "action": "Explore disciplines"
+      },
+      "partnerCoursesZone": {
+        "title": "No partner courses at the moment",
+        "description": "New courses created with our partner companies will arrive very soon.",
+        "action": "View courses"
+      },
+      "watchlist": {
+        "title": "Your watchlist is empty",
+        "description": "Save courses you are interested in to find and track them easily.",
+        "action": "Browse catalog"
+      },
+      "mostSearchedThisWeek": {
+        "title": "Weekly ranking updating",
+        "description": "Search trends for this week are updated regularly.",
+        "action": "Explore trending"
+      },
+      "exclusiveToEvolve": {
+        "title": "No exclusive courses available",
+        "description": "Exclusive Evolve masterclasses will be announced soon.",
+        "action": "Discover courses"
+      },
+      "trending": {
+        "title": "No trending courses right now",
+        "description": "Browse our full catalog to find the most popular courses.",
+        "action": "View catalog"
+      },
+      "comingSoon": {
+        "title": "No upcoming releases scheduled",
+        "description": "Check back soon to discover the next upcoming courses.",
+        "action": "View available courses"
+      },
+      "default": {
+        "title": "No courses available",
+        "description": "No items are currently available in this section.",
+        "action": "Discover courses"
+      }
+    },
+    "errorState": {
+      "title": "Unable to load this section",
+      "description": "A temporary error occurred while retrieving data.",
+      "retry": "Try again"
+    }
   },
   "common": {
     "viewAll": "View all",

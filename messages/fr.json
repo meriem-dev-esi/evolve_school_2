@@ -56,7 +56,74 @@
     "comingSoon": "Bientôt disponible",
     "inProgress": "En cours",
     "progress": "Progression",
-    "continueButton": "Continuer →"
+    "continueButton": "Continuer →",
+    "emptyStates": {
+      "recommended": {
+        "title": "Aucune recommandation personnalisée",
+        "description": "Complétez votre profil pour recevoir des suggestions adaptées à vos objectifs.",
+        "action": "Découvrir le catalogue"
+      },
+      "enrollmentPath": {
+        "title": "Aucun parcours d'inscription actif",
+        "description": "Inscrivez-vous à une série guidée pour suivre un cursus structuré étape par étape.",
+        "action": "Explorer les parcours"
+      },
+      "continueLearning": {
+        "title": "Aucune formation en cours",
+        "description": "Démarrez une leçon aujourd'hui pour reprendre rapidement votre progression ici.",
+        "action": "Commencer une formation"
+      },
+      "becauseYouCompleted": {
+        "title": "Aucune formation terminée pour l'instant",
+        "description": "Terminez votre premier cours pour débloquer des recommandations de niveau supérieur.",
+        "action": "Voir toutes les formations"
+      },
+      "beginnerStarterPack": {
+        "title": "Bientôt de nouvelles formations débutants",
+        "description": "Nos modules d'initiation sont en cours de mise à jour par nos mentors.",
+        "action": "Explorer les disciplines"
+      },
+      "partnerCoursesZone": {
+        "title": "Aucune formation partenaire pour le moment",
+        "description": "De nouveaux cours créés avec nos entreprises partenaires arrivent très prochainement.",
+        "action": "Voir les formations"
+      },
+      "watchlist": {
+        "title": "Votre liste de favoris est vide",
+        "description": "Ajoutez des formations à votre sélection pour les retrouver et les suivre en un clic.",
+        "action": "Parcourir le catalogue"
+      },
+      "mostSearchedThisWeek": {
+        "title": "Classement en cours d'actualisation",
+        "description": "Les tendances de recherche de la semaine se mettent à jour régulièrement.",
+        "action": "Explorer les tendances"
+      },
+      "exclusiveToEvolve": {
+        "title": "Aucun cours exclusif disponible",
+        "description": "Les masterclasses exclusives Evolve seront annoncées prochainement.",
+        "action": "Découvrir les formations"
+      },
+      "trending": {
+        "title": "Aucune tendance actuellement",
+        "description": "Explorez l'ensemble de notre catalogue pour trouver les cours les plus prisés.",
+        "action": "Consulter le catalogue"
+      },
+      "comingSoon": {
+        "title": "Aucune sortie programmée pour le moment",
+        "description": "Revenez bientôt pour découvrir les prochaines formations en préparation.",
+        "action": "Voir les cours disponibles"
+      },
+      "default": {
+        "title": "Aucune formation disponible",
+        "description": "Aucun élément n'est disponible pour le moment dans cette section.",
+        "action": "Découvrir le catalogue"
+      }
+    },
+    "errorState": {
+      "title": "Impossible de charger cette section",
+      "description": "Une erreur temporaire est survenue lors de la récupération des données.",
+      "retry": "Réessayer"
+    }
   },
   "common": {
     "viewAll": "Voir tout",

@@ -207,11 +207,24 @@ export async function POST(request: Request) {
 
     const checkout = await checkoutResponse.json();
 
+    // TEMPORARY DEBUG LOG — remove once checkout_url is confirmed working.
+    // Logs the full raw Chargily response regardless of success/failure,
+    // so we can see the exact field name/shape it actually returns.
+    console.log("CHARGILY RESPONSE:", JSON.stringify(checkout));
+
     if (!checkoutResponse.ok) {
       console.error("CHARGILY ERROR:", checkout);
       return NextResponse.json(
         { error: "Impossible d'initialiser le paiement avec le prestataire." },
         { status: checkoutResponse.status },
+      );
+    }
+
+    if (!checkout.checkout_url) {
+      console.error("CHARGILY: missing checkout_url in response", checkout);
+      return NextResponse.json(
+        { error: "Payment URL was not returned" },
+        { status: 502 },
       );
     }
 

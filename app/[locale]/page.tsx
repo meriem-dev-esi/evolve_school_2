@@ -1,11 +1,11 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import ContinueLearningCard from "@/components/ContinueLearningCard";
 import Hero from "@/components/Hero";
 import HorizontalCourseSection from "@/components/HorizontalCourseSection";
+import ContinueLearningSection from "@/components/home/ContinueLearningSection";
+import EnrollmentPathSection from "@/components/home/EnrollmentPathSection";
 import IntroGate from "@/components/IntroGate";
 import IntroPreloader from "@/components/IntroPreloader";
 import Navbar from "@/components/Navbar";
-import SeriesCard from "@/components/SeriesCard";
 import {
   type ContinueLearning,
   type Course,
@@ -28,12 +28,29 @@ export default async function HomePage({
   const tHome = await getTranslations("home");
   const supabase = await createClient();
 
-  const [
-    publicCourses,
-    {
-      data: { user },
-    },
-  ] = await Promise.all([getHomePagePublicCourses(), supabase.auth.getUser()]);
+  let publicCourses = {
+    beginnerCourses: [] as Course[],
+    partnerCourses: [] as Course[],
+    exclusiveCourses: [] as Course[],
+    trendingCourses: [] as Course[],
+    comingSoonCourses: [] as Course[],
+  };
+  let publicError: Error | null = null;
+
+  const [publicRes, { data: authData }] = await Promise.all([
+    getHomePagePublicCourses()
+      .then((data) => ({ ok: true as const, data }))
+      .catch((err) => ({ ok: false as const, error: err as Error })),
+    supabase.auth.getUser(),
+  ]);
+
+  if (publicRes.ok) {
+    publicCourses = publicRes.data;
+  } else {
+    publicError = publicRes.error;
+  }
+
+  const user = authData?.user ?? null;
 
   let recommendedCourses: Course[] = [];
   let watchlistCourses: Course[] = [];
@@ -42,23 +59,50 @@ export default async function HomePage({
   let enrollmentPaths: EnrollmentSeries[] = [];
   let continueLearning: ContinueLearning | null = null;
 
+  let recommendationsError: Error | null = null;
+  let userDataError: Error | null = null;
+  let continueDataError: Error | null = null;
+
   if (user) {
-    const [recommendations, userData, continueData] = await Promise.all([
+    const [recRes, userRes, contRes] = await Promise.allSettled([
       getRecommendedCourses(10),
       getUserDashboardData(user.id),
       getContinueLearning(user.id),
     ]);
 
-    recommendedCourses = recommendations.map((c) => ({
-      ...c,
-      price: null,
-      practice_percentage: null,
-    }));
-    watchlistCourses = userData.watchlistCourses;
-    becauseYouCompleted = userData.becauseYouCompleted;
-    enrollmentPaths = userData.enrollmentPaths;
-    mostSearchedCourses = userData.mostSearchedCourses;
-    continueLearning = continueData;
+    if (recRes.status === "fulfilled") {
+      recommendedCourses = recRes.value.map((c) => ({
+        ...c,
+        price: null,
+        practice_percentage: null,
+      }));
+    } else {
+      recommendationsError =
+        recRes.reason instanceof Error
+          ? recRes.reason
+          : new Error(String(recRes.reason));
+    }
+
+    if (userRes.status === "fulfilled") {
+      watchlistCourses = userRes.value.watchlistCourses;
+      becauseYouCompleted = userRes.value.becauseYouCompleted;
+      enrollmentPaths = userRes.value.enrollmentPaths;
+      mostSearchedCourses = userRes.value.mostSearchedCourses;
+    } else {
+      userDataError =
+        userRes.reason instanceof Error
+          ? userRes.reason
+          : new Error(String(userRes.reason));
+    }
+
+    if (contRes.status === "fulfilled") {
+      continueLearning = contRes.value;
+    } else {
+      continueDataError =
+        contRes.reason instanceof Error
+          ? contRes.reason
+          : new Error(String(contRes.reason));
+    }
   }
 
   return (
@@ -77,69 +121,28 @@ export default async function HomePage({
           courses={recommendedCourses}
           locale={locale}
           locked={!user}
+          error={recommendationsError}
+          emptyTitle={tHome("emptyStates.recommended.title")}
+          emptyDescription={tHome("emptyStates.recommended.description")}
+          emptyActionText={tHome("emptyStates.recommended.action")}
+          emptyActionHref="/disciplines"
         />
 
         {/* 2. YOUR ENROLLMENT PATH */}
-        {user && enrollmentPaths.length > 0 ? (
-          <section className="bg-transparent px-6 py-12 lg:px-10">
-            <div className="mx-auto max-w-7xl">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-white md:text-3xl">
-                  {tHome("yourEnrollmentPath")}
-                </h2>
-              </div>
-              <div className="flex gap-5 overflow-x-auto pb-4">
-                {enrollmentPaths.map((series) => (
-                  <SeriesCard
-                    key={series.id}
-                    series={series}
-                    courseCount={series.courseIds.length}
-                    completedCourses={series.completedCourses}
-                    progress={series.progress}
-                    locale={locale}
-                  />
-                ))}
-              </div>
-            </div>
-          </section>
-        ) : (
-          <HorizontalCourseSection
-            title={tHome("yourEnrollmentPath")}
-            courses={[]}
-            locale={locale}
-            locked={!user}
-          />
-        )}
+        <EnrollmentPathSection
+          user={user}
+          locale={locale}
+          enrollmentPaths={enrollmentPaths}
+          error={userDataError}
+        />
 
         {/* 3. CONTINUE LEARNING */}
-        {user && continueLearning ? (
-          <section className="bg-transparent px-6 py-12 lg:px-10">
-            <div className="mx-auto max-w-7xl">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-white md:text-3xl">
-                  {tHome("continueLearning")}
-                </h2>
-              </div>
-              <div className="flex gap-5 overflow-x-auto pb-4">
-                <ContinueLearningCard
-                  data={continueLearning}
-                  labels={{
-                    inProgress: tHome("inProgress"),
-                    progress: tHome("progress"),
-                    continueButton: tHome("continueButton"),
-                  }}
-                />
-              </div>
-            </div>
-          </section>
-        ) : (
-          <HorizontalCourseSection
-            title={tHome("continueLearning")}
-            courses={[]}
-            locale={locale}
-            locked={!user}
-          />
-        )}
+        <ContinueLearningSection
+          user={user}
+          locale={locale}
+          continueLearning={continueLearning}
+          error={continueDataError}
+        />
 
         {/* 4. BECAUSE YOU COMPLETED */}
         <HorizontalCourseSection
@@ -147,6 +150,13 @@ export default async function HomePage({
           courses={becauseYouCompleted}
           locale={locale}
           locked={!user}
+          error={userDataError}
+          emptyTitle={tHome("emptyStates.becauseYouCompleted.title")}
+          emptyDescription={tHome(
+            "emptyStates.becauseYouCompleted.description",
+          )}
+          emptyActionText={tHome("emptyStates.becauseYouCompleted.action")}
+          emptyActionHref="/formations"
         />
 
         {/* 5. BEGINNER STARTER PACK */}
@@ -154,6 +164,13 @@ export default async function HomePage({
           title={tHome("beginnerStarterPack")}
           courses={publicCourses.beginnerCourses}
           locale={locale}
+          error={publicError}
+          emptyTitle={tHome("emptyStates.beginnerStarterPack.title")}
+          emptyDescription={tHome(
+            "emptyStates.beginnerStarterPack.description",
+          )}
+          emptyActionText={tHome("emptyStates.beginnerStarterPack.action")}
+          emptyActionHref="/disciplines"
         />
 
         {/* 6. PARTNER COURSES ZONE */}
@@ -161,6 +178,11 @@ export default async function HomePage({
           title={tHome("partnerCoursesZone")}
           courses={publicCourses.partnerCourses}
           locale={locale}
+          error={publicError}
+          emptyTitle={tHome("emptyStates.partnerCoursesZone.title")}
+          emptyDescription={tHome("emptyStates.partnerCoursesZone.description")}
+          emptyActionText={tHome("emptyStates.partnerCoursesZone.action")}
+          emptyActionHref="/formations"
         />
 
         {/* 7. WATCHLIST */}
@@ -169,6 +191,11 @@ export default async function HomePage({
           courses={watchlistCourses}
           locale={locale}
           locked={!user}
+          error={userDataError}
+          emptyTitle={tHome("emptyStates.watchlist.title")}
+          emptyDescription={tHome("emptyStates.watchlist.description")}
+          emptyActionText={tHome("emptyStates.watchlist.action")}
+          emptyActionHref="/formations"
         />
 
         {/* 8. MOST SEARCHED THIS WEEK */}
@@ -177,6 +204,13 @@ export default async function HomePage({
           courses={mostSearchedCourses}
           locale={locale}
           locked={!user}
+          error={userDataError}
+          emptyTitle={tHome("emptyStates.mostSearchedThisWeek.title")}
+          emptyDescription={tHome(
+            "emptyStates.mostSearchedThisWeek.description",
+          )}
+          emptyActionText={tHome("emptyStates.mostSearchedThisWeek.action")}
+          emptyActionHref="/formations"
         />
 
         {/* 9. EXCLUSIVE TO EVOLVE */}
@@ -184,6 +218,11 @@ export default async function HomePage({
           title={tHome("exclusiveToEvolve")}
           courses={publicCourses.exclusiveCourses}
           locale={locale}
+          error={publicError}
+          emptyTitle={tHome("emptyStates.exclusiveToEvolve.title")}
+          emptyDescription={tHome("emptyStates.exclusiveToEvolve.description")}
+          emptyActionText={tHome("emptyStates.exclusiveToEvolve.action")}
+          emptyActionHref="/formations"
         />
 
         {/* 10. TRENDING */}
@@ -191,6 +230,11 @@ export default async function HomePage({
           title={tHome("trending")}
           courses={publicCourses.trendingCourses}
           locale={locale}
+          error={publicError}
+          emptyTitle={tHome("emptyStates.trending.title")}
+          emptyDescription={tHome("emptyStates.trending.description")}
+          emptyActionText={tHome("emptyStates.trending.action")}
+          emptyActionHref="/formations"
         />
 
         {/* 11. COMING SOON */}
@@ -198,6 +242,11 @@ export default async function HomePage({
           title={tHome("comingSoon")}
           courses={publicCourses.comingSoonCourses}
           locale={locale}
+          error={publicError}
+          emptyTitle={tHome("emptyStates.comingSoon.title")}
+          emptyDescription={tHome("emptyStates.comingSoon.description")}
+          emptyActionText={tHome("emptyStates.comingSoon.action")}
+          emptyActionHref="/formations"
         />
       </div>
     </main>

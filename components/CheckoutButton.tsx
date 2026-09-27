@@ -40,7 +40,7 @@ export default function CheckoutButton({
         );
       }
 
-      const checkoutUrl = data.checkout?.checkout_url || data.checkout?.url;
+      const checkoutUrl = data.checkout_url;
 
       if (!checkoutUrl) {
         throw new Error("Payment URL was not returned");

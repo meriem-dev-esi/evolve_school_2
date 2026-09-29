@@ -24,7 +24,7 @@ export default function DashboardWorkshopsSection({
           Ateliers &amp; Masterclasses Disponibles
         </h3>
         <Link
-          href={`/${locale}/ateliers`}
+          href={`/ateliers`}
           prefetch={true}
           className="text-xs font-semibold text-lime-700 hover:underline flex items-center gap-1"
         >
@@ -81,7 +81,7 @@ export default function DashboardWorkshopsSection({
 
             <div className="mt-5 pt-3 border-t border-gray-100">
               <Link
-                href={`/${locale}/ateliers`}
+                href={`/ateliers`}
                 prefetch={true}
                 className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-gray-50 py-2.5 text-xs font-semibold text-gray-700 hover:bg-lime-400 hover:border-lime-400 hover:text-black transition shadow-sm"
               >

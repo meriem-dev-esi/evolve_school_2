@@ -75,7 +75,7 @@ export default function DashboardHeroBanner({
         {resumeCourse?.nextLesson && (
           <div className="flex shrink-0 items-center gap-3">
             <Link
-              href={`/${locale}/courses/${resumeCourse.id}/lessons/${resumeCourse.nextLesson.id}`}
+              href={`/courses/${resumeCourse.id}/lessons/${resumeCourse.nextLesson.id}`}
               className="group relative inline-flex items-center gap-3 rounded-2xl bg-lime-400 px-6 py-3.5 text-sm font-bold text-black shadow-lg shadow-lime-400/30 transition-all duration-300 hover:bg-lime-300 hover:scale-[1.02] active:scale-95"
             >
               <Play className="h-4 w-4 fill-black transition-transform group-hover:scale-110" />

@@ -47,13 +47,13 @@ export default function DashboardCoursesGrid({
         </p>
         <div className="mt-6 flex justify-center gap-3">
           <Link
-            href={`/${locale}/formations`}
+            href={`/formations`}
             className="rounded-xl bg-lime-400 px-6 py-2.5 text-xs font-bold text-black hover:bg-lime-300 transition shadow-sm shadow-lime-400/30"
           >
             Découvrir les formations
           </Link>
           <Link
-            href={`/${locale}/ateliers`}
+            href={`/ateliers`}
             className="rounded-xl border border-gray-200 bg-white px-6 py-2.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition shadow-sm"
           >
             Voir les ateliers
@@ -165,7 +165,7 @@ export default function DashboardCoursesGrid({
                   <span>Attestation</span>
                 </button>
                 <Link
-                  href={`/${locale}/courses/${course.id}`}
+                  href={`/courses/${course.id}`}
                   prefetch={true}
                   className="flex items-center justify-center rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition shadow-sm"
                 >
@@ -174,7 +174,7 @@ export default function DashboardCoursesGrid({
               </div>
             ) : course.nextLesson ? (
               <Link
-                href={`/${locale}/courses/${course.id}/lessons/${course.nextLesson.id}`}
+                href={`/courses/${course.id}/lessons/${course.nextLesson.id}`}
                 prefetch={true}
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-lime-400 py-2.5 text-xs font-bold text-black transition hover:bg-lime-300 active:scale-95 shadow-sm shadow-lime-400/30"
               >
@@ -183,7 +183,7 @@ export default function DashboardCoursesGrid({
               </Link>
             ) : (
               <Link
-                href={`/${locale}/courses/${course.id}`}
+                href={`/courses/${course.id}`}
                 prefetch={true}
                 className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-gray-50 py-2.5 text-xs font-semibold text-gray-700 hover:bg-gray-100 transition shadow-sm"
               >

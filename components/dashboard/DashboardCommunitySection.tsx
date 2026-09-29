@@ -38,7 +38,7 @@ export default function DashboardCommunitySection({
             Réponse moyenne : &lt; 2h
           </span>
           <Link
-            href={`/${locale}/messages`}
+            href={`/messages`}
             prefetch={true}
             className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-lime-400 hover:border-lime-400 hover:text-black transition shadow-sm"
           >
@@ -68,7 +68,7 @@ export default function DashboardCommunitySection({
             +350 projets partagés cette semaine
           </span>
           <Link
-            href={`/${locale}/community`}
+            href={`/community`}
             prefetch={true}
             className="rounded-xl border border-sky-200 bg-sky-50 px-4 py-2 text-xs font-semibold text-sky-700 hover:bg-sky-100 transition shadow-sm"
           >

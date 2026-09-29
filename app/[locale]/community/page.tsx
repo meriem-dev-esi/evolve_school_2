@@ -187,7 +187,7 @@ export default async function CommunityPage({ params, searchParams }: Props) {
                   d'élargir votre recherche.
                 </p>
                 <Link
-                  href={`/${locale}/community`}
+                  href={`/community`}
                   className="mt-6 inline-block rounded-full bg-brand px-6 py-2.5 text-xs font-bold text-black transition hover:scale-105"
                 >
                   Réinitialiser les filtres
@@ -223,7 +223,7 @@ export default async function CommunityPage({ params, searchParams }: Props) {
           {/* Back link */}
           <div className="mt-14 pt-8 border-t border-white/10 flex items-center justify-between">
             <Link
-              href={`/${locale}/formations`}
+              href={`/formations`}
               className="inline-flex items-center gap-2 text-xs font-semibold text-white/60 transition hover:text-brand"
             >
               <ArrowLeft size={14} className="rtl:rotate-180" />

@@ -22,7 +22,7 @@ export default function CommunityProjectCard({
       <div>
         {/* Image Container */}
         <Link
-          href={`/${locale}/community/${project.id}`}
+          href={`/community/${project.id}`}
           className="block relative aspect-video w-full overflow-hidden bg-zinc-900"
         >
           {project.image_url ? (
@@ -53,7 +53,7 @@ export default function CommunityProjectCard({
 
         {/* Content */}
         <div className="p-6">
-          <Link href={`/${locale}/community/${project.id}`}>
+          <Link href={`/community/${project.id}`}>
             <h3 className="text-base font-bold text-white transition-colors group-hover:text-brand line-clamp-1">
               {project.title}
             </h3>
@@ -143,7 +143,7 @@ export default function CommunityProjectCard({
               </a>
             )}
             <Link
-              href={`/${locale}/community/${project.id}`}
+              href={`/community/${project.id}`}
               className="inline-flex items-center gap-1 rounded-full bg-brand/10 border border-brand/20 px-3 py-1 text-[11px] font-bold text-brand transition hover:bg-brand hover:text-black"
             >
               <span>Détails</span>

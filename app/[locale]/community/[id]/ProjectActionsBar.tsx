@@ -51,7 +51,7 @@ export default function ProjectActionsBar({
 
         {/* Direct Message Author */}
         <Link
-          href={`/${locale}/messages?recipient=${authorId}&course=${encodeURIComponent(projectTitle)}`}
+          href={`/messages?recipient=${authorId}&course=${encodeURIComponent(projectTitle)}`}
           className="inline-flex items-center gap-2 rounded-xl border border-cyan-500/40 bg-cyan-500/10 px-5 py-2.5 text-xs font-semibold text-cyan-300 hover:bg-cyan-500/20 transition"
         >
           <MessageSquare className="h-3.5 w-3.5" />

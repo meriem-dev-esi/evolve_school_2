@@ -38,7 +38,7 @@ export default function CommunityPagination({
         return (
           <Link
             key={pageNum}
-            href={`/${locale}/community?${queryParams}`}
+            href={`/community?${queryParams}`}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition ${
               pageNum === currentPage
                 ? "bg-brand text-black shadow-[0_0_15px_rgba(95,236,107,0.4)]"

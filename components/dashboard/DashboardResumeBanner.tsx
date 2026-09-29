@@ -103,14 +103,14 @@ export default function DashboardResumeBanner({
             </button>
           ) : resumeCourse.nextLesson ? (
             <Link
-              href={`/${locale}/courses/${resumeCourse.id}/lessons/${resumeCourse.nextLesson.id}`}
+              href={`/courses/${resumeCourse.id}/lessons/${resumeCourse.nextLesson.id}`}
               className="rounded-2xl bg-lime-400 px-6 py-3 text-sm font-bold text-black transition-all hover:bg-lime-300 active:scale-95 shadow-lg shadow-lime-400/30"
             >
               Continuer la leçon
             </Link>
           ) : (
             <Link
-              href={`/${locale}/courses/${resumeCourse.id}`}
+              href={`/courses/${resumeCourse.id}`}
               className="rounded-2xl bg-lime-400 px-6 py-3 text-sm font-bold text-black transition-all hover:bg-lime-300 active:scale-95 shadow-lg shadow-lime-400/30"
             >
               Ouvrir le cours
@@ -118,7 +118,7 @@ export default function DashboardResumeBanner({
           )}
 
           <Link
-            href={`/${locale}/courses/${resumeCourse.id}`}
+            href={`/courses/${resumeCourse.id}`}
             className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 transition shadow-sm"
           >
             Programme complet

@@ -45,7 +45,7 @@ export default function EditLessonPage({
       } = await supabase.auth.getUser();
 
       if (!user) {
-        router.push(`/${locale}/sign-in`);
+        router.push(`/sign-in`);
         return;
       }
 
@@ -230,7 +230,7 @@ export default function EditLessonPage({
           <button
             type="button"
             onClick={() =>
-              router.push(`/${locale}/teacher/courses/${courseId}/lessons`)
+              router.push(`/teacher/courses/${courseId}/lessons`)
             }
             className="rounded-full border border-white/10 px-6 py-3 font-semibold"
           >

@@ -39,7 +39,7 @@ export default function NewLessonPage({
       } = await supabase.auth.getUser();
 
       if (!user) {
-        router.push(`/${locale}/sign-in`);
+        router.push(`/sign-in`);
         return;
       }
 
@@ -98,7 +98,7 @@ export default function NewLessonPage({
       return;
     }
 
-    router.push(`/${locale}/teacher/courses/${courseId}/lessons`);
+    router.push(`/teacher/courses/${courseId}/lessons`);
   }
 
   if (initialLoading) {
@@ -205,7 +205,7 @@ export default function NewLessonPage({
           <button
             type="button"
             onClick={() =>
-              router.push(`/${locale}/teacher/courses/${courseId}/lessons`)
+              router.push(`/teacher/courses/${courseId}/lessons`)
             }
             className="rounded-full border border-white/10 px-6 py-3 font-semibold"
           >

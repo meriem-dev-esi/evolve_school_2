@@ -35,7 +35,7 @@ export default function DashboardRecommendationsSection({
         </div>
 
         <Link
-          href={`/${locale}/formations`}
+          href={`/formations`}
           prefetch={true}
           className="text-xs font-semibold text-gray-500 hover:text-lime-600 transition flex items-center gap-1"
         >
@@ -82,7 +82,7 @@ export default function DashboardRecommendationsSection({
 
             <div className="mt-5 pt-3 border-t border-gray-100">
               <Link
-                href={`/${locale}/courses/${rec.id}`}
+                href={`/courses/${rec.id}`}
                 prefetch={true}
                 className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-gray-50 py-2.5 text-xs font-semibold text-gray-700 hover:bg-lime-400 hover:border-lime-400 hover:text-black transition shadow-sm"
               >

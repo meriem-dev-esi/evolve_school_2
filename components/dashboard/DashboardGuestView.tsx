@@ -100,7 +100,7 @@ export default function DashboardGuestView({
             </Link>
 
             <Link
-              href={`/${locale}/formations`}
+              href={`/formations`}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-300 bg-white px-6 py-3.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition shadow-sm"
             >
               Explorer les formations

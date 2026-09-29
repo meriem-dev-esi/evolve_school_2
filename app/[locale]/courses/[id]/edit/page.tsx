@@ -46,7 +46,7 @@ export default function EditCoursePage({
       } = await supabase.auth.getUser();
 
       if (!user) {
-        router.push(`/${locale}/sign-in`);
+        router.push(`/sign-in`);
         return;
       }
 
@@ -217,7 +217,7 @@ export default function EditCoursePage({
           <div className="flex flex-wrap gap-4">
             <button
               type="button"
-              onClick={() => router.push(`/${locale}/teacher/courses`)}
+              onClick={() => router.push(`/teacher/courses`)}
               className="rounded-full border border-white/10 px-6 py-3 font-semibold transition hover:bg-white/5"
             >
               Cancel

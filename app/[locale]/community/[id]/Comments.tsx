@@ -83,7 +83,28 @@ export default function Comments({ projectId }: Props) {
   useEffect(() => {
     loadComments();
     loadUser();
-  }, [loadUser, loadComments]);
+
+    // Realtime subscription for instant comment updates
+    const channel = supabase
+      .channel(`project_comments_${projectId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "community_project_comments",
+          filter: `project_id=eq.${projectId}`,
+        },
+        () => {
+          loadComments();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [loadUser, loadComments, projectId, supabase]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

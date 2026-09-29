@@ -1,7 +1,7 @@
 "use client";
 
 import { Heart, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 type Props = {
@@ -20,6 +20,31 @@ export default function LikeButton({
   const [likes, setLikes] = useState(initialLikes);
   const [liked, setLiked] = useState(initiallyLiked);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel(`project_likes_${projectId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "community_projects",
+          filter: `id=eq.${projectId}`,
+        },
+        (payload) => {
+          const updated = payload.new as { likes_count?: number };
+          if (typeof updated?.likes_count === "number") {
+            setLikes(updated.likes_count);
+          }
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [projectId, supabase]);
 
   async function handleLike() {
     if (loading) return;

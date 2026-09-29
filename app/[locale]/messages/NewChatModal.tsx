@@ -1,11 +1,12 @@
 "use client";
 
 import { MessageSquare, Search, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   COMMUNITY_PROFILES,
   type DirectoryProfile,
 } from "@/lib/data/community-directory";
+import { createClient } from "@/lib/supabase/client";
 
 interface NewChatModalProps {
   isOpen: boolean;
@@ -19,10 +20,51 @@ export default function NewChatModal({
   onSelectContact,
 }: NewChatModalProps) {
   const [search, setSearch] = useState("");
+  const [contactsList, setContactsList] = useState<DirectoryProfile[]>(
+    Object.values(COMMUNITY_PROFILES),
+  );
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    async function loadRealProfiles() {
+      try {
+        const supabase = createClient();
+        const { data: dbProfiles, error } = await supabase
+          .from("profiles")
+          .select("id, full_name, avatar_url, role");
+
+        if (!error && dbProfiles && dbProfiles.length > 0) {
+          const map = new Map<string, DirectoryProfile>();
+          // Base mentor profiles first
+          for (const p of Object.values(COMMUNITY_PROFILES)) {
+            map.set(p.id, p);
+          }
+          // Real Supabase profiles
+          for (const p of dbProfiles) {
+            if (p.full_name) {
+              map.set(p.id, {
+                id: p.id,
+                full_name: p.full_name,
+                avatar_url: p.avatar_url,
+                role: p.role || "Membre Evolve",
+                online: true,
+              });
+            }
+          }
+          setContactsList(Array.from(map.values()));
+        }
+      } catch {
+        // Fallback to COMMUNITY_PROFILES
+      }
+    }
+
+    loadRealProfiles();
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const contacts = Object.values(COMMUNITY_PROFILES).filter(
+  const contacts = contactsList.filter(
     (c) =>
       c.full_name.toLowerCase().includes(search.toLowerCase()) ||
       c.role.toLowerCase().includes(search.toLowerCase()) ||

@@ -42,10 +42,15 @@ export default async function MessagesPage({ params, searchParams }: Props) {
   const currentUserId = user?.id || "me";
 
   const conversations = await getConversations(currentUserId, recipient, name);
-  const initialActiveConvId = recipient
-    ? `conv-${recipient}`
-    : conversations[0]?.id || "conv-1";
-  const initialMessagesMap = getAllInitialMessagesMap();
+  const matchedRecipientConv = recipient
+    ? conversations.find((c) => c.participant.id === recipient)
+    : null;
+  const initialActiveConvId = matchedRecipientConv
+    ? matchedRecipientConv.id
+    : recipient
+      ? `conv-${recipient}`
+      : conversations[0]?.id || "conv-1";
+  const initialMessagesMap = await getAllInitialMessagesMap(currentUserId);
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col selection:bg-brand selection:text-black">

@@ -159,6 +159,13 @@ export const BASE_MESSAGES_MAP: Record<string, DirectMessage[]> = {
   ],
 };
 
+export function isUuid(str?: string | null): boolean {
+  if (!str) return false;
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    str,
+  );
+}
+
 export async function getConversations(
   currentUserId?: string,
   recipientId?: string,
@@ -168,8 +175,30 @@ export async function getConversations(
 
   // If a specific recipient is requested (e.g. from community project author)
   if (recipientId) {
+    let convId = `conv-${recipientId}`;
+
+    // If both current user and recipient are valid UUIDs, try to get or create real DB conversation
+    if (
+      currentUserId &&
+      isUuid(currentUserId) &&
+      isUuid(recipientId) &&
+      currentUserId !== recipientId
+    ) {
+      try {
+        const supabase = await createClient();
+        const { data: dbConvId, error } = await supabase.rpc(
+          "get_or_create_conversation",
+          { p_recipient_id: recipientId },
+        );
+        if (!error && dbConvId) {
+          convId = dbConvId;
+        }
+      } catch {
+        // Fallback to convId
+      }
+    }
+
     const authorProfile = resolveAuthorProfile(recipientId);
-    const convId = `conv-${recipientId}`;
     conversationsMap.set(convId, {
       id: convId,
       participant: {
@@ -189,7 +218,7 @@ export async function getConversations(
     });
   }
 
-  // Populate base conversations
+  // Populate base conversations for mentors / demo
   for (const conv of BASE_CONVERSATIONS) {
     if (!conversationsMap.has(conv.id)) {
       conversationsMap.set(conv.id, conv);
@@ -205,9 +234,26 @@ export async function getConversations(
         .select(
           "id, conversation_id, sender_id, receiver_id, content, created_at, is_read",
         )
+        .or(`sender_id.eq.${currentUserId},receiver_id.eq.${currentUserId}`)
         .order("created_at", { ascending: false });
 
       if (!error && dbMessages && dbMessages.length > 0) {
+        // Gather other user IDs to resolve real profiles
+        const otherUserIds = Array.from(
+          new Set(
+            dbMessages.map((m) =>
+              m.sender_id === currentUserId ? m.receiver_id : m.sender_id,
+            ),
+          ),
+        );
+
+        const { data: dbProfiles } = await supabase
+          .from("profiles")
+          .select("id, full_name, avatar_url, role")
+          .in("id", otherUserIds);
+
+        const profileMap = new Map((dbProfiles || []).map((p) => [p.id, p]));
+
         for (const msg of dbMessages) {
           const otherUserId =
             msg.sender_id === currentUserId ? msg.receiver_id : msg.sender_id;
@@ -216,7 +262,7 @@ export async function getConversations(
             !msg.is_read && msg.receiver_id === currentUserId;
 
           if (!conversationsMap.has(convId)) {
-            const authorProfile = resolveAuthorProfile(otherUserId);
+            const authorProfile = resolveAuthorProfile(otherUserId, profileMap);
             conversationsMap.set(convId, {
               id: convId,
               participant: {
@@ -243,7 +289,7 @@ export async function getConversations(
         }
       }
     } catch {
-      // Fallback smoothly to map
+      // Fallback smoothly
     }
   }
 
@@ -318,6 +364,37 @@ export async function getConversationMessages(
   };
 }
 
-export function getAllInitialMessagesMap(): Record<string, DirectMessage[]> {
-  return BASE_MESSAGES_MAP;
+export async function getAllInitialMessagesMap(
+  currentUserId?: string,
+): Promise<Record<string, DirectMessage[]>> {
+  const map: Record<string, DirectMessage[]> = { ...BASE_MESSAGES_MAP };
+
+  if (currentUserId && currentUserId !== "me") {
+    try {
+      const supabase = await createClient();
+      const { data: dbMessages } = await supabase
+        .from("direct_messages")
+        .select(
+          "id, conversation_id, sender_id, receiver_id, content, created_at, is_read",
+        )
+        .or(`sender_id.eq.${currentUserId},receiver_id.eq.${currentUserId}`)
+        .order("created_at", { ascending: true });
+
+      if (dbMessages && dbMessages.length > 0) {
+        for (const msg of dbMessages) {
+          const convId = msg.conversation_id;
+          if (!map[convId]) {
+            map[convId] = [];
+          }
+          if (!map[convId].some((m) => m.id === msg.id)) {
+            map[convId].push(msg);
+          }
+        }
+      }
+    } catch {
+      // Continue with base map
+    }
+  }
+
+  return map;
 }

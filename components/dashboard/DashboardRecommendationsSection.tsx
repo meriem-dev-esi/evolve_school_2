@@ -14,7 +14,6 @@ interface DashboardRecommendationsSectionProps {
  * to help students deepen their expertise.
  */
 export default function DashboardRecommendationsSection({
-  locale,
   recommendedCourses,
 }: DashboardRecommendationsSectionProps) {
   if (recommendedCourses.length === 0) return null;

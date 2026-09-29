@@ -15,7 +15,6 @@ interface DashboardResumeBannerProps {
  * showing percentage completed, next lesson title, and action CTA.
  */
 export default function DashboardResumeBanner({
-  locale,
   resumeCourse,
   onOpenCertificate,
 }: DashboardResumeBannerProps) {

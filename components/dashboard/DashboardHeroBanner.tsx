@@ -18,7 +18,6 @@ interface DashboardHeroBannerProps {
  * and quick-action button to resume their next lesson.
  */
 export default function DashboardHeroBanner({
-  locale,
   userName,
   userEmail,
   userAvatar,

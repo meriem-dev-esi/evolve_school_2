@@ -15,7 +15,6 @@ interface CommunityProjectCardProps {
 export default function CommunityProjectCard({
   project,
   profile,
-  locale,
 }: CommunityProjectCardProps) {
   return (
     <article className="group glass-card flex flex-col justify-between overflow-hidden rounded-3xl border border-white/10 shadow-2xl transition-all duration-300 hover:border-brand/40 hover:-translate-y-1.5">

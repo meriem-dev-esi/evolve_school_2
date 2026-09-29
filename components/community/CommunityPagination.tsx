@@ -16,7 +16,6 @@ interface CommunityPaginationProps {
 export default function CommunityPagination({
   totalPages,
   currentPage,
-  locale,
   search,
   category,
   technology,

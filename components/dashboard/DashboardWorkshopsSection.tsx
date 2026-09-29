@@ -14,7 +14,6 @@ interface DashboardWorkshopsSectionProps {
  * and quick-link reservations for the student.
  */
 export default function DashboardWorkshopsSection({
-  locale,
   upcomingWorkshops,
 }: DashboardWorkshopsSectionProps) {
   return (

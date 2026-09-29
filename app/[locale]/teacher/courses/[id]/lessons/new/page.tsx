@@ -1,6 +1,5 @@
 "use client";
 
-import { useLocale } from "next-intl";
 import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -10,7 +9,6 @@ export default function NewLessonPage({
 }: {
   params: Promise<{ locale: string; id: string }>;
 }) {
-  const locale = useLocale();
   const router = useRouter();
 
   const [courseId, setCourseId] = useState("");

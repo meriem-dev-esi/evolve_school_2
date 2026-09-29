@@ -24,7 +24,6 @@ interface DashboardCoursesGridProps {
  * badges, and direct action triggers (play lesson / open certificate).
  */
 export default function DashboardCoursesGrid({
-  locale,
   filteredCourses,
   totalCoursesCount,
   onOpenCertificate,

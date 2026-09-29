@@ -47,7 +47,7 @@ type DbLesson = {
   course_id: string;
   title: string;
   order_index: number;
-  duration?: number | null;
+  duration?: string | null;
 };
 
 type DbProgress = {

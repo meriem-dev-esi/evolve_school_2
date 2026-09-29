@@ -113,10 +113,10 @@ export default async function CoursePage({ params, searchParams }: Props) {
     .eq("id", id)
     .maybeSingle();
 
-  if (courseError || !course) {
-    notFound();
-  }
-
+if (courseError || !course) {
+  console.error("[Evolve] Course page error:", id, courseError);
+  notFound();
+}
   // Fetch user profile name for certificate
   const { data: profile } = await supabase
     .from("profiles")

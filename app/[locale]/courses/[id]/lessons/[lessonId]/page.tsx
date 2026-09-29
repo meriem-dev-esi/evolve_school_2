@@ -95,9 +95,10 @@ export default async function LessonPage({ params }: Props) {
     .eq("course_id", id)
     .maybeSingle();
 
-  if (error || !lesson) {
-    notFound();
-  }
+ if (error || !lesson) {
+  console.error("[Evolve] Lesson page error:", { id, lessonId, error });
+  notFound();
+}
   let signedVideoUrl: string | null = null;
 
   if (lesson.video_url) {

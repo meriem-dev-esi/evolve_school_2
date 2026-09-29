@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { env } from "@/lib/env";
 import { checkRateLimit, RATE_LIMIT_TIERS } from "@/lib/rateLimiter";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 // Spending safety cap
@@ -190,7 +191,6 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         amount: course.price,
         currency: "dzd",
-        payment_method: "edahabia",
         locale: locale === "ar" || locale === "fr" ? locale : "en",
         description: course.title,
         success_url: `${origin}/${locale}/courses/${course.id}?payment=success`,
@@ -207,9 +207,7 @@ export async function POST(request: Request) {
 
     const checkout = await checkoutResponse.json();
 
-    // TEMPORARY DEBUG LOG — remove once checkout_url is confirmed working.
-    // Logs the full raw Chargily response regardless of success/failure,
-    // so we can see the exact field name/shape it actually returns.
+    // Logs the raw Chargily response
     console.log("CHARGILY RESPONSE:", JSON.stringify(checkout));
 
     if (!checkoutResponse.ok) {
@@ -228,14 +226,15 @@ export async function POST(request: Request) {
       );
     }
 
-    // Pre-create enrollment with pending status
-    await supabase.from("enrollments").upsert(
+    // Pre-create enrollment with pending status using admin client
+    const adminSupabase = createAdminClient();
+    await adminSupabase.from("enrollments").upsert(
       {
         user_id: user.id,
         course_id: course.id,
         payment_status: "pending",
         payment_amount: course.price,
-        payment_method: "edahabia",
+        payment_method: "chargily",
         chargily_checkout_id: checkout.id,
         enrolled_at: new Date().toISOString(),
       },

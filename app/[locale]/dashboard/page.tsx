@@ -151,18 +151,17 @@ export default async function DashboardPage({ params }: Props) {
     const courseLessons = lessons.filter((l) => l.course_id === course.id);
     const totalLessons = courseLessons.length || 1;
 
-    let completedCount = 0;
-    let totalProgressSum = 0;
-
-    for (const lesson of courseLessons) {
-      const p = progressMap.get(lesson.id);
-      if (p?.completed) {
-        completedCount += 1;
-        totalProgressSum += 100;
-      } else if (p?.progress_percentage) {
-        totalProgressSum += p.progress_percentage;
-      }
-    }
+    const completedCount = courseLessons.filter(
+      (l) => progressMap.get(l.id)?.completed,
+    ).length;
+    const totalProgressSum = courseLessons.reduce(
+      (sum, l) =>
+        sum +
+        (progressMap.get(l.id)?.completed
+          ? 100
+          : progressMap.get(l.id)?.progress_percentage || 0),
+      0,
+    );
 
     const progressPercentage = Math.min(
       100,
@@ -198,6 +197,13 @@ export default async function DashboardPage({ params }: Props) {
             order_index: nextLesson.order_index,
           }
         : null,
+      certificate: isCompleted
+        ? {
+            verificationCode:
+              `${course.id.slice(0, 4)}-${user.id.slice(0, 4)}`.toUpperCase(),
+            issuedAt: new Date().toISOString(),
+          }
+        : null,
     });
   }
 
@@ -220,7 +226,6 @@ export default async function DashboardPage({ params }: Props) {
     price: w.price ?? 0,
   }));
 
-  // Fetch recommended courses if user has few or zero courses
   let recommendedCourses: EnrolledCourseItem[] = [];
   if (enrolledCourses.length <= 2) {
     const excludedIds = enrolledCourses.map((c) => c.id);
@@ -248,21 +253,16 @@ export default async function DashboardPage({ params }: Props) {
       }));
   }
 
-  // Calculate comprehensive metrics
   const completedCount = enrolledCourses.filter((c) => c.isCompleted).length;
-  const inProgressCount = enrolledCourses.filter((c) => !c.isCompleted).length;
+  const inProgressCount = enrolledCourses.length - completedCount;
   const totalLessonsCompleted = progressList.filter((p) => p.completed).length;
-  const totalHoursEstimated = Math.max(
-    1,
-    Math.round(totalLessonsCompleted * 0.75),
-  );
 
   const stats: UserStats = {
     totalCourses: enrolledCourses.length,
     inProgressCount,
     completedCount,
     totalLessonsCompleted,
-    totalHoursEstimated,
+    totalHoursEstimated: Math.max(1, Math.round(totalLessonsCompleted * 0.75)),
     streakDays: Math.min(14, Math.max(3, totalLessonsCompleted > 0 ? 5 : 1)),
     certificatesEarned: completedCount,
   };

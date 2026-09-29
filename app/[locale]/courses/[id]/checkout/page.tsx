@@ -1,5 +1,16 @@
+import {
+  ArrowLeft,
+  Award,
+  Lock,
+  ShieldCheck,
+  Sparkles,
+  Video,
+} from "lucide-react";
+import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import CheckoutButton from "@/components/CheckoutButton";
+import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -9,6 +20,23 @@ type Props = {
     id: string;
   }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+
+  const { data: course } = await supabase
+    .from("courses")
+    .select("title")
+    .eq("id", id)
+    .maybeSingle();
+
+  return {
+    title: course
+      ? `Inscription & Paiement — ${course.title}`
+      : "Paiement Formation",
+  };
+}
 
 export default async function CheckoutPage({ params }: Props) {
   const { locale, id } = await params;
@@ -44,40 +72,109 @@ export default async function CheckoutPage({ params }: Props) {
     redirect(`/${locale}/courses/${id}`);
   }
 
+  const coursePrice = Number(course.price) || 50;
+
   return (
-    <main className="min-h-screen bg-background px-6 py-10">
-      <div className="mx-auto max-w-2xl">
-        <Link
-          href={`/courses/${id}`}
-          className="mb-8 inline-flex text-sm font-medium text-muted-foreground hover:text-foreground"
-        >
-          ← Back to course
-        </Link>
+    <div className="min-h-dvh bg-canvas text-ink flex flex-col">
+      <Navbar />
 
-        <div className="rounded-3xl border bg-card p-8 shadow-sm">
-          <h1 className="text-3xl font-bold">Complete your enrollment</h1>
+      <main className="flex-1 px-4 pt-28 pb-20 sm:px-6 relative overflow-hidden flex items-center justify-center">
+        {/* Background glow effects */}
+        <div className="pointer-events-none absolute -top-40 start-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-lime-300/10 blur-[130px]" />
+        <div className="pointer-events-none absolute bottom-10 end-10 h-[350px] w-[350px] rounded-full bg-emerald-400/10 blur-[120px]" />
 
-          <p className="mt-3 text-muted-foreground">{course.title}</p>
+        <div className="relative z-10 w-full max-w-xl">
+          {/* Back link */}
+          <Link
+            href={`/courses/${id}`}
+            className="mb-6 inline-flex items-center gap-2 text-xs font-semibold text-white/60 transition hover:text-brand"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Retour au cours</span>
+          </Link>
 
-          <div className="mt-8 rounded-2xl border p-6">
-            <h2 className="text-xl font-semibold">Course access</h2>
+          <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
+            {/* Header badge */}
+            <div className="flex items-center justify-between gap-4">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-brand/30 bg-brand/10 px-3.5 py-1 text-xs font-bold text-brand uppercase tracking-wider">
+                <Sparkles className="h-3.5 w-3.5" />
+                Paiement Sécurisé Chargily Pay
+              </span>
 
-            <p className="mt-2 text-sm text-muted-foreground">
-              Payment is required to access all lessons in this course.
-            </p>
-          </div>
+              <span className="text-2xl font-black text-brand font-mono">
+                {coursePrice} DZD
+              </span>
+            </div>
 
-          <div className="mt-8 rounded-2xl border p-6">
-            <h2 className="text-xl font-semibold">💳 Edahabia payment</h2>
+            <h1 className="mt-4 text-2xl sm:text-3xl font-black tracking-tight text-white">
+              Débloquer la formation
+            </h1>
 
-            <p className="mt-2 text-sm text-muted-foreground">
-              The Edahabia payment system will be connected here.
-            </p>
+            <p className="mt-2 text-sm text-white/60">{course.title}</p>
 
-            <CheckoutButton courseId={id} locale={locale} />
+            {/* Course inclusion summary */}
+            <div className="mt-6 space-y-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-xs text-white/80">
+              <p className="font-semibold text-white uppercase tracking-wider text-[11px] mb-2">
+                Ce qui est inclus dans votre inscription :
+              </p>
+
+              <div className="flex items-center gap-2.5">
+                <Video className="h-4 w-4 text-brand shrink-0" />
+                <span>
+                  1 Vidéo d&apos;introduction gratuite (accessible tout de
+                  suite)
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2.5">
+                <Lock className="h-4 w-4 text-emerald-400 shrink-0" />
+                <span>
+                  1 Leçon complète et pratique (débloquée immédiatement après
+                  règlement)
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2.5">
+                <Award className="h-4 w-4 text-yellow-400 shrink-0" />
+                <span>
+                  Attestation & Certificat officiel Evolve Academy après
+                  complétion
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2.5">
+                <ShieldCheck className="h-4 w-4 text-sky-400 shrink-0" />
+                <span>
+                  Paiement en direct avec Carte Edahabia ou CIB (Passerelle
+                  Chargily Live)
+                </span>
+              </div>
+            </div>
+
+            {/* Pricing Details */}
+            <div className="mt-6 flex items-center justify-between border-t border-white/10 pt-4 text-sm">
+              <span className="text-white/60">Total à payer :</span>
+              <span className="text-xl font-bold text-white font-mono">
+                {coursePrice} DA
+              </span>
+            </div>
+
+            {/* Checkout Action Button */}
+            <CheckoutButton courseId={id} locale={locale} price={coursePrice} />
+
+            <div className="mt-4 text-center">
+              <p className="text-[11px] text-white/40 flex items-center justify-center gap-1.5">
+                <ShieldCheck className="h-3.5 w-3.5 text-white/50" />
+                <span>
+                  Transaction chiffrée SSL conforme aux normes SATIM / Chargily
+                </span>
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+
+      <Footer locale={locale} />
+    </div>
   );
 }

@@ -145,8 +145,8 @@ export default function MarkLessonComplete({
           return;
         }
 
-        // No next course
-        window.location.href = `/${locale}/formations`;
+        // No next course → return to course page with certificate
+        window.location.href = `/${locale}/courses/${courseId}?completed=1`;
 
         return;
       }

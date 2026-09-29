@@ -37,7 +37,7 @@ const securityHeaders = [
       "img-src 'self' data: blob: https: http:",
       "font-src 'self' data:",
       "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.chargily.net https://*.chargily.com https://pay.chargily.dz https://*.ngrok-free.dev",
-     "frame-src 'self' https://*.chargily.net https://*.chargily.com https://pay.chargily.dz https://www.youtube.com",
+      "frame-src 'self' https://*.chargily.net https://*.chargily.com https://pay.chargily.dz https://www.youtube.com",
       "base-uri 'self'",
       "form-action 'self' https://*.chargily.net https://pay.chargily.dz",
     ].join("; "),

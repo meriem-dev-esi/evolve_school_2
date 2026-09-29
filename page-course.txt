@@ -1,4 +1,4 @@
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
+﻿import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import CourseCertificateSection from "@/components/course/CourseCertificateSection";
@@ -38,18 +38,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .maybeSingle();
 
   if (!course) {
-    return { title: "Formation — Evolve Academy" };
+    return { title: "Formation â€” Evolve Academy" };
   }
 
   return {
-    title: `${course.title} — Evolve Academy`,
+    title: `${course.title} â€” Evolve Academy`,
     description:
       course.description ||
       `Suivez le cours ${course.title} sur Evolve Academy.`,
     openGraph: {
       title: `${course.title} | Evolve Academy`,
       description:
-        course.description || `Formation ${course.domain || "créative"}.`,
+        course.description || `Formation ${course.domain || "crÃ©ative"}.`,
       images: course.image_url ? [{ url: course.image_url }] : [],
     },
   };
@@ -128,7 +128,7 @@ export default async function CoursePage({ params, searchParams }: Props) {
     profile?.full_name ||
     user.user_metadata?.full_name ||
     user.email?.split("@")[0] ||
-    "Étudiant Evolve";
+    "Ã‰tudiant Evolve";
 
   // Check enrollment payment status
   const { data: enrollment } = await supabase
@@ -232,8 +232,8 @@ export default async function CoursePage({ params, searchParams }: Props) {
             <div className="mb-8 flex items-center gap-3 rounded-2xl border border-brand/40 bg-brand/10 p-4 text-sm font-medium text-brand">
               <CheckCircle2 className="h-5 w-5 shrink-0" />
               <span>
-                Paiement validé avec succès ! Votre accès complet aux leçons est
-                débloqué.
+                Paiement validÃ© avec succÃ¨s ! Votre accÃ¨s complet aux leÃ§ons est
+                dÃ©bloquÃ©.
               </span>
             </div>
           )}

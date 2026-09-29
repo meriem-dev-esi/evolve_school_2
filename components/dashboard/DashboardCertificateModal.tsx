@@ -22,8 +22,7 @@ export default function DashboardCertificateModal({
     window.print();
   };
 
-  const verificationCode =
-    course.certificate?.verificationCode ?? "EN ATTENTE";
+  const verificationCode = course.certificate?.verificationCode ?? "EN ATTENTE";
   const issuedDate = course.certificate?.issuedAt
     ? new Date(course.certificate.issuedAt).toLocaleDateString("fr-FR", {
         day: "2-digit",

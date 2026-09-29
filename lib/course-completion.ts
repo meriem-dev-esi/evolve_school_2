@@ -105,6 +105,6 @@ export async function completeLessonAndNavigate({
     return;
   }
 
-  // 6️⃣ No next course
-  window.location.href = `/${locale}/formations`;
+  // 6️⃣ No next course → back to course page to claim certificate
+  window.location.href = `/${locale}/courses/${courseId}?completed=1`;
 }

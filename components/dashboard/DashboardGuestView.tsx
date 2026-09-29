@@ -18,9 +18,7 @@ interface DashboardGuestViewProps {
  * DashboardGuestView is rendered for unauthenticated users visiting /dashboard,
  * displaying key platform features and prompting sign in / registration.
  */
-export default function DashboardGuestView({
-  locale,
-}: DashboardGuestViewProps) {
+export default function DashboardGuestView(_props: DashboardGuestViewProps) {
   return (
     <div className="min-h-screen bg-canvas text-ink flex flex-col selection:bg-lime-100 selection:text-lime-900">
       <Navbar />

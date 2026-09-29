@@ -71,8 +71,15 @@ export function useSubmitProjectForm(locale: string) {
       });
 
     if (uploadError) {
-      console.error("[Image Upload]", uploadError);
-      throw new Error(uploadError.message);
+      console.warn(
+        "[Image Upload] Storage bucket unavailable, falling back to inline DataURL:",
+        uploadError.message,
+      );
+      return new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(fileToUpload);
+      });
     }
 
     const { data: publicUrlData } = supabase.storage

@@ -1,5 +1,6 @@
 import "server-only";
 
+import { resolveAuthorProfile } from "@/lib/data/community-directory";
 import { createClient } from "@/lib/supabase/server";
 
 export interface MessageUser {
@@ -32,35 +33,65 @@ export interface Conversation {
   unread_count: number;
 }
 
-const DEFAULT_PARTICIPANT: MessageUser = {
-  id: "teacher-amina",
-  name: "Amina Benali",
-  avatar_url:
-    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
-  role: "Instructrice UI/UX Design",
-  online: true,
-};
-
-const SEED_PARTICIPANTS: Record<string, MessageUser> = {
-  "teacher-amina": DEFAULT_PARTICIPANT,
-  "teacher-yacine": {
-    id: "teacher-yacine",
-    name: "Yacine Mansouri",
-    avatar_url:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-    role: "Lead Formateur Web",
-    online: false,
+export const BASE_CONVERSATIONS: Conversation[] = [
+  {
+    id: "conv-1",
+    participant: {
+      id: "teacher-amina",
+      name: "Amina Benali",
+      avatar_url:
+        "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+      role: "Instructrice UI/UX Design",
+      online: true,
+    },
+    last_message: {
+      content:
+        "Superbe progression ! N'hésitez pas à partager votre projet dans l'onglet Communauté.",
+      created_at: new Date(Date.now() - 3600000 * 1).toISOString(),
+      sender_id: "teacher-amina",
+      is_read: false,
+    },
+    unread_count: 1,
   },
-  "support-evolve": {
-    id: "support-evolve",
-    name: "Support Evolve Academy",
-    avatar_url: "/logo.png",
-    role: "Équipe Pédagogique",
-    online: true,
+  {
+    id: "conv-2",
+    participant: {
+      id: "teacher-yacine",
+      name: "Yacine Mansouri",
+      avatar_url:
+        "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80",
+      role: "Lead Formateur Web Fullstack",
+      online: true,
+    },
+    last_message: {
+      content: "Merci Yacine ! Les exemples sur Next.js 15 sont très clairs.",
+      created_at: new Date(Date.now() - 86400000 * 1).toISOString(),
+      sender_id: "me",
+      is_read: true,
+    },
+    unread_count: 0,
   },
-};
+  {
+    id: "conv-3",
+    participant: {
+      id: "support-evolve",
+      name: "Support Evolve Academy",
+      avatar_url: "/logo.png",
+      role: "Équipe Pédagogique",
+      online: true,
+    },
+    last_message: {
+      content:
+        "Votre inscription à l'atelier présentiel du samedi est confirmée. Rendez-vous à 10h !",
+      created_at: new Date(Date.now() - 86400000 * 3).toISOString(),
+      sender_id: "support-evolve",
+      is_read: true,
+    },
+    unread_count: 0,
+  },
+];
 
-const SEED_MESSAGES: Record<string, DirectMessage[]> = {
+export const BASE_MESSAGES_MAP: Record<string, DirectMessage[]> = {
   "conv-1": [
     {
       id: "m-101",
@@ -100,7 +131,7 @@ const SEED_MESSAGES: Record<string, DirectMessage[]> = {
       sender_id: "teacher-yacine",
       receiver_id: "me",
       content:
-        "Bienvenue sur le module Next.js 15 & Supabase. Si vous rencontrez un problème sur l'authentification, écrivez-moi.",
+        "Bienvenue sur le module Next.js 15 & Supabase. Si vous rencontrez un problème sur l'authentification ou les requêtes, écrivez-moi.",
       created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
       is_read: true,
     },
@@ -109,7 +140,7 @@ const SEED_MESSAGES: Record<string, DirectMessage[]> = {
       conversation_id: "conv-2",
       sender_id: "me",
       receiver_id: "teacher-yacine",
-      content: "Merci Yacine ! Les exemples sont très clairs.",
+      content: "Merci Yacine ! Les exemples sur Next.js 15 sont très clairs.",
       created_at: new Date(Date.now() - 86400000 * 1).toISOString(),
       is_read: true,
     },
@@ -130,103 +161,101 @@ const SEED_MESSAGES: Record<string, DirectMessage[]> = {
 
 export async function getConversations(
   currentUserId?: string,
+  recipientId?: string,
+  recipientName?: string,
 ): Promise<Conversation[]> {
-  const supabase = await createClient();
+  const conversationsMap = new Map<string, Conversation>();
 
-  try {
-    const { data: dbMessages, error } = await supabase
-      .from("direct_messages")
-      .select(
-        "id, conversation_id, sender_id, receiver_id, content, created_at, is_read",
-      )
-      .order("created_at", { ascending: false });
+  // If a specific recipient is requested (e.g. from community project author)
+  if (recipientId) {
+    const authorProfile = resolveAuthorProfile(recipientId);
+    const convId = `conv-${recipientId}`;
+    conversationsMap.set(convId, {
+      id: convId,
+      participant: {
+        id: recipientId,
+        name: recipientName || authorProfile.full_name,
+        avatar_url: authorProfile.avatar_url,
+        role: authorProfile.role,
+        online: true,
+      },
+      last_message: {
+        content: "Nouvelle discussion initiée",
+        created_at: new Date().toISOString(),
+        sender_id: recipientId,
+        is_read: true,
+      },
+      unread_count: 0,
+    });
+  }
 
-    if (!error && dbMessages && dbMessages.length > 0) {
-      const map = new Map<string, Conversation>();
+  // Populate base conversations
+  for (const conv of BASE_CONVERSATIONS) {
+    if (!conversationsMap.has(conv.id)) {
+      conversationsMap.set(conv.id, conv);
+    }
+  }
 
-      for (const msg of dbMessages) {
-        const isUnreadForMe = !msg.is_read && msg.receiver_id === currentUserId;
+  // Fetch real messages from Supabase if user is logged in
+  if (currentUserId && currentUserId !== "me") {
+    try {
+      const supabase = await createClient();
+      const { data: dbMessages, error } = await supabase
+        .from("direct_messages")
+        .select(
+          "id, conversation_id, sender_id, receiver_id, content, created_at, is_read",
+        )
+        .order("created_at", { ascending: false });
 
-        if (!map.has(msg.conversation_id)) {
+      if (!error && dbMessages && dbMessages.length > 0) {
+        for (const msg of dbMessages) {
           const otherUserId =
             msg.sender_id === currentUserId ? msg.receiver_id : msg.sender_id;
+          const convId = msg.conversation_id || `conv-${otherUserId}`;
+          const isUnreadForMe =
+            !msg.is_read && msg.receiver_id === currentUserId;
 
-          map.set(msg.conversation_id, {
-            id: msg.conversation_id,
-            participant: SEED_PARTICIPANTS[otherUserId] ?? {
-              id: otherUserId,
-              name: "Membre Evolve",
-              avatar_url: null,
-              role: "Étudiant",
-              online: false,
-            },
-            last_message: {
-              content: msg.content,
-              created_at: msg.created_at,
-              sender_id: msg.sender_id,
-              is_read: msg.is_read,
-            },
-            unread_count: isUnreadForMe ? 1 : 0,
-          });
-        } else if (isUnreadForMe) {
-          const existing = map.get(msg.conversation_id);
-          if (existing) {
-            existing.unread_count += 1;
+          if (!conversationsMap.has(convId)) {
+            const authorProfile = resolveAuthorProfile(otherUserId);
+            conversationsMap.set(convId, {
+              id: convId,
+              participant: {
+                id: otherUserId,
+                name: authorProfile.full_name,
+                avatar_url: authorProfile.avatar_url,
+                role: authorProfile.role,
+                online: false,
+              },
+              last_message: {
+                content: msg.content,
+                created_at: msg.created_at,
+                sender_id: msg.sender_id,
+                is_read: msg.is_read,
+              },
+              unread_count: isUnreadForMe ? 1 : 0,
+            });
+          } else if (isUnreadForMe) {
+            const existing = conversationsMap.get(convId);
+            if (existing) {
+              existing.unread_count += 1;
+            }
           }
         }
       }
-      return Array.from(map.values());
+    } catch {
+      // Fallback smoothly to map
     }
-  } catch {
-    // Database schema does not exist yet; gracefully fallback to seed conversations
   }
 
-  // Fallback seed conversations
-  return [
-    {
-      id: "conv-1",
-      participant: SEED_PARTICIPANTS["teacher-amina"] ?? DEFAULT_PARTICIPANT,
-      last_message: {
-        content:
-          "Superbe progression ! N'hésitez pas à partager votre projet dans l'onglet Communauté...",
-        created_at: new Date(Date.now() - 3600000 * 1).toISOString(),
-        sender_id: "teacher-amina",
-        is_read: false,
-      },
-      unread_count: 1,
-    },
-    {
-      id: "conv-2",
-      participant: SEED_PARTICIPANTS["teacher-yacine"] ?? DEFAULT_PARTICIPANT,
-      last_message: {
-        content: "Merci Yacine ! Les exemples sont très clairs.",
-        created_at: new Date(Date.now() - 86400000 * 1).toISOString(),
-        sender_id: "me",
-        is_read: true,
-      },
-      unread_count: 0,
-    },
-    {
-      id: "conv-3",
-      participant: SEED_PARTICIPANTS["support-evolve"] ?? DEFAULT_PARTICIPANT,
-      last_message: {
-        content:
-          "Votre inscription à l'atelier présentiel du samedi est confirmée...",
-        created_at: new Date(Date.now() - 86400000 * 3).toISOString(),
-        sender_id: "support-evolve",
-        is_read: true,
-      },
-      unread_count: 0,
-    },
-  ];
+  return Array.from(conversationsMap.values());
 }
 
 export async function getConversationMessages(
   conversationId: string,
 ): Promise<{ participant: MessageUser; messages: DirectMessage[] }> {
-  const supabase = await createClient();
-
+  // If in Supabase
   try {
+    const supabase = await createClient();
     const { data: dbMessages, error } = await supabase
       .from("direct_messages")
       .select(
@@ -238,31 +267,57 @@ export async function getConversationMessages(
     if (!error && dbMessages && dbMessages.length > 0) {
       const firstMsg = dbMessages[0];
       const otherId = firstMsg ? firstMsg.sender_id : "teacher-amina";
+      const profile = resolveAuthorProfile(otherId);
 
       return {
-        participant: SEED_PARTICIPANTS[otherId] ?? {
+        participant: {
           id: otherId,
-          name: "Membre Evolve",
-          avatar_url: null,
-          role: "Étudiant",
-          online: false,
+          name: profile.full_name,
+          avatar_url: profile.avatar_url,
+          role: profile.role,
+          online: true,
         },
         messages: dbMessages,
       };
     }
   } catch {
-    // Fallback
+    // Continue
   }
 
-  const participantKey =
-    conversationId === "conv-1"
-      ? "teacher-amina"
-      : conversationId === "conv-2"
-        ? "teacher-yacine"
-        : "support-evolve";
+  // Check community author conversation: e.g. conv-10000000-...
+  if (conversationId.startsWith("conv-1000")) {
+    const authorId = conversationId.replace("conv-", "");
+    const profile = resolveAuthorProfile(authorId);
+    return {
+      participant: {
+        id: authorId,
+        name: profile.full_name,
+        avatar_url: profile.avatar_url,
+        role: profile.role,
+        online: true,
+      },
+      messages: [],
+    };
+  }
+
+  const baseConv = BASE_CONVERSATIONS.find((c) => c.id === conversationId);
+  const fallbackParticipant: MessageUser = {
+    id: "teacher-amina",
+    name: "Amina Benali",
+    avatar_url:
+      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+    role: "Instructrice UI/UX Design",
+    online: true,
+  };
+  const participant = baseConv?.participant ?? fallbackParticipant;
+  const messages = BASE_MESSAGES_MAP[conversationId] ?? [];
 
   return {
-    participant: SEED_PARTICIPANTS[participantKey] ?? DEFAULT_PARTICIPANT,
-    messages: SEED_MESSAGES[conversationId] ?? SEED_MESSAGES["conv-1"] ?? [],
+    participant,
+    messages,
   };
+}
+
+export function getAllInitialMessagesMap(): Record<string, DirectMessage[]> {
+  return BASE_MESSAGES_MAP;
 }

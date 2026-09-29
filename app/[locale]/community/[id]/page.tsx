@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Link } from "@/i18n/navigation";
+import { resolveAuthorProfile } from "@/lib/data/community-directory";
 import { createClient } from "@/lib/supabase/server";
 import Comments from "./Comments";
 import ProjectActionsBar from "./ProjectActionsBar";
@@ -109,6 +110,23 @@ export default async function CommunityProjectPage({ params }: Props) {
     .eq("id", project.user_id)
     .maybeSingle();
 
+  const dbMap = authorProfile
+    ? new Map([
+        [
+          project.user_id,
+          {
+            id: project.user_id,
+            full_name: authorProfile.full_name,
+            avatar_url: authorProfile.avatar_url,
+            role: authorProfile.role,
+          },
+        ],
+      ])
+    : undefined;
+
+  const resolvedAuthor = resolveAuthorProfile(project.user_id, dbMap);
+  const authorName = resolvedAuthor.full_name;
+
   // Check if current user has liked this project
   let initiallyLiked = false;
 
@@ -126,7 +144,6 @@ export default async function CommunityProjectPage({ params }: Props) {
   // Check if current user owns this project
   const isOwner = user?.id === project.user_id;
 
-  const authorName = authorProfile?.full_name || "Étudiant Evolve";
   const formattedDate = new Date(project.created_at).toLocaleDateString(
     locale === "ar" ? "ar-DZ" : "fr-FR",
     {
@@ -175,8 +192,8 @@ export default async function CommunityProjectPage({ params }: Props) {
                 category={project.category}
                 formattedDate={formattedDate}
                 authorName={authorName}
-                authorAvatarUrl={authorProfile?.avatar_url}
-                authorRole={authorProfile?.role}
+                authorAvatarUrl={resolvedAuthor.avatar_url}
+                authorRole={resolvedAuthor.role}
                 projectId={project.id}
                 initialLikes={project.likes_count}
                 initiallyLiked={initiallyLiked}
@@ -193,6 +210,7 @@ export default async function CommunityProjectPage({ params }: Props) {
                 projectId={project.id}
                 projectTitle={project.title}
                 authorId={project.user_id}
+                authorName={authorName}
                 locale={locale}
                 isOwner={!!isOwner}
               />

@@ -8,6 +8,7 @@ type ProjectActionsBarProps = {
   projectId: string;
   projectTitle: string;
   authorId: string;
+  authorName?: string;
   locale: string;
   isOwner: boolean;
 };
@@ -18,9 +19,14 @@ export default function ProjectActionsBar({
   projectId,
   projectTitle,
   authorId,
+  authorName,
   locale,
   isOwner,
 }: ProjectActionsBarProps) {
+  const messageHref = `/messages?recipient=${authorId}&course=${encodeURIComponent(
+    projectTitle,
+  )}${authorName ? `&name=${encodeURIComponent(authorName)}` : ""}`;
+
   return (
     <>
       {/* Action Buttons */}
@@ -51,7 +57,7 @@ export default function ProjectActionsBar({
 
         {/* Direct Message Author */}
         <Link
-          href={`/messages?recipient=${authorId}&course=${encodeURIComponent(projectTitle)}`}
+          href={messageHref}
           className="inline-flex items-center gap-2 rounded-xl border border-cyan-500/40 bg-cyan-500/10 px-5 py-2.5 text-xs font-semibold text-cyan-300 hover:bg-cyan-500/20 transition"
         >
           <MessageSquare className="h-3.5 w-3.5" />

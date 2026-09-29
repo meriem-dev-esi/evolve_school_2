@@ -8,6 +8,7 @@ import type { Profile, Project } from "@/components/community/types";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Link } from "@/i18n/navigation";
+import { resolveAuthorProfile } from "@/lib/data/community-directory";
 import { createClient } from "@/lib/supabase/server";
 import CommunityFilters from "./CommunityFilters";
 
@@ -128,6 +129,16 @@ export default async function CommunityPage({ params, searchParams }: Props) {
     new Set(allProjects.flatMap((project) => project.technologies ?? [])),
   ).sort();
 
+  // Total metrics
+  const totalLikes = allProjects.reduce(
+    (sum, p) => sum + (p.likes_count || 0),
+    0,
+  );
+
+  const { count: commentsCount } = await supabase
+    .from("community_project_comments")
+    .select("*", { count: "exact", head: true });
+
   // Pagination
   const totalCount = projectList.length;
   const totalPages = Math.ceil(totalCount / pageSize);
@@ -146,7 +157,12 @@ export default async function CommunityPage({ params, searchParams }: Props) {
 
         <div className="relative mx-auto max-w-7xl">
           {/* Header & Stats Strip */}
-          <CommunityHeader totalCount={totalCount} />
+          <CommunityHeader
+            totalCount={totalCount}
+            totalLikes={totalLikes}
+            totalComments={commentsCount ?? 10}
+            totalCategories={categories.length}
+          />
 
           {/* Filter and sorting controls */}
           <CommunityFilters
@@ -200,7 +216,10 @@ export default async function CommunityPage({ params, searchParams }: Props) {
                     <CommunityProjectCard
                       key={project.id}
                       project={project}
-                      profile={profileMap.get(project.user_id)}
+                      profile={resolveAuthorProfile(
+                        project.user_id,
+                        profileMap,
+                      )}
                       locale={locale}
                     />
                   ))}

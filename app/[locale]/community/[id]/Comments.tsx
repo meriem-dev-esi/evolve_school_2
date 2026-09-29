@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import CommentComposer from "@/components/community/CommentComposer";
 import CommentItem from "@/components/community/CommentItem";
 import type { ProjectComment } from "@/components/community/types";
+import { resolveAuthorProfile } from "@/lib/data/community-directory";
 import { createClient } from "@/lib/supabase/client";
 
 type Props = {
@@ -56,10 +57,17 @@ export default function Comments({ projectId }: Props) {
 
     const profileMap = new Map(profiles.map((p) => [p.id, p]));
 
-    const commentsWithProfiles: ProjectComment[] = commentList.map((c) => ({
-      ...c,
-      profile: profileMap.get(c.user_id) ?? null,
-    }));
+    const commentsWithProfiles: ProjectComment[] = commentList.map((c) => {
+      const resolved = resolveAuthorProfile(c.user_id, profileMap);
+      return {
+        ...c,
+        profile: {
+          full_name: resolved.full_name,
+          avatar_url: resolved.avatar_url,
+          role: resolved.role,
+        },
+      };
+    });
 
     setComments(commentsWithProfiles);
     setLoading(false);
@@ -88,7 +96,7 @@ export default function Comments({ projectId }: Props) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      alert("Connectez-vous pour participer à la discussion.");
+      alert("Veuillez vous connecter pour publier un retour sur ce projet.");
       setSubmitting(false);
       return;
     }
@@ -101,6 +109,7 @@ export default function Comments({ projectId }: Props) {
 
     if (error) {
       console.error("[Comments]", error);
+      alert(`Erreur lors de l'envoi du commentaire : ${error.message}`);
       setSubmitting(false);
       return;
     }

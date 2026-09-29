@@ -1,7 +1,7 @@
 "use client";
 
 import { Code2, Paperclip, Send, Smile, Sparkles } from "lucide-react";
-import type { FormEvent } from "react";
+import type { FormEvent, KeyboardEvent } from "react";
 
 const QUICK_PROMPTS = [
   "Question sur un exercice",
@@ -15,6 +15,8 @@ interface MessageComposerProps {
   onChangeText: (value: string) => void;
   onSubmit: (e: FormEvent) => void;
   onQuickPromptClick: (prompt: string) => void;
+  placeholder?: string;
+  disabled?: boolean;
 }
 
 export default function MessageComposer({
@@ -22,7 +24,16 @@ export default function MessageComposer({
   onChangeText,
   onSubmit,
   onQuickPromptClick,
+  placeholder = "Posez votre question à votre formateur ou camarade...",
+  disabled = false,
 }: MessageComposerProps) {
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      onSubmit(e);
+    }
+  };
+
   return (
     <>
       {/* Suggested Quick Prompts */}
@@ -52,6 +63,11 @@ export default function MessageComposer({
           <button
             type="button"
             title="Joindre un fichier"
+            onClick={() =>
+              alert(
+                "Le partage de fichiers sera disponible lors des ateliers pratiques.",
+              )
+            }
             className="p-2 text-white/40 hover:text-white transition rounded-xl hover:bg-white/5"
           >
             <Paperclip className="h-4 w-4" />
@@ -61,7 +77,11 @@ export default function MessageComposer({
             type="button"
             title="Insérer du code"
             onClick={() =>
-              onChangeText(`${newMessageText}\`\`\`\n// Votre code\n\`\`\``)
+              onChangeText(
+                newMessageText
+                  ? `${newMessageText}\n\`\`\`javascript\n// Votre code ici\n\`\`\``
+                  : "```javascript\n// Votre code ici\n```",
+              )
             }
             className="p-2 text-white/40 hover:text-white transition rounded-xl hover:bg-white/5"
           >
@@ -72,8 +92,10 @@ export default function MessageComposer({
             type="text"
             value={newMessageText}
             onChange={(e) => onChangeText(e.target.value)}
-            placeholder="Posez votre question à votre formateur..."
-            className="flex-1 bg-transparent px-3 py-2 text-xs sm:text-sm text-white placeholder-white/40 focus:outline-none"
+            onKeyDown={handleKeyDown}
+            disabled={disabled}
+            placeholder={placeholder}
+            className="flex-1 bg-transparent px-3 py-2 text-xs sm:text-sm text-white placeholder-white/40 focus:outline-none disabled:opacity-50"
           />
 
           <button
@@ -87,7 +109,7 @@ export default function MessageComposer({
 
           <button
             type="submit"
-            disabled={!newMessageText.trim()}
+            disabled={disabled || !newMessageText.trim()}
             className="inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-2.5 text-xs font-bold text-black shadow-md shadow-brand/20 transition hover:opacity-90 disabled:opacity-40 active:scale-95"
           >
             <span>Envoyer</span>

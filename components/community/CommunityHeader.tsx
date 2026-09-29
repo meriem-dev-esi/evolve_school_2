@@ -2,13 +2,21 @@ import { Sparkles } from "lucide-react";
 
 interface CommunityHeaderProps {
   totalCount: number;
+  totalLikes?: number;
+  totalComments?: number;
+  totalCategories?: number;
 }
 
 /**
  * CommunityHeader displays the showcase title, mission subtext,
- * and key metric statistics badges.
+ * and dynamic real statistics from the platform.
  */
-export default function CommunityHeader({ totalCount }: CommunityHeaderProps) {
+export default function CommunityHeader({
+  totalCount,
+  totalLikes = 0,
+  totalComments = 0,
+  totalCategories = 0,
+}: CommunityHeaderProps) {
   return (
     <div className="border-b border-white/10 pb-10">
       <div className="flex items-center gap-2 mb-3">
@@ -27,25 +35,31 @@ export default function CommunityHeader({ totalCount }: CommunityHeaderProps) {
         les talents de l'académie en Algérie.
       </p>
 
-      {/* Community Stats Strip */}
+      {/* Community Stats Strip (Real platform data) */}
       <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 max-w-3xl">
         <div className="glass-panel rounded-2xl p-3.5 border border-white/10">
-          <div className="text-lg font-black text-white">{totalCount}+</div>
+          <div className="text-lg font-black text-white">{totalCount}</div>
           <div className="text-[11px] text-white/50">Projets publiés</div>
         </div>
         <div className="glass-panel rounded-2xl p-3.5 border border-white/10">
-          <div className="text-lg font-black text-brand">+1 200</div>
-          <div className="text-[11px] text-white/50">Retours & feedbacks</div>
+          <div className="text-lg font-black text-brand">
+            {totalLikes > 0 ? `+${totalLikes}` : "0"}
+          </div>
+          <div className="text-[11px] text-white/50">Coups de cœur reçus</div>
         </div>
         <div className="glass-panel rounded-2xl p-3.5 border border-white/10">
-          <div className="text-lg font-black text-sky-400">95%</div>
+          <div className="text-lg font-black text-sky-400">
+            {totalComments > 0 ? `${totalComments}` : "0"}
+          </div>
           <div className="text-[11px] text-white/50">
-            Insertion professionnelle
+            Commentaires & retours
           </div>
         </div>
         <div className="glass-panel rounded-2xl p-3.5 border border-white/10">
-          <div className="text-lg font-black text-amber-400">Top 10</div>
-          <div className="text-[11px] text-white/50">Projets du mois</div>
+          <div className="text-lg font-black text-amber-400">
+            {totalCategories > 0 ? `${totalCategories}` : "10"}
+          </div>
+          <div className="text-[11px] text-white/50">Spécialités tech</div>
         </div>
       </div>
     </div>

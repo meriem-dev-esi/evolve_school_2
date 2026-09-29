@@ -1,6 +1,6 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import type { Conversation } from "@/lib/data/messages";
 
 interface ConversationSidebarProps {
@@ -10,6 +10,7 @@ interface ConversationSidebarProps {
   searchFilter: string;
   onSearchFilterChange: (value: string) => void;
   locale: string;
+  onOpenNewChat?: () => void;
 }
 
 export default function ConversationSidebar({
@@ -19,6 +20,7 @@ export default function ConversationSidebar({
   searchFilter,
   onSearchFilterChange,
   locale,
+  onOpenNewChat,
 }: ConversationSidebarProps) {
   const filteredConversations = conversations.filter(
     (c) =>
@@ -37,6 +39,18 @@ export default function ConversationSidebar({
               {conversations.length}
             </span>
           </h2>
+
+          {onOpenNewChat && (
+            <button
+              type="button"
+              onClick={onOpenNewChat}
+              title="Nouvelle discussion"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-brand/10 border border-brand/30 px-2.5 py-1 text-xs font-bold text-brand hover:bg-brand hover:text-black transition"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>Nouveau</span>
+            </button>
+          )}
         </div>
 
         <div className="relative mt-4">

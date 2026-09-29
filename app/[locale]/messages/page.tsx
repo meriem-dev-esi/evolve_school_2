@@ -2,7 +2,10 @@ import { Clock, MessageSquare, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import { getConversationMessages, getConversations } from "@/lib/data/messages";
+import {
+  getAllInitialMessagesMap,
+  getConversations,
+} from "@/lib/data/messages";
 import { createClient } from "@/lib/supabase/server";
 import MessagingClient from "./MessagingClient";
 
@@ -23,12 +26,13 @@ type Props = {
   searchParams: Promise<{
     recipient?: string;
     course?: string;
+    name?: string;
   }>;
 };
 
 export default async function MessagesPage({ params, searchParams }: Props) {
   const { locale } = await params;
-  const { recipient, course } = await searchParams;
+  const { recipient, course, name } = await searchParams;
 
   const supabase = await createClient();
   const {
@@ -37,9 +41,11 @@ export default async function MessagesPage({ params, searchParams }: Props) {
 
   const currentUserId = user?.id || "me";
 
-  const conversations = await getConversations(currentUserId);
-  const firstConvId = conversations[0]?.id || "conv-1";
-  const { messages } = await getConversationMessages(firstConvId);
+  const conversations = await getConversations(currentUserId, recipient, name);
+  const initialActiveConvId = recipient
+    ? `conv-${recipient}`
+    : conversations[0]?.id || "conv-1";
+  const initialMessagesMap = getAllInitialMessagesMap();
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col selection:bg-brand selection:text-black">
@@ -65,7 +71,7 @@ export default async function MessagesPage({ params, searchParams }: Props) {
 
               <p className="mt-1 text-xs sm:text-sm text-white/60">
                 Posez vos questions sur vos cours, demandez des revues de code
-                et contactez les formateurs Evolve.
+                et contactez les formateurs et membres Evolve.
               </p>
             </div>
 
@@ -77,7 +83,7 @@ export default async function MessagesPage({ params, searchParams }: Props) {
 
               <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-3.5 py-2 text-xs text-emerald-400 backdrop-blur-md">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Formateurs en ligne</span>
+                <span>Membres en ligne</span>
               </div>
 
               <div className="hidden sm:flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-3.5 py-2 text-xs text-white/50 backdrop-blur-md">
@@ -90,10 +96,12 @@ export default async function MessagesPage({ params, searchParams }: Props) {
           {/* Messaging Workspace Client */}
           <MessagingClient
             initialConversations={conversations}
-            initialMessages={messages}
+            initialMessagesMap={initialMessagesMap}
+            initialActiveConvId={initialActiveConvId}
             currentUserId={currentUserId}
             recipientId={recipient}
             courseTitle={course}
+            recipientName={name}
             locale={locale}
           />
         </div>

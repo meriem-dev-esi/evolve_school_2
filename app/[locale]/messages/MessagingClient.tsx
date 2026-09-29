@@ -6,7 +6,7 @@ import {
   type Conversation,
   type DirectMessage,
   isUuid,
-} from "@/lib/data/messages";
+} from "@/lib/data/messages-shared";
 import { createClient } from "@/lib/supabase/client";
 import ChatHeader from "./ChatHeader";
 import ConversationSidebar from "./ConversationSidebar";

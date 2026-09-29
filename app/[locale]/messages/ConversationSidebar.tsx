@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus, Search } from "lucide-react";
-import type { Conversation } from "@/lib/data/messages";
+import type { Conversation } from "@/lib/data/messages-shared";
 
 interface ConversationSidebarProps {
   conversations: Conversation[];

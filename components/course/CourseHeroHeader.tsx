@@ -83,9 +83,7 @@ export default function CourseHeroHeader({
           </div>
 
           <Link
-            href={`/messages?recipient=teacher&course=${encodeURIComponent(
-              course.title,
-            )}`}
+            href={`/messages?course=${encodeURIComponent(course.title)}`}
             className="inline-flex items-center gap-2 rounded-full border border-brand/40 bg-brand/10 px-4 py-2 text-xs font-bold text-brand transition-all hover:bg-brand hover:text-black hover:shadow-[0_0_15px_rgba(95,236,107,0.4)]"
           >
             <MessageSquare className="h-3.5 w-3.5" />

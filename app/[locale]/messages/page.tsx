@@ -38,6 +38,19 @@ export default async function MessagesPage({ params, searchParams }: Props) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const { data: profile, error: profileError } = user
+    ? await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .maybeSingle()
+    : { data: null, error: null };
+
+  if (profileError) {
+    throw new Error(
+      `Impossible de charger votre profil : ${profileError.message}`,
+    );
+  }
 
   const currentUserId = user?.id || "me";
 
@@ -51,7 +64,10 @@ export default async function MessagesPage({ params, searchParams }: Props) {
     ? matchedRecipientConv.id
     : conversations[0]?.id || "";
   const initialMessagesMap = user
-    ? await getAllInitialMessagesMap(currentUserId)
+    ? await getAllInitialMessagesMap(
+        currentUserId,
+        conversations.map((conversation) => conversation.id),
+      )
     : {};
 
   return (
@@ -77,8 +93,8 @@ export default async function MessagesPage({ params, searchParams }: Props) {
               </h1>
 
               <p className="mt-1 text-xs sm:text-sm text-white/60">
-                Consultez vos conversations et échangez avec les membres
-                inscrits sur Evolve.
+                Échangez avec vos formateurs ou les étudiants que vous
+                accompagnez.
               </p>
             </div>
           </div>
@@ -89,6 +105,7 @@ export default async function MessagesPage({ params, searchParams }: Props) {
               initialMessagesMap={initialMessagesMap}
               initialActiveConvId={initialActiveConvId}
               currentUserId={currentUserId}
+              currentUserRole={profile?.role ?? ""}
               recipientId={recipient}
               courseTitle={course}
               locale={locale}

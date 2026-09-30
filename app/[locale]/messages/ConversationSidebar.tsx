@@ -59,7 +59,7 @@ export default function ConversationSidebar({
             type="text"
             value={searchFilter}
             onChange={(e) => onSearchFilterChange(e.target.value)}
-            placeholder="Rechercher un formateur ou contact..."
+            placeholder="Rechercher un étudiant ou un formateur..."
             className="w-full rounded-2xl border border-white/10 bg-white/5 ps-10 pe-4 py-2 text-xs text-white placeholder-white/40 focus:border-brand focus:outline-none transition"
           />
         </div>

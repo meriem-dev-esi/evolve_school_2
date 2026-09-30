@@ -5,6 +5,43 @@ export interface DirectoryProfile {
   role: string;
 }
 
+export function isStudentTeacherPair(firstRole: string, secondRole: string) {
+  const category = (role: string) => {
+    const normalizedRole = role.trim().toLowerCase();
+    if (
+      [
+        "student",
+        "étudiant",
+        "étudiante",
+        "étudiant evolve",
+        "étudiante evolve",
+      ].includes(normalizedRole)
+    ) {
+      return "student";
+    }
+    if (
+      [
+        "teacher",
+        "formateur",
+        "formatrice",
+        "enseignant",
+        "enseignante",
+        "instructor",
+      ].includes(normalizedRole)
+    ) {
+      return "teacher";
+    }
+    return null;
+  };
+
+  const firstCategory = category(firstRole);
+  const secondCategory = category(secondRole);
+  return (
+    (firstCategory === "student" && secondCategory === "teacher") ||
+    (firstCategory === "teacher" && secondCategory === "student")
+  );
+}
+
 export function resolveAuthorProfile(
   id: string,
   dbProfilesMap?: Map<

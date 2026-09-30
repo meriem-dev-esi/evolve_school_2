@@ -13,6 +13,7 @@ interface MessagingClientProps {
   initialMessagesMap: Record<string, DirectMessage[]>;
   initialActiveConvId: string;
   currentUserId?: string;
+  currentUserRole: string;
   recipientId?: string;
   courseTitle?: string;
   locale: string;
@@ -82,6 +83,7 @@ export default function MessagingClient(props: MessagingClientProps) {
       <NewChatModal
         isOpen={isNewChatModalOpen}
         onClose={() => setIsNewChatModalOpen(false)}
+        currentUserRole={props.currentUserRole}
         onSelectContact={handleSelectContact}
       />
     </>

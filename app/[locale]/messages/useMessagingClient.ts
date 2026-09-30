@@ -1,7 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { DirectoryProfile } from "@/lib/community-directory";
+import {
+  type DirectoryProfile,
+  isStudentTeacherPair,
+} from "@/lib/community-directory";
 import {
   type Conversation,
   type DirectMessage,
@@ -14,6 +17,7 @@ interface UseMessagingClientProps {
   initialMessagesMap: Record<string, DirectMessage[]>;
   initialActiveConvId: string;
   currentUserId?: string;
+  currentUserRole: string;
   recipientId?: string;
   courseTitle?: string;
 }
@@ -23,6 +27,7 @@ export function useMessagingClient({
   initialMessagesMap,
   initialActiveConvId,
   currentUserId = "me",
+  currentUserRole,
   recipientId,
   courseTitle,
 }: UseMessagingClientProps) {
@@ -70,6 +75,12 @@ export function useMessagingClient({
       setNewMessageText(`Bonjour ${matched.participant.name}, `);
     }
   }, [recipientId, courseTitle, initialConversations]);
+
+  useEffect(() => {
+    if (courseTitle && !recipientId) {
+      setIsNewChatModalOpen(true);
+    }
+  }, [courseTitle, recipientId]);
 
   // 3. Auto-scroll on messages change
   const scrollToBottom = useCallback(() => {
@@ -263,6 +274,18 @@ export function useMessagingClient({
       return;
     }
 
+    if (
+      !isStudentTeacherPair(
+        currentUserRole,
+        activeConversation.participant.role,
+      )
+    ) {
+      setActionError(
+        "La messagerie est réservée aux échanges entre étudiants et formateurs.",
+      );
+      return;
+    }
+
     if (!isUuid(activeConversation.participant.id) || !isUuid(activeConvId)) {
       setActionError(
         "Le contact ou la conversation n'existe plus dans la base de données.",
@@ -338,6 +361,13 @@ export function useMessagingClient({
       return;
     }
 
+    if (!isStudentTeacherPair(currentUserRole, contact.role)) {
+      setActionError(
+        "Vous pouvez uniquement contacter un étudiant ou un formateur de l'autre groupe.",
+      );
+      return;
+    }
+
     setActionError("");
     const existing = conversations.find(
       (conversation) => conversation.participant.id === contact.id,
@@ -389,7 +419,11 @@ export function useMessagingClient({
       ...previous.filter((item) => item.id !== conversation.id),
     ]);
     setActiveConvId(conversation.id);
-    setNewMessageText(`Bonjour ${contact.full_name}, `);
+    setNewMessageText(
+      courseTitle
+        ? `Bonjour ${contact.full_name}, j'ai découvert votre cours "${courseTitle}" et j'aimerais échanger avec vous à ce sujet : `
+        : `Bonjour ${contact.full_name}, `,
+    );
   };
 
   return {

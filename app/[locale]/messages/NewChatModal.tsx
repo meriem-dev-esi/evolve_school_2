@@ -2,18 +2,23 @@
 
 import { MessageSquare, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { DirectoryProfile } from "@/lib/community-directory";
+import {
+  type DirectoryProfile,
+  isStudentTeacherPair,
+} from "@/lib/community-directory";
 import { createClient } from "@/lib/supabase/client";
 
 interface NewChatModalProps {
   isOpen: boolean;
   onClose: () => void;
+  currentUserRole: string;
   onSelectContact: (contact: DirectoryProfile) => void | Promise<void>;
 }
 
 export default function NewChatModal({
   isOpen,
   onClose,
+  currentUserRole,
   onSelectContact,
 }: NewChatModalProps) {
   const [search, setSearch] = useState("");
@@ -54,7 +59,13 @@ export default function NewChatModal({
         if (!cancelled) {
           setContactsList(
             (dbProfiles ?? [])
-              .filter((profile) => profile.id !== user.id && profile.full_name)
+              .filter(
+                (profile) =>
+                  profile.id !== user.id &&
+                  profile.full_name &&
+                  profile.role &&
+                  isStudentTeacherPair(currentUserRole, profile.role),
+              )
               .map((profile) => ({
                 id: profile.id,
                 full_name: profile.full_name ?? "",
@@ -85,7 +96,7 @@ export default function NewChatModal({
     return () => {
       cancelled = true;
     };
-  }, [isOpen]);
+  }, [currentUserRole, isOpen]);
 
   if (!isOpen) return null;
 
@@ -109,7 +120,7 @@ export default function NewChatModal({
                 Nouvel échange direct
               </h3>
               <p className="text-xs text-white/50">
-                Contactez un membre de la base Evolve
+                Choisissez un étudiant ou un formateur inscrit
               </p>
             </div>
           </div>

@@ -1,5 +1,6 @@
 import "server-only";
 
+import { isStudentTeacherPair } from "@/lib/community-directory";
 import {
   type Conversation,
   type DirectMessage,
@@ -17,6 +18,21 @@ export async function getConversations(
 
   const userId = currentUserId;
   const supabase = await createClient();
+  const { data: currentProfile, error: currentProfileError } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (currentProfileError) {
+    throw new Error(
+      `Unable to load current messaging profile: ${currentProfileError.message}`,
+    );
+  }
+  if (!currentProfile?.role) {
+    return [];
+  }
+
   let requestedConversation:
     | {
         id: string;
@@ -38,7 +54,10 @@ export async function getConversations(
       );
     }
 
-    if (recipient) {
+    if (
+      recipient?.role &&
+      isStudentTeacherPair(currentProfile.role, recipient.role)
+    ) {
       const { data: conversationId, error: conversationError } =
         await supabase.rpc("get_or_create_conversation", {
           p_recipient_id: recipient.id,
@@ -130,6 +149,7 @@ export async function getConversations(
       .map((profile) => [profile.id, profile]),
   );
   const conversations = new Map<string, Conversation>();
+  const currentRole = currentProfile.role;
 
   for (const row of conversationRows) {
     const otherUserId =
@@ -140,7 +160,11 @@ export async function getConversations(
           : null;
     const profile = otherUserId ? profileMap.get(otherUserId) : undefined;
 
-    if (!otherUserId || !profile) {
+    if (
+      !otherUserId ||
+      !profile?.role ||
+      !isStudentTeacherPair(currentRole, profile.role)
+    ) {
       continue;
     }
 
@@ -162,7 +186,7 @@ export async function getConversations(
       message.sender_id === userId ? message.receiver_id : message.sender_id;
     const profile = profileMap.get(otherUserId);
 
-    if (!profile) {
+    if (!profile?.role || !isStudentTeacherPair(currentRole, profile.role)) {
       continue;
     }
 
@@ -205,8 +229,13 @@ export async function getConversations(
 
 export async function getAllInitialMessagesMap(
   currentUserId?: string,
+  conversationIds?: string[],
 ): Promise<Record<string, DirectMessage[]>> {
-  if (typeof currentUserId !== "string" || !isUuid(currentUserId)) {
+  if (
+    typeof currentUserId !== "string" ||
+    !isUuid(currentUserId) ||
+    !conversationIds?.length
+  ) {
     return {};
   }
 
@@ -218,6 +247,7 @@ export async function getAllInitialMessagesMap(
       "id, conversation_id, sender_id, receiver_id, content, created_at, is_read",
     )
     .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+    .in("conversation_id", conversationIds)
     .order("created_at", { ascending: true });
 
   if (error) {

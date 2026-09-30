@@ -1,15 +1,31 @@
 "use client";
 
+import { ArrowLeft } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { Conversation } from "@/lib/messages-shared";
 
 interface ChatHeaderProps {
   activeConversation?: Conversation;
+  onBack: () => void;
 }
 
-export default function ChatHeader({ activeConversation }: ChatHeaderProps) {
+export default function ChatHeader({
+  activeConversation,
+  onBack,
+}: ChatHeaderProps) {
+  const t = useTranslations("messaging");
+
   return (
     <div className="flex items-center justify-between border-b border-white/10 px-6 py-4 bg-white/[0.02]">
       <div className="flex items-center gap-3.5">
+        <button
+          type="button"
+          onClick={onBack}
+          aria-label={t("backToConversations")}
+          className="rounded-xl p-2 text-white/60 transition hover:bg-white/10 hover:text-white md:hidden"
+        >
+          <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+        </button>
         <div className="relative shrink-0">
           {activeConversation?.participant.avatar_url ? (
             <img

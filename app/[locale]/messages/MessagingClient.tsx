@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type { Conversation, DirectMessage } from "@/lib/messages-shared";
 import ChatHeader from "./ChatHeader";
 import ConversationSidebar from "./ConversationSidebar";
@@ -20,6 +21,7 @@ interface MessagingClientProps {
 }
 
 export default function MessagingClient(props: MessagingClientProps) {
+  const t = useTranslations("messaging");
   const {
     conversations,
     activeConvId,
@@ -34,6 +36,7 @@ export default function MessagingClient(props: MessagingClientProps) {
     activeMessages,
     actionError,
     handleSelectConversation,
+    handleBackToConversations,
     handleSendMessage,
     handleQuickPromptClick,
     handleSelectContact,
@@ -49,7 +52,7 @@ export default function MessagingClient(props: MessagingClientProps) {
           {actionError}
         </p>
       )}
-      <div className="grid h-[calc(100vh-14rem)] min-h-[580px] overflow-hidden rounded-3xl border border-white/10 bg-zinc-950/80 shadow-2xl backdrop-blur-2xl md:grid-cols-12">
+      <div className="grid h-[calc(100dvh-13rem)] min-h-[560px] overflow-hidden rounded-3xl border border-white/10 bg-zinc-950/80 shadow-2xl backdrop-blur-2xl md:grid-cols-12">
         <ConversationSidebar
           conversations={conversations}
           activeConvId={activeConvId}
@@ -58,25 +61,50 @@ export default function MessagingClient(props: MessagingClientProps) {
           onSearchFilterChange={setSearchFilter}
           locale={props.locale}
           onOpenNewChat={() => setIsNewChatModalOpen(true)}
+          className={activeConvId ? "hidden md:flex" : "flex"}
         />
 
-        <section className="flex flex-col md:col-span-8 lg:col-span-9 bg-zinc-950/40">
-          <ChatHeader activeConversation={activeConversation} />
-
-          <MessagesThread
-            messages={activeMessages}
-            currentUserId={props.currentUserId || "me"}
-            locale={props.locale}
-            messagesEndRef={messagesEndRef}
+        <section
+          className={`${activeConvId ? "flex" : "hidden md:flex"} min-h-0 flex-col bg-zinc-950/40 md:col-span-7 lg:col-span-8`}
+        >
+          <ChatHeader
+            activeConversation={activeConversation}
+            onBack={handleBackToConversations}
           />
 
-          <MessageComposer
-            newMessageText={newMessageText}
-            onChangeText={setNewMessageText}
-            onSubmit={handleSendMessage}
-            onQuickPromptClick={handleQuickPromptClick}
-            disabled={!activeConversation}
-          />
+          {activeConversation ? (
+            <>
+              <MessagesThread
+                messages={activeMessages}
+                currentUserId={props.currentUserId || "me"}
+                locale={props.locale}
+                messagesEndRef={messagesEndRef}
+              />
+
+              <MessageComposer
+                newMessageText={newMessageText}
+                onChangeText={setNewMessageText}
+                onSubmit={handleSendMessage}
+                onQuickPromptClick={handleQuickPromptClick}
+              />
+            </>
+          ) : (
+            <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
+              <p className="text-sm font-semibold text-white">
+                {t("chooseConversation")}
+              </p>
+              <p className="mt-2 max-w-sm text-xs leading-relaxed text-white/50">
+                {t("chooseConversationDescription")}
+              </p>
+              <button
+                type="button"
+                onClick={() => setIsNewChatModalOpen(true)}
+                className="mt-5 rounded-xl bg-brand px-4 py-2.5 text-xs font-bold text-black transition hover:opacity-90"
+              >
+                {t("newConversation")}
+              </button>
+            </div>
+          )}
         </section>
       </div>
 

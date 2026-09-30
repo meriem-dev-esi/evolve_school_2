@@ -1,6 +1,7 @@
 "use client";
 
 import { MessageSquare, Search, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import {
   type DirectoryProfile,
@@ -12,7 +13,7 @@ interface NewChatModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentUserRole: string;
-  onSelectContact: (contact: DirectoryProfile) => void | Promise<void>;
+  onSelectContact: (contact: DirectoryProfile) => Promise<boolean>;
 }
 
 export default function NewChatModal({
@@ -21,10 +22,13 @@ export default function NewChatModal({
   currentUserRole,
   onSelectContact,
 }: NewChatModalProps) {
+  const t = useTranslations("messaging");
   const [search, setSearch] = useState("");
   const [contactsList, setContactsList] = useState<DirectoryProfile[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState("");
+  const [selectionError, setSelectionError] = useState("");
+  const [selectingContactId, setSelectingContactId] = useState("");
 
   useEffect(() => {
     if (!isOpen) return;
@@ -45,7 +49,7 @@ export default function NewChatModal({
           throw authError;
         }
         if (!user) {
-          throw new Error("Connectez-vous pour rechercher des membres.");
+          throw new Error(t("loginToSearch"));
         }
 
         const { data: dbProfiles, error } = await supabase
@@ -79,9 +83,7 @@ export default function NewChatModal({
         if (!cancelled) {
           setContactsList([]);
           setLoadError(
-            error instanceof Error
-              ? error.message
-              : "Impossible de charger les membres depuis la base de données.",
+            error instanceof Error ? error.message : t("contactLoadError"),
           );
         }
       } finally {
@@ -96,7 +98,7 @@ export default function NewChatModal({
     return () => {
       cancelled = true;
     };
-  }, [currentUserRole, isOpen]);
+  }, [currentUserRole, isOpen, t]);
 
   if (!isOpen) return null;
 
@@ -117,17 +119,16 @@ export default function NewChatModal({
             </div>
             <div>
               <h3 className="text-base font-bold text-white">
-                Nouvel échange direct
+                {t("newChatTitle")}
               </h3>
-              <p className="text-xs text-white/50">
-                Choisissez un étudiant ou un formateur inscrit
-              </p>
+              <p className="text-xs text-white/50">{t("newChatSubtitle")}</p>
             </div>
           </div>
 
           <button
             type="button"
             onClick={onClose}
+            aria-label={t("close")}
             className="rounded-full p-2 text-white/40 hover:bg-white/10 hover:text-white transition"
           >
             <X className="h-5 w-5" />
@@ -141,37 +142,57 @@ export default function NewChatModal({
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Rechercher par nom, rôle ou spécialité..."
+            placeholder={t("searchContacts")}
+            aria-label={t("searchContacts")}
             className="w-full rounded-2xl border border-white/10 bg-white/5 ps-10 pe-4 py-2.5 text-xs text-white placeholder-white/40 focus:border-brand focus:outline-none transition"
           />
         </div>
 
         {/* Contacts list */}
         <div className="mt-4 max-h-80 overflow-y-auto divide-y divide-white/5 scrollbar-thin">
+          {selectionError && (
+            <div className="mb-3 text-center text-xs text-red-300" role="alert">
+              {selectionError}
+            </div>
+          )}
           {loadError ? (
             <div className="py-8 text-center text-xs text-red-300" role="alert">
               {loadError}
             </div>
           ) : isLoading ? (
             <div className="py-8 text-center text-xs text-white/40">
-              Chargement des membres...
+              {t("loadingContacts")}
             </div>
           ) : contacts.length === 0 ? (
             <div className="py-8 text-center text-xs text-white/40">
-              {search
-                ? `Aucun membre trouvé pour "${search}".`
-                : "Aucun autre profil disponible dans la base de données."}
+              {search ? t("noContactForSearch", { search }) : t("noContacts")}
             </div>
           ) : (
             contacts.map((contact) => (
               <button
                 key={contact.id}
                 type="button"
+                disabled={Boolean(selectingContactId)}
                 onClick={async () => {
-                  await onSelectContact(contact);
-                  onClose();
+                  setSelectingContactId(contact.id);
+                  setSelectionError("");
+                  try {
+                    if (await onSelectContact(contact)) {
+                      onClose();
+                    } else {
+                      setSelectionError(t("openConversationError"));
+                    }
+                  } catch (error) {
+                    console.error(
+                      "[Messaging] Unable to open conversation:",
+                      error,
+                    );
+                    setSelectionError(t("openConversationError"));
+                  } finally {
+                    setSelectingContactId("");
+                  }
                 }}
-                className="w-full flex items-center gap-3.5 p-3.5 text-left rounded-2xl hover:bg-white/5 transition group"
+                className="w-full flex items-center gap-3.5 p-3.5 text-left rounded-2xl hover:bg-white/5 transition group disabled:cursor-wait disabled:opacity-50"
               >
                 <div className="relative shrink-0">
                   {contact.avatar_url ? (
@@ -192,6 +213,11 @@ export default function NewChatModal({
                     <span className="text-xs font-bold text-white group-hover:text-brand transition-colors">
                       {contact.full_name}
                     </span>
+                    {selectingContactId === contact.id && (
+                      <span className="text-[10px] text-white/50">
+                        {t("openingConversation")}
+                      </span>
+                    )}
                   </div>
                   <p className="text-[11px] text-brand/80 truncate">
                     {contact.role}

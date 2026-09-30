@@ -240,5 +240,51 @@
         "cta": "انضم إلى المجتمع"
       }
     }
+  },
+  "messaging": {
+    "badge": "الإرشاد والمحادثات",
+    "title": "رسائل تعليمية",
+    "subtitle": "تواصل مع مدرّسيك أو الطلاب الذين ترافقهم.",
+    "loginPrompt": "سجّل الدخول للوصول إلى محادثاتك.",
+    "loginButton": "تسجيل الدخول",
+    "conversations": "المحادثات",
+    "newConversation": "محادثة جديدة",
+    "new": "جديد",
+    "search": "ابحث عن طالب أو مدرّس...",
+    "noSearchResults": "لم يتم العثور على محادثات.",
+    "emptyInbox": "لا توجد محادثات بعد.",
+    "noMessagesYet": "لا توجد رسائل بعد",
+    "unreadCount": "{count, plural, zero {لا رسائل غير مقروءة} one {رسالة واحدة غير مقروءة} two {رسالتان غير مقروءتين} few {# رسائل غير مقروءة} many {# رسالة غير مقروءة} other {# رسالة غير مقروءة}}",
+    "backToConversations": "العودة إلى المحادثات",
+    "chooseConversation": "اختر محادثة",
+    "chooseConversationDescription": "اختر طالبًا أو مدرّسًا من صندوق الوارد لمتابعة المحادثة.",
+    "send": "إرسال",
+    "insertCode": "إدراج مقتطف برمجي",
+    "codePlaceholder": "// ألصق الشيفرة هنا",
+    "insertEmoji": "إضافة فكرة",
+    "messagePlaceholder": "اكتب إلى مدرّسك أو طالبك...",
+    "suggestions": "اقتراحات",
+    "prompts": {
+      "exercise": "سؤال حول تمرين",
+      "codeReview": "مراجعة الشيفرة",
+      "deployment": "المساعدة في النشر",
+      "resources": "مصادر إضافية"
+    },
+    "conversationMessages": "رسائل المحادثة",
+    "startConversation": "ابدأ المحادثة",
+    "startConversationDescription": "اطرح سؤالك الأول أو شارك أفكارك لبدء هذا الحوار.",
+    "read": "مقروءة",
+    "sent": "مُرسلة",
+    "newChatTitle": "بدء محادثة مباشرة",
+    "newChatSubtitle": "اختر طالبًا أو مدرّسًا مسجلًا",
+    "close": "إغلاق",
+    "searchContacts": "ابحث بالاسم أو الدور...",
+    "loadingContacts": "جارٍ تحميل الأعضاء...",
+    "noContactForSearch": "لم يتم العثور على عضو باسم «{search}».",
+    "noContacts": "لا توجد ملفات شخصية أخرى.",
+    "loginToSearch": "سجّل الدخول للبحث عن الأعضاء.",
+    "contactLoadError": "تعذر تحميل الأعضاء.",
+    "openingConversation": "جارٍ الفتح...",
+    "openConversationError": "تعذر فتح هذه المحادثة. يُرجى المحاولة مجددًا."
   }
 }

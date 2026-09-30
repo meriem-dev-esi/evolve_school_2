@@ -240,5 +240,51 @@
         "cta": "Rejoindre la communauté"
       }
     }
+  },
+  "messaging": {
+    "badge": "Mentorat et échanges",
+    "title": "Messagerie pédagogique",
+    "subtitle": "Échangez avec vos formateurs ou les étudiants que vous accompagnez.",
+    "loginPrompt": "Connectez-vous pour accéder à vos conversations.",
+    "loginButton": "Se connecter",
+    "conversations": "Discussions",
+    "newConversation": "Nouvelle discussion",
+    "new": "Nouveau",
+    "search": "Rechercher un étudiant ou un formateur...",
+    "noSearchResults": "Aucune discussion trouvée.",
+    "emptyInbox": "Aucune discussion pour le moment.",
+    "noMessagesYet": "Aucun message pour le moment",
+    "unreadCount": "{count, plural, one {# message non lu} other {# messages non lus}}",
+    "backToConversations": "Retour aux discussions",
+    "chooseConversation": "Choisissez une discussion",
+    "chooseConversationDescription": "Sélectionnez un étudiant ou un formateur dans votre boîte de réception pour reprendre un échange.",
+    "send": "Envoyer",
+    "insertCode": "Insérer un extrait de code",
+    "codePlaceholder": "// Collez votre code ici",
+    "insertEmoji": "Ajouter une idée",
+    "messagePlaceholder": "Écrivez à votre formateur ou à votre étudiant...",
+    "suggestions": "Suggestions",
+    "prompts": {
+      "exercise": "Question sur un exercice",
+      "codeReview": "Revue de code",
+      "deployment": "Aide au déploiement",
+      "resources": "Ressources complémentaires"
+    },
+    "conversationMessages": "Messages de la discussion",
+    "startConversation": "Démarrez la conversation",
+    "startConversationDescription": "Posez votre première question ou partagez vos impressions pour débuter cet échange direct.",
+    "read": "Lu",
+    "sent": "Envoyé",
+    "newChatTitle": "Nouvel échange direct",
+    "newChatSubtitle": "Choisissez un étudiant ou un formateur inscrit",
+    "close": "Fermer",
+    "searchContacts": "Rechercher par nom ou rôle...",
+    "loadingContacts": "Chargement des membres...",
+    "noContactForSearch": "Aucun membre trouvé pour « {search} ».",
+    "noContacts": "Aucun autre profil disponible.",
+    "loginToSearch": "Connectez-vous pour rechercher des membres.",
+    "contactLoadError": "Impossible de charger les membres.",
+    "openingConversation": "Ouverture...",
+    "openConversationError": "Impossible d'ouvrir cette discussion. Réessayez."
   }
 }

@@ -240,5 +240,51 @@
         "cta": "Join the community"
       }
     }
+  },
+  "messaging": {
+    "badge": "Mentoring & conversations",
+    "title": "Learning messages",
+    "subtitle": "Chat with your teachers or the students you mentor.",
+    "loginPrompt": "Sign in to access your conversations.",
+    "loginButton": "Sign in",
+    "conversations": "Conversations",
+    "newConversation": "New conversation",
+    "new": "New",
+    "search": "Search students or teachers...",
+    "noSearchResults": "No conversations found.",
+    "emptyInbox": "No conversations yet.",
+    "noMessagesYet": "No messages yet",
+    "unreadCount": "{count, plural, one {# unread message} other {# unread messages}}",
+    "backToConversations": "Back to conversations",
+    "chooseConversation": "Choose a conversation",
+    "chooseConversationDescription": "Select a student or teacher from your inbox to pick up a conversation.",
+    "send": "Send",
+    "insertCode": "Insert code snippet",
+    "codePlaceholder": "// Paste your code here",
+    "insertEmoji": "Add an idea",
+    "messagePlaceholder": "Write to your teacher or student...",
+    "suggestions": "Suggestions",
+    "prompts": {
+      "exercise": "Question about an exercise",
+      "codeReview": "Code review",
+      "deployment": "Deployment help",
+      "resources": "Extra resources"
+    },
+    "conversationMessages": "Conversation messages",
+    "startConversation": "Start the conversation",
+    "startConversationDescription": "Ask your first question or share your thoughts to start this conversation.",
+    "read": "Read",
+    "sent": "Sent",
+    "newChatTitle": "Start a conversation",
+    "newChatSubtitle": "Choose a registered student or teacher",
+    "close": "Close",
+    "searchContacts": "Search by name or role...",
+    "loadingContacts": "Loading members...",
+    "noContactForSearch": "No member found for “{search}”.",
+    "noContacts": "No other profiles are available.",
+    "loginToSearch": "Sign in to search for members.",
+    "contactLoadError": "Unable to load members.",
+    "openingConversation": "Opening...",
+    "openConversationError": "Unable to open this conversation. Please try again."
   }
 }

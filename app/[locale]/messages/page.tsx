@@ -1,5 +1,6 @@
 import { MessageSquare } from "lucide-react";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Link } from "@/i18n/navigation";
@@ -33,6 +34,7 @@ type Props = {
 export default async function MessagesPage({ params, searchParams }: Props) {
   const { locale } = await params;
   const { recipient, course } = await searchParams;
+  const t = await getTranslations({ locale, namespace: "messaging" });
 
   const supabase = await createClient();
   const {
@@ -85,16 +87,15 @@ export default async function MessagesPage({ params, searchParams }: Props) {
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-3.5 py-1 text-xs font-bold text-brand uppercase tracking-wider">
                 <MessageSquare className="h-3.5 w-3.5" />
-                Mentorat & Échanges
+                {t("badge")}
               </div>
 
               <h1 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">
-                Messagerie Pédagogique
+                {t("title")}
               </h1>
 
               <p className="mt-1 text-xs sm:text-sm text-white/60">
-                Échangez avec vos formateurs ou les étudiants que vous
-                accompagnez.
+                {t("subtitle")}
               </p>
             </div>
           </div>
@@ -112,14 +113,12 @@ export default async function MessagesPage({ params, searchParams }: Props) {
             />
           ) : (
             <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 text-center">
-              <p className="text-white/70">
-                Connectez-vous pour accéder à vos conversations.
-              </p>
+              <p className="text-white/70">{t("loginPrompt")}</p>
               <Link
                 href="/sign-in"
                 className="mt-5 inline-flex rounded-xl bg-brand px-5 py-3 text-sm font-bold text-black"
               >
-                Se connecter
+                {t("loginButton")}
               </Link>
             </div>
           )}

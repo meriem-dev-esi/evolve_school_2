@@ -1,6 +1,7 @@
 "use client";
 
 import { Plus, Search } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { Conversation } from "@/lib/messages-shared";
 
 interface ConversationSidebarProps {
@@ -11,6 +12,7 @@ interface ConversationSidebarProps {
   onSearchFilterChange: (value: string) => void;
   locale: string;
   onOpenNewChat?: () => void;
+  className?: string;
 }
 
 export default function ConversationSidebar({
@@ -21,7 +23,9 @@ export default function ConversationSidebar({
   onSearchFilterChange,
   locale,
   onOpenNewChat,
+  className = "",
 }: ConversationSidebarProps) {
+  const t = useTranslations("messaging");
   const filteredConversations = conversations.filter(
     (c) =>
       c.participant.name.toLowerCase().includes(searchFilter.toLowerCase()) ||
@@ -29,12 +33,14 @@ export default function ConversationSidebar({
   );
 
   return (
-    <aside className="flex flex-col border-b border-white/10 md:col-span-5 lg:col-span-4 md:border-b-0 md:border-r">
+    <aside
+      className={`min-h-0 flex-col border-b border-white/10 md:col-span-5 md:border-b-0 md:border-r lg:col-span-4 ${className}`}
+    >
       {/* Header & Search */}
       <div className="border-b border-white/10 p-5">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold text-white flex items-center gap-2">
-            <span>Discussions</span>
+            <span>{t("conversations")}</span>
             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand/20 text-[10px] font-bold text-brand">
               {conversations.length}
             </span>
@@ -44,11 +50,11 @@ export default function ConversationSidebar({
             <button
               type="button"
               onClick={onOpenNewChat}
-              title="Nouvelle discussion"
+              title={t("newConversation")}
               className="inline-flex items-center gap-1.5 rounded-xl bg-brand/10 border border-brand/30 px-2.5 py-1 text-xs font-bold text-brand hover:bg-brand hover:text-black transition"
             >
               <Plus className="h-3.5 w-3.5" />
-              <span>Nouveau</span>
+              <span>{t("new")}</span>
             </button>
           )}
         </div>
@@ -59,7 +65,8 @@ export default function ConversationSidebar({
             type="text"
             value={searchFilter}
             onChange={(e) => onSearchFilterChange(e.target.value)}
-            placeholder="Rechercher un étudiant ou un formateur..."
+            aria-label={t("search")}
+            placeholder={t("search")}
             className="w-full rounded-2xl border border-white/10 bg-white/5 ps-10 pe-4 py-2 text-xs text-white placeholder-white/40 focus:border-brand focus:outline-none transition"
           />
         </div>
@@ -69,19 +76,26 @@ export default function ConversationSidebar({
       <div className="flex-1 overflow-y-auto divide-y divide-white/5 scrollbar-thin">
         {filteredConversations.length === 0 ? (
           <div className="p-8 text-center text-xs text-white/40">
-            Aucune conversation trouvée.
+            {searchFilter ? t("noSearchResults") : t("emptyInbox")}
           </div>
         ) : (
           filteredConversations.map((c) => {
             const isSelected = c.id === activeConvId;
-            const formattedTime = c.last_message
-              ? new Date(c.last_message.created_at).toLocaleTimeString(
-                  locale === "ar" ? "ar-DZ" : "fr-FR",
-                  {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  },
-                )
+            const messageDate = c.last_message
+              ? new Date(c.last_message.created_at)
+              : null;
+            const isToday =
+              messageDate?.toDateString() === new Date().toDateString();
+            const formattedTime = messageDate
+              ? isToday
+                ? messageDate.toLocaleTimeString(
+                    locale === "ar" ? "ar-DZ" : locale,
+                    { hour: "2-digit", minute: "2-digit" },
+                  )
+                : messageDate.toLocaleDateString(
+                    locale === "ar" ? "ar-DZ" : locale,
+                    { day: "numeric", month: "short" },
+                  )
               : "";
 
             return (
@@ -89,9 +103,10 @@ export default function ConversationSidebar({
                 key={c.id}
                 type="button"
                 onClick={() => onSelectConversation(c.id)}
+                aria-pressed={isSelected}
                 className={`group relative w-full flex items-start gap-3.5 p-4 text-left transition-all duration-200 ${
                   isSelected
-                    ? "bg-white/[0.06] before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-brand"
+                    ? "bg-white/[0.06] before:absolute before:inset-y-0 before:start-0 before:w-1 before:bg-brand"
                     : "hover:bg-white/[0.02]"
                 }`}
               >
@@ -126,13 +141,17 @@ export default function ConversationSidebar({
                   </div>
 
                   <p className="mt-1 truncate text-xs text-white/60">
-                    {c.last_message?.content ?? "Aucun message"}
+                    {c.last_message?.content ?? t("noMessagesYet")}
                   </p>
                 </div>
 
                 {c.unread_count > 0 && (
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand text-[10px] font-black text-black shadow-md shadow-brand/30">
-                    {c.unread_count}
+                  <span
+                    className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-black text-black shadow-md shadow-brand/30"
+                    role="status"
+                    aria-label={t("unreadCount", { count: c.unread_count })}
+                  >
+                    {c.unread_count > 99 ? "99+" : c.unread_count}
                   </span>
                 )}
               </button>

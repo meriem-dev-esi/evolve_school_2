@@ -145,24 +145,32 @@ export function useMessagingClient({
                     );
                   }
                 });
-            } else if (newDbMsg.receiver_id === currentUserId) {
-              setConversations((prev) =>
-                prev.map((c) =>
-                  c.id === newDbMsg.conversation_id
-                    ? {
-                        ...c,
-                        unread_count: c.unread_count + 1,
-                        last_message: {
-                          content: newDbMsg.content,
-                          created_at: newDbMsg.created_at,
-                          sender_id: newDbMsg.sender_id,
-                          is_read: false,
-                        },
-                      }
-                    : c,
-                ),
-              );
             }
+
+            setConversations((prev) =>
+              prev.map((conversation) =>
+                conversation.id === newDbMsg.conversation_id
+                  ? {
+                      ...conversation,
+                      unread_count:
+                        newDbMsg.receiver_id === currentUserId
+                          ? newDbMsg.conversation_id === activeConvId
+                            ? 0
+                            : conversation.unread_count + 1
+                          : conversation.unread_count,
+                      last_message: {
+                        content: newDbMsg.content,
+                        created_at: newDbMsg.created_at,
+                        sender_id: newDbMsg.sender_id,
+                        is_read:
+                          newDbMsg.is_read ||
+                          (newDbMsg.receiver_id === currentUserId &&
+                            newDbMsg.conversation_id === activeConvId),
+                      },
+                    }
+                  : conversation,
+              ),
+            );
           }
         },
       )
@@ -259,6 +267,11 @@ export function useMessagingClient({
           : message,
       ),
     }));
+  };
+
+  const handleBackToConversations = () => {
+    setActiveConvId("");
+    setNewMessageText("");
   };
 
   // 6. Send message handler
@@ -358,14 +371,14 @@ export function useMessagingClient({
   const handleSelectContact = async (contact: DirectoryProfile) => {
     if (!isUuid(currentUserId) || !isUuid(contact.id)) {
       setActionError("Le contact ne correspond pas à un profil enregistré.");
-      return;
+      return false;
     }
 
     if (!isStudentTeacherPair(currentUserRole, contact.role)) {
       setActionError(
         "Vous pouvez uniquement contacter un étudiant ou un formateur de l'autre groupe.",
       );
-      return;
+      return false;
     }
 
     setActionError("");
@@ -385,7 +398,7 @@ export function useMessagingClient({
           setActionError(
             `Impossible d'ouvrir la conversation : ${error?.message ?? "aucun identifiant retourné par la base de données."}`,
           );
-          return;
+          return false;
         }
         conversationId = data;
       } catch (error) {
@@ -393,13 +406,13 @@ export function useMessagingClient({
         setActionError(
           `Impossible d'ouvrir la conversation : ${error instanceof Error ? error.message : "erreur inattendue."}`,
         );
-        return;
+        return false;
       }
     }
 
     if (!conversationId) {
       setActionError("La base de données n'a pas retourné de conversation.");
-      return;
+      return false;
     }
 
     const conversation: Conversation = existing ?? {
@@ -424,6 +437,7 @@ export function useMessagingClient({
         ? `Bonjour ${contact.full_name}, j'ai découvert votre cours "${courseTitle}" et j'aimerais échanger avec vous à ce sujet : `
         : `Bonjour ${contact.full_name}, `,
     );
+    return true;
   };
 
   return {
@@ -441,6 +455,7 @@ export function useMessagingClient({
     activeMessages,
     actionError,
     handleSelectConversation,
+    handleBackToConversations,
     handleSendMessage,
     handleQuickPromptClick,
     handleSelectContact,

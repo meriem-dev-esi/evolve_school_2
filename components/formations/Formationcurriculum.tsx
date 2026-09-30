@@ -34,8 +34,7 @@ export default function FormationCurriculum({
 
       <div className="divide-y divide-white/5">
         {formation.courses.map((course, index) => {
-          const locked =
-            index > 0 && !formation.courses[index - 1]?.completed;
+          const locked = index > 0 && !formation.courses[index - 1]?.completed;
 
           return (
             <div

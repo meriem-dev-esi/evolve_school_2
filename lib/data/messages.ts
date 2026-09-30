@@ -1,14 +1,15 @@
 import "server-only";
 
-import { resolveAuthorProfile } from "@/lib/data/community-directory";
-import { createClient } from "@/lib/supabase/server";
-
-export {
+import { resolveAuthorProfile } from "@/lib/community-directory";
+import {
   type Conversation,
   type DirectMessage,
   isUuid,
   type MessageUser,
-} from "@/lib/data/messages-shared";
+} from "@/lib/messages-shared";
+import { createClient } from "@/lib/supabase/server";
+
+export { type Conversation, type DirectMessage, isUuid, type MessageUser };
 
 export const BASE_CONVERSATIONS: Conversation[] = [
   {

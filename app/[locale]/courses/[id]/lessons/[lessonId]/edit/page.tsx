@@ -1,5 +1,4 @@
 "use client";
-import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -13,7 +12,6 @@ export default function EditLessonPage({
     lessonId: string;
   }>;
 }) {
-  const locale = useLocale();
   const router = useRouter();
 
   const [courseId, setCourseId] = useState("");
@@ -88,7 +86,7 @@ export default function EditLessonPage({
     }
 
     void loadLesson();
-  }, [locale, router, params]);
+  }, [router, params]);
 
   async function handleSave() {
     if (!lessonId || !courseId || !title.trim()) {
@@ -229,9 +227,7 @@ export default function EditLessonPage({
         <div className="mt-6 flex flex-wrap gap-4">
           <button
             type="button"
-            onClick={() =>
-              router.push(`/teacher/courses/${courseId}/lessons`)
-            }
+            onClick={() => router.push(`/teacher/courses/${courseId}/lessons`)}
             className="rounded-full border border-white/10 px-6 py-3 font-semibold"
           >
             Cancel

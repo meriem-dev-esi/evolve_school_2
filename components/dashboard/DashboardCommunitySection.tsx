@@ -11,7 +11,9 @@ interface DashboardCommunitySectionProps {
  * DashboardCommunitySection provides quick access banners to
  * direct mentor support and the student community showcase.
  */
-export default function DashboardCommunitySection(_props: DashboardCommunitySectionProps) {
+export default function DashboardCommunitySection(
+  _props: DashboardCommunitySectionProps,
+) {
   return (
     <section className="grid gap-6 md:grid-cols-2 mt-12">
       {/* Mentor direct contact */}

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Link } from "@/i18n/navigation";
-import { resolveAuthorProfile } from "@/lib/data/community-directory";
+import { resolveAuthorProfile } from "@/lib/community-directory";
 import { createClient } from "@/lib/supabase/server";
 import Comments from "./Comments";
 import ProjectActionsBar from "./ProjectActionsBar";

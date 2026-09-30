@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import CommentComposer from "@/components/community/CommentComposer";
 import CommentItem from "@/components/community/CommentItem";
 import type { ProjectComment } from "@/components/community/types";
-import { resolveAuthorProfile } from "@/lib/data/community-directory";
+import { resolveAuthorProfile } from "@/lib/community-directory";
 import { createClient } from "@/lib/supabase/client";
 
 type Props = {

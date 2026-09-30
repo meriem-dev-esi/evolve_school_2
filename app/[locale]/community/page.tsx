@@ -8,7 +8,7 @@ import type { Profile, Project } from "@/components/community/types";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Link } from "@/i18n/navigation";
-import { resolveAuthorProfile } from "@/lib/data/community-directory";
+import { resolveAuthorProfile } from "@/lib/community-directory";
 import { createClient } from "@/lib/supabase/server";
 import CommunityFilters from "./CommunityFilters";
 

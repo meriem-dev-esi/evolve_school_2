@@ -202,9 +202,7 @@ export default function NewLessonPage({
         <div className="mt-6 flex gap-4">
           <button
             type="button"
-            onClick={() =>
-              router.push(`/teacher/courses/${courseId}/lessons`)
-            }
+            onClick={() => router.push(`/teacher/courses/${courseId}/lessons`)}
             className="rounded-full border border-white/10 px-6 py-3 font-semibold"
           >
             Cancel

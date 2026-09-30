@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import {
   COMMUNITY_PROFILES,
   type DirectoryProfile,
-} from "@/lib/data/community-directory";
+} from "@/lib/community-directory";
 import { createClient } from "@/lib/supabase/client";
 
 interface NewChatModalProps {

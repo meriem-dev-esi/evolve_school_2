@@ -1,7 +1,7 @@
 "use client";
 
 import { Clock, ShieldCheck } from "lucide-react";
-import type { Conversation } from "@/lib/data/messages-shared";
+import type { Conversation } from "@/lib/messages-shared";
 
 interface ChatHeaderProps {
   activeConversation?: Conversation;

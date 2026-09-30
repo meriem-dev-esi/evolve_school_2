@@ -1,6 +1,5 @@
 "use client";
 
-import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
 import EditCourseBasicInfo from "@/components/course/EditCourseBasicInfo";
 import EditCoursePlacement from "@/components/course/EditCoursePlacement";
@@ -12,7 +11,6 @@ export default function EditCoursePage({
 }: {
   params: Promise<{ locale: string; id: string }>;
 }) {
-  const locale = useLocale();
   const router = useRouter();
 
   const [courseId, setCourseId] = useState("");
@@ -95,7 +93,7 @@ export default function EditCoursePage({
     }
 
     void loadCourse();
-  }, [locale, router, params]);
+  }, [router, params]);
 
   async function handleSave() {
     if (!courseId) return;

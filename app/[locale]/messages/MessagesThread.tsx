@@ -2,7 +2,7 @@
 
 import { CheckCheck, MessageSquare } from "lucide-react";
 import type { RefObject } from "react";
-import type { DirectMessage } from "@/lib/data/messages-shared";
+import type { DirectMessage } from "@/lib/messages-shared";
 
 interface MessagesThreadProps {
   messages: DirectMessage[];

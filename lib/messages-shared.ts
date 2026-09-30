@@ -3,7 +3,6 @@ export interface MessageUser {
   name: string;
   avatar_url: string | null;
   role: string;
-  online?: boolean;
 }
 
 export interface DirectMessage {
@@ -24,7 +23,7 @@ export interface Conversation {
     created_at: string;
     sender_id: string;
     is_read: boolean;
-  };
+  } | null;
   unread_count: number;
 }
 

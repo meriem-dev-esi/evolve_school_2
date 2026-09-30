@@ -146,33 +146,13 @@ export async function POST(request: Request) {
     const apiUrl = env.chargilyApiUrl;
 
     if (!secretKey || !apiUrl) {
-      // In dev/demo without Chargily keys, register demo enrollment gracefully
-      const { data: mockEnrollment, error: mockError } = await supabase
-        .from("enrollments")
-        .upsert(
-          {
-            user_id: user.id,
-            course_id: course.id,
-            payment_status: "paid",
-            payment_amount: course.price,
-            payment_method: "demo_edahabia",
-            enrolled_at: new Date().toISOString(),
-          },
-          { onConflict: "user_id,course_id" },
-        )
-        .select("id")
-        .single();
-
-      if (mockError) {
-        console.error("[Checkout] Enrollment fallback error:", mockError);
-      }
-
-      const origin = new URL(request.url).origin;
-      return NextResponse.json({
-        checkout_url: `${origin}/${locale}/courses/${course.id}?enrolled=success`,
-        demo_mode: true,
-        enrollment_id: mockEnrollment?.id,
-      });
+      return NextResponse.json(
+        {
+          error:
+            "Le paiement en ligne n'est pas configuré. Veuillez réessayer plus tard.",
+        },
+        { status: 503 },
+      );
     }
 
     // Handle timeout with AbortController

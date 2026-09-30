@@ -15,7 +15,6 @@ interface MessagingClientProps {
   currentUserId?: string;
   recipientId?: string;
   courseTitle?: string;
-  recipientName?: string;
   locale: string;
 }
 
@@ -32,6 +31,7 @@ export default function MessagingClient(props: MessagingClientProps) {
     messagesEndRef,
     activeConversation,
     activeMessages,
+    actionError,
     handleSelectConversation,
     handleSendMessage,
     handleQuickPromptClick,
@@ -40,6 +40,14 @@ export default function MessagingClient(props: MessagingClientProps) {
 
   return (
     <>
+      {actionError && (
+        <p
+          className="mb-4 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200"
+          role="alert"
+        >
+          {actionError}
+        </p>
+      )}
       <div className="grid h-[calc(100vh-14rem)] min-h-[580px] overflow-hidden rounded-3xl border border-white/10 bg-zinc-950/80 shadow-2xl backdrop-blur-2xl md:grid-cols-12">
         <ConversationSidebar
           conversations={conversations}
@@ -66,6 +74,7 @@ export default function MessagingClient(props: MessagingClientProps) {
             onChangeText={setNewMessageText}
             onSubmit={handleSendMessage}
             onQuickPromptClick={handleQuickPromptClick}
+            disabled={!activeConversation}
           />
         </section>
       </div>

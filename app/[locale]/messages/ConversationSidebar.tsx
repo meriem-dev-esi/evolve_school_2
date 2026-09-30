@@ -74,12 +74,15 @@ export default function ConversationSidebar({
         ) : (
           filteredConversations.map((c) => {
             const isSelected = c.id === activeConvId;
-            const formattedTime = new Date(
-              c.last_message.created_at,
-            ).toLocaleTimeString(locale === "ar" ? "ar-DZ" : "fr-FR", {
-              hour: "2-digit",
-              minute: "2-digit",
-            });
+            const formattedTime = c.last_message
+              ? new Date(c.last_message.created_at).toLocaleTimeString(
+                  locale === "ar" ? "ar-DZ" : "fr-FR",
+                  {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  },
+                )
+              : "";
 
             return (
               <button
@@ -104,9 +107,6 @@ export default function ConversationSidebar({
                       {c.participant.name.charAt(0)}
                     </div>
                   )}
-                  {c.participant.online && (
-                    <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-zinc-950 bg-emerald-500" />
-                  )}
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -114,9 +114,11 @@ export default function ConversationSidebar({
                     <span className="truncate text-xs sm:text-sm font-bold text-white group-hover:text-brand transition-colors">
                       {c.participant.name}
                     </span>
-                    <span className="shrink-0 text-[10px] text-white/40 font-mono">
-                      {formattedTime}
-                    </span>
+                    {formattedTime && (
+                      <span className="shrink-0 text-[10px] text-white/40 font-mono">
+                        {formattedTime}
+                      </span>
+                    )}
                   </div>
 
                   <div className="text-[11px] text-brand/80 truncate font-medium mt-0.5">
@@ -124,7 +126,7 @@ export default function ConversationSidebar({
                   </div>
 
                   <p className="mt-1 truncate text-xs text-white/60">
-                    {c.last_message.content}
+                    {c.last_message?.content ?? "Aucun message"}
                   </p>
                 </div>
 

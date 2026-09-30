@@ -7,13 +7,9 @@ interface DashboardCommunitySectionProps {
   locale: string;
 }
 
-/**
- * DashboardCommunitySection provides quick access banners to
- * direct mentor support and the student community showcase.
- */
-export default function DashboardCommunitySection(
-  _props: DashboardCommunitySectionProps,
-) {
+export default function DashboardCommunitySection({
+  locale,
+}: DashboardCommunitySectionProps) {
   return (
     <section className="grid gap-6 md:grid-cols-2 mt-12">
       {/* Mentor direct contact */}
@@ -27,18 +23,14 @@ export default function DashboardCommunitySection(
               Besoin d&apos;aide sur un exercice ?
             </h4>
             <p className="text-xs text-gray-500">
-              Vos formateurs et tuteurs sont connectés pour répondre à vos
-              questions.
+              Échangez avec les membres disponibles dans la messagerie.
             </p>
           </div>
         </div>
         <div className="mt-5 flex items-center justify-between">
-          <span className="text-xs text-emerald-600 flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            Réponse moyenne : &lt; 2h
-          </span>
           <Link
-            href={`/messages`}
+            href="/messages"
+            locale={locale}
             prefetch={true}
             className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-lime-400 hover:border-lime-400 hover:text-black transition shadow-sm"
           >
@@ -64,11 +56,9 @@ export default function DashboardCommunitySection(
           </div>
         </div>
         <div className="mt-5 flex items-center justify-between">
-          <span className="text-xs text-sky-500">
-            +350 projets partagés cette semaine
-          </span>
           <Link
-            href={`/community`}
+            href="/community"
+            locale={locale}
             prefetch={true}
             className="rounded-xl border border-sky-200 bg-sky-50 px-4 py-2 text-xs font-semibold text-sky-700 hover:bg-sky-100 transition shadow-sm"
           >

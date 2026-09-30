@@ -2,16 +2,13 @@
 
 import { MessageSquare, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import {
-  COMMUNITY_PROFILES,
-  type DirectoryProfile,
-} from "@/lib/community-directory";
+import type { DirectoryProfile } from "@/lib/community-directory";
 import { createClient } from "@/lib/supabase/client";
 
 interface NewChatModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelectContact: (contact: DirectoryProfile) => void;
+  onSelectContact: (contact: DirectoryProfile) => void | Promise<void>;
 }
 
 export default function NewChatModal({
@@ -20,46 +17,74 @@ export default function NewChatModal({
   onSelectContact,
 }: NewChatModalProps) {
   const [search, setSearch] = useState("");
-  const [contactsList, setContactsList] = useState<DirectoryProfile[]>(
-    Object.values(COMMUNITY_PROFILES),
-  );
+  const [contactsList, setContactsList] = useState<DirectoryProfile[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
     if (!isOpen) return;
 
+    let cancelled = false;
+
     async function loadRealProfiles() {
+      setIsLoading(true);
+      setLoadError("");
       try {
         const supabase = createClient();
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
+
+        if (authError) {
+          throw authError;
+        }
+        if (!user) {
+          throw new Error("Connectez-vous pour rechercher des membres.");
+        }
+
         const { data: dbProfiles, error } = await supabase
           .from("profiles")
           .select("id, full_name, avatar_url, role");
 
-        if (!error && dbProfiles && dbProfiles.length > 0) {
-          const map = new Map<string, DirectoryProfile>();
-          // Base mentor profiles first
-          for (const p of Object.values(COMMUNITY_PROFILES)) {
-            map.set(p.id, p);
-          }
-          // Real Supabase profiles
-          for (const p of dbProfiles) {
-            if (p.full_name) {
-              map.set(p.id, {
-                id: p.id,
-                full_name: p.full_name,
-                avatar_url: p.avatar_url,
-                role: p.role || "Membre Evolve",
-                online: true,
-              });
-            }
-          }
-          setContactsList(Array.from(map.values()));
+        if (error) {
+          throw error;
         }
-      } catch {
-        // Fallback to COMMUNITY_PROFILES
+
+        if (!cancelled) {
+          setContactsList(
+            (dbProfiles ?? [])
+              .filter((profile) => profile.id !== user.id && profile.full_name)
+              .map((profile) => ({
+                id: profile.id,
+                full_name: profile.full_name ?? "",
+                avatar_url: profile.avatar_url,
+                role: profile.role ?? "",
+              })),
+          );
+        }
+      } catch (error) {
+        console.error("[Messaging] Unable to load contacts:", error);
+        if (!cancelled) {
+          setContactsList([]);
+          setLoadError(
+            error instanceof Error
+              ? error.message
+              : "Impossible de charger les membres depuis la base de données.",
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
       }
     }
 
-    loadRealProfiles();
+    void loadRealProfiles();
+
+    return () => {
+      cancelled = true;
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -67,8 +92,7 @@ export default function NewChatModal({
   const contacts = contactsList.filter(
     (c) =>
       c.full_name.toLowerCase().includes(search.toLowerCase()) ||
-      c.role.toLowerCase().includes(search.toLowerCase()) ||
-      c.bio?.toLowerCase().includes(search.toLowerCase()),
+      c.role.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
@@ -85,7 +109,7 @@ export default function NewChatModal({
                 Nouvel échange direct
               </h3>
               <p className="text-xs text-white/50">
-                Contactez un formateur ou un créateur de projet
+                Contactez un membre de la base Evolve
               </p>
             </div>
           </div>
@@ -113,17 +137,27 @@ export default function NewChatModal({
 
         {/* Contacts list */}
         <div className="mt-4 max-h-80 overflow-y-auto divide-y divide-white/5 scrollbar-thin">
-          {contacts.length === 0 ? (
+          {loadError ? (
+            <div className="py-8 text-center text-xs text-red-300" role="alert">
+              {loadError}
+            </div>
+          ) : isLoading ? (
             <div className="py-8 text-center text-xs text-white/40">
-              Aucun membre trouvé pour "{search}".
+              Chargement des membres...
+            </div>
+          ) : contacts.length === 0 ? (
+            <div className="py-8 text-center text-xs text-white/40">
+              {search
+                ? `Aucun membre trouvé pour "${search}".`
+                : "Aucun autre profil disponible dans la base de données."}
             </div>
           ) : (
             contacts.map((contact) => (
               <button
                 key={contact.id}
                 type="button"
-                onClick={() => {
-                  onSelectContact(contact);
+                onClick={async () => {
+                  await onSelectContact(contact);
                   onClose();
                 }}
                 className="w-full flex items-center gap-3.5 p-3.5 text-left rounded-2xl hover:bg-white/5 transition group"
@@ -140,9 +174,6 @@ export default function NewChatModal({
                       {contact.full_name.charAt(0)}
                     </div>
                   )}
-                  {contact.online && (
-                    <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-zinc-950 bg-emerald-500" />
-                  )}
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -150,18 +181,10 @@ export default function NewChatModal({
                     <span className="text-xs font-bold text-white group-hover:text-brand transition-colors">
                       {contact.full_name}
                     </span>
-                    <span className="text-[10px] text-white/40">
-                      {contact.online ? "En ligne" : "Disponible"}
-                    </span>
                   </div>
                   <p className="text-[11px] text-brand/80 truncate">
                     {contact.role}
                   </p>
-                  {contact.bio && (
-                    <p className="text-[10px] text-white/50 truncate mt-0.5">
-                      {contact.bio}
-                    </p>
-                  )}
                 </div>
               </button>
             ))

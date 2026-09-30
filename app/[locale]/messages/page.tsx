@@ -1,7 +1,8 @@
-import { Clock, MessageSquare, ShieldCheck } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import type { Metadata } from "next";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import { Link } from "@/i18n/navigation";
 import {
   getAllInitialMessagesMap,
   getConversations,
@@ -26,13 +27,12 @@ type Props = {
   searchParams: Promise<{
     recipient?: string;
     course?: string;
-    name?: string;
   }>;
 };
 
 export default async function MessagesPage({ params, searchParams }: Props) {
   const { locale } = await params;
-  const { recipient, course, name } = await searchParams;
+  const { recipient, course } = await searchParams;
 
   const supabase = await createClient();
   const {
@@ -41,16 +41,18 @@ export default async function MessagesPage({ params, searchParams }: Props) {
 
   const currentUserId = user?.id || "me";
 
-  const conversations = await getConversations(currentUserId, recipient, name);
+  const conversations = user
+    ? await getConversations(currentUserId, recipient)
+    : [];
   const matchedRecipientConv = recipient
     ? conversations.find((c) => c.participant.id === recipient)
     : null;
   const initialActiveConvId = matchedRecipientConv
     ? matchedRecipientConv.id
-    : recipient
-      ? `conv-${recipient}`
-      : conversations[0]?.id || "conv-1";
-  const initialMessagesMap = await getAllInitialMessagesMap(currentUserId);
+    : conversations[0]?.id || "";
+  const initialMessagesMap = user
+    ? await getAllInitialMessagesMap(currentUserId)
+    : {};
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col selection:bg-brand selection:text-black">
@@ -75,40 +77,35 @@ export default async function MessagesPage({ params, searchParams }: Props) {
               </h1>
 
               <p className="mt-1 text-xs sm:text-sm text-white/60">
-                Posez vos questions sur vos cours, demandez des revues de code
-                et contactez les formateurs et membres Evolve.
+                Consultez vos conversations et échangez avec les membres
+                inscrits sur Evolve.
               </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-3.5 py-2 text-xs text-white/70 backdrop-blur-md">
-                <Clock className="h-3.5 w-3.5 text-brand" />
-                <span>Réponse moyenne : &lt; 2h</span>
-              </div>
-
-              <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-3.5 py-2 text-xs text-emerald-400 backdrop-blur-md">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Membres en ligne</span>
-              </div>
-
-              <div className="hidden sm:flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-3.5 py-2 text-xs text-white/50 backdrop-blur-md">
-                <ShieldCheck className="h-3.5 w-3.5 text-cyan-400" />
-                <span>Mentorat vérifié</span>
-              </div>
             </div>
           </div>
 
-          {/* Messaging Workspace Client */}
-          <MessagingClient
-            initialConversations={conversations}
-            initialMessagesMap={initialMessagesMap}
-            initialActiveConvId={initialActiveConvId}
-            currentUserId={currentUserId}
-            recipientId={recipient}
-            courseTitle={course}
-            recipientName={name}
-            locale={locale}
-          />
+          {user ? (
+            <MessagingClient
+              initialConversations={conversations}
+              initialMessagesMap={initialMessagesMap}
+              initialActiveConvId={initialActiveConvId}
+              currentUserId={currentUserId}
+              recipientId={recipient}
+              courseTitle={course}
+              locale={locale}
+            />
+          ) : (
+            <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 text-center">
+              <p className="text-white/70">
+                Connectez-vous pour accéder à vos conversations.
+              </p>
+              <Link
+                href="/sign-in"
+                className="mt-5 inline-flex rounded-xl bg-brand px-5 py-3 text-sm font-bold text-black"
+              >
+                Se connecter
+              </Link>
+            </div>
+          )}
         </div>
       </main>
 

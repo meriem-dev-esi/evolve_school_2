@@ -208,18 +208,30 @@ export async function POST(request: Request) {
 
     // Pre-create enrollment with pending status using admin client
     const adminSupabase = createAdminClient();
-    await adminSupabase.from("enrollments").upsert(
-      {
-        user_id: user.id,
-        course_id: course.id,
-        payment_status: "pending",
-        payment_amount: course.price,
-        payment_method: "chargily",
-        chargily_checkout_id: checkout.id,
-        enrolled_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id,course_id" },
-    );
+    const { error: enrollmentError } = await adminSupabase
+      .from("enrollments")
+      .upsert(
+        {
+          user_id: user.id,
+          course_id: course.id,
+          payment_status: "pending",
+          payment_amount: course.price,
+          payment_method: "chargily",
+          chargily_checkout_id: checkout.id,
+          enrolled_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id,course_id" },
+      );
+    if (enrollmentError) {
+      console.error(
+        "[Checkout] Unable to persist pending enrollment:",
+        enrollmentError,
+      );
+      return NextResponse.json(
+        { error: "Impossible d'enregistrer votre inscription au cours." },
+        { status: 500 },
+      );
+    }
 
     return NextResponse.json({
       checkout_url: checkout.checkout_url,

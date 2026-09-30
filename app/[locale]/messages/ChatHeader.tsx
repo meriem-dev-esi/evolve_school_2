@@ -42,7 +42,7 @@ export default function ChatHeader({
 
         <div>
           <h3 className="text-sm font-bold text-white">
-            {activeConversation?.participant.name ?? "Choisissez un contact"}
+            {activeConversation?.participant.name ?? t("chooseContact")}
           </h3>
           {activeConversation?.participant.role && (
             <p className="text-xs text-white/50">

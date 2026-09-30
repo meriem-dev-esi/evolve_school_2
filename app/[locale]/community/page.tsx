@@ -135,9 +135,14 @@ export default async function CommunityPage({ params, searchParams }: Props) {
     0,
   );
 
-  const { count: commentsCount } = await supabase
+  const { count: commentsCount, error: commentsError } = await supabase
     .from("community_project_comments")
     .select("*", { count: "exact", head: true });
+  if (commentsError) {
+    throw new Error(
+      `Unable to load community comment count: ${commentsError.message}`,
+    );
+  }
 
   // Pagination
   const totalCount = projectList.length;
@@ -160,7 +165,7 @@ export default async function CommunityPage({ params, searchParams }: Props) {
           <CommunityHeader
             totalCount={totalCount}
             totalLikes={totalLikes}
-            totalComments={commentsCount ?? 10}
+            totalComments={commentsCount ?? 0}
             totalCategories={categories.length}
           />
 

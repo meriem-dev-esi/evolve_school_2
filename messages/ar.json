@@ -171,7 +171,8 @@
     "successSignIn": "تم تسجيل الدخول بنجاح! جارٍ التوجيه...",
     "successSignUp": "تم إنشاء الحساب بنجاح! مرحباً بك.",
     "errorSignInPrefix": "خطأ في تسجيل الدخول: ",
-    "errorSignUpPrefix": "خطأ في إنشاء الحساب: "
+    "errorSignUpPrefix": "خطأ في إنشاء الحساب: ",
+    "profileSaveError": "تم إنشاء حسابك، لكن تعذر حفظ ملفك الشخصي. يُرجى التواصل مع الدعم."
   },
   "formations": {
     "badge": "مسارات معتمدة",
@@ -257,6 +258,7 @@
     "unreadCount": "{count, plural, zero {لا رسائل غير مقروءة} one {رسالة واحدة غير مقروءة} two {رسالتان غير مقروءتين} few {# رسائل غير مقروءة} many {# رسالة غير مقروءة} other {# رسالة غير مقروءة}}",
     "backToConversations": "العودة إلى المحادثات",
     "chooseConversation": "اختر محادثة",
+    "chooseContact": "اختر جهة اتصال",
     "chooseConversationDescription": "اختر طالبًا أو مدرّسًا من صندوق الوارد لمتابعة المحادثة.",
     "send": "إرسال",
     "insertCode": "إدراج مقتطف برمجي",
@@ -285,6 +287,25 @@
     "loginToSearch": "سجّل الدخول للبحث عن الأعضاء.",
     "contactLoadError": "تعذر تحميل الأعضاء.",
     "openingConversation": "جارٍ الفتح...",
-    "openConversationError": "تعذر فتح هذه المحادثة. يُرجى المحاولة مجددًا."
+    "openConversationError": "تعذر فتح هذه المحادثة. يُرجى المحاولة مجددًا.",
+    "contactGreeting": "مرحبًا {name}، ",
+    "courseGreeting": "مرحبًا {name}، اطّلعت على مقررك «{course}» وأرغب في التحدث معك عنه: ",
+    "projectGreeting": "مرحبًا {name}، اطّلعت على مشروعك «{course}» في مجتمع Evolve! أود التحدث معك عنه: ",
+    "recipientUnavailable": "لا يمكن التواصل مع هذا الملف مباشرة. اختر طالبًا أو مدرّسًا من القائمة.",
+    "conversationUnavailable": "هذه المحادثة لم تعد موجودة أو لا يمكن الوصول إليها.",
+    "markReadError": "تعذر تحديد الرسائل كمقروءة: {error}",
+    "receivedMessageReadError": "تعذر تحديد الرسالة المستلمة كمقروءة: {error}",
+    "sendMessageError": "تعذر حفظ الرسالة: {error}",
+    "loginBeforeSending": "سجّل الدخول واختر جهة اتصال قبل إرسال رسالة.",
+    "studentTeacherOnly": "المراسلة متاحة بين الطلاب والمدرّسين فقط.",
+    "contactOrConversationUnavailable": "لم يعد الملف الشخصي أو المحادثة متاحًا.",
+    "invalidSavedContact": "جهة الاتصال ليست ملفًا شخصيًا مسجلًا.",
+    "openConversationFailure": "تعذر فتح المحادثة: {error}",
+    "noConversationReturned": "لم تُرجع قاعدة البيانات معرّف المحادثة.",
+    "unexpectedError": "حدث خطأ غير متوقع."
+  },
+  "paymentStatus": {
+    "verified": "تم الدفع بنجاح! أصبح بإمكانك الوصول إلى جميع الدروس.",
+    "pendingVerification": "جارٍ التحقق من دفعتك. سيتم تفعيل الوصول إلى الدروس فور تأكيدها."
   }
 }

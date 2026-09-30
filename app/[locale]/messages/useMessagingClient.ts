@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   type DirectoryProfile,
@@ -31,6 +32,7 @@ export function useMessagingClient({
   recipientId,
   courseTitle,
 }: UseMessagingClientProps) {
+  const t = useTranslations("messaging");
   const supabase = createClient();
 
   const [conversations, setConversations] =
@@ -63,18 +65,25 @@ export function useMessagingClient({
     );
     if (!matched) {
       setActiveConvId("");
+      setActionError(t("recipientUnavailable"));
+      setIsNewChatModalOpen(true);
       return;
     }
 
     setActiveConvId(matched.id);
     if (courseTitle) {
       setNewMessageText(
-        `Bonjour ${matched.participant.name}, j'ai découvert votre projet "${courseTitle}" sur la Communauté Evolve ! J'aimerais échanger avec vous à ce sujet : `,
+        t("projectGreeting", {
+          name: matched.participant.name,
+          course: courseTitle,
+        }),
       );
     } else {
-      setNewMessageText(`Bonjour ${matched.participant.name}, `);
+      setNewMessageText(
+        t("contactGreeting", { name: matched.participant.name }),
+      );
     }
-  }, [recipientId, courseTitle, initialConversations]);
+  }, [recipientId, courseTitle, initialConversations, t]);
 
   useEffect(() => {
     if (courseTitle && !recipientId) {
@@ -141,35 +150,41 @@ export function useMessagingClient({
                       error,
                     );
                     setActionError(
-                      `Impossible de marquer le message comme lu : ${error.message}`,
+                      t("receivedMessageReadError", { error: error.message }),
                     );
                   }
                 });
             }
 
             setConversations((prev) =>
-              prev.map((conversation) =>
-                conversation.id === newDbMsg.conversation_id
-                  ? {
-                      ...conversation,
-                      unread_count:
-                        newDbMsg.receiver_id === currentUserId
-                          ? newDbMsg.conversation_id === activeConvId
-                            ? 0
-                            : conversation.unread_count + 1
-                          : conversation.unread_count,
-                      last_message: {
-                        content: newDbMsg.content,
-                        created_at: newDbMsg.created_at,
-                        sender_id: newDbMsg.sender_id,
-                        is_read:
-                          newDbMsg.is_read ||
-                          (newDbMsg.receiver_id === currentUserId &&
-                            newDbMsg.conversation_id === activeConvId),
-                      },
-                    }
-                  : conversation,
-              ),
+              prev
+                .map((conversation) =>
+                  conversation.id === newDbMsg.conversation_id
+                    ? {
+                        ...conversation,
+                        unread_count:
+                          newDbMsg.receiver_id === currentUserId
+                            ? newDbMsg.conversation_id === activeConvId
+                              ? 0
+                              : conversation.unread_count + 1
+                            : conversation.unread_count,
+                        last_message: {
+                          content: newDbMsg.content,
+                          created_at: newDbMsg.created_at,
+                          sender_id: newDbMsg.sender_id,
+                          is_read:
+                            newDbMsg.is_read ||
+                            (newDbMsg.receiver_id === currentUserId &&
+                              newDbMsg.conversation_id === activeConvId),
+                        },
+                      }
+                    : conversation,
+                )
+                .sort((first, second) =>
+                  (second.last_message?.created_at ?? "").localeCompare(
+                    first.last_message?.created_at ?? "",
+                  ),
+                ),
             );
           }
         },
@@ -204,16 +219,14 @@ export function useMessagingClient({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [currentUserId, activeConvId, supabase]);
+  }, [currentUserId, activeConvId, supabase, t]);
 
   const activeConversation = conversations.find((c) => c.id === activeConvId);
 
   // 5. Select conversation & mark as read
   const handleSelectConversation = async (id: string) => {
     if (!isUuid(currentUserId) || !isUuid(id)) {
-      setActionError(
-        "Cette conversation n'existe pas dans la base de données.",
-      );
+      setActionError(t("conversationUnavailable"));
       return;
     }
 
@@ -233,15 +246,18 @@ export function useMessagingClient({
         caughtError,
       );
       setActionError(
-        `Impossible de marquer les messages comme lus : ${caughtError instanceof Error ? caughtError.message : "erreur inattendue."}`,
+        t("markReadError", {
+          error:
+            caughtError instanceof Error
+              ? caughtError.message
+              : t("unexpectedError"),
+        }),
       );
       return;
     }
 
     if (error) {
-      setActionError(
-        `Impossible de marquer les messages comme lus : ${error.message}`,
-      );
+      setActionError(t("markReadError", { error: error.message }));
       return;
     }
 
@@ -281,9 +297,7 @@ export function useMessagingClient({
     if (!trimmed) return;
 
     if (!activeConversation || !isUuid(currentUserId)) {
-      setActionError(
-        "Connectez-vous et choisissez un contact avant d'envoyer un message.",
-      );
+      setActionError(t("loginBeforeSending"));
       return;
     }
 
@@ -293,16 +307,12 @@ export function useMessagingClient({
         activeConversation.participant.role,
       )
     ) {
-      setActionError(
-        "La messagerie est réservée aux échanges entre étudiants et formateurs.",
-      );
+      setActionError(t("studentTeacherOnly"));
       return;
     }
 
     if (!isUuid(activeConversation.participant.id) || !isUuid(activeConvId)) {
-      setActionError(
-        "Le contact ou la conversation n'existe plus dans la base de données.",
-      );
+      setActionError(t("contactOrConversationUnavailable"));
       return;
     }
 
@@ -322,16 +332,16 @@ export function useMessagingClient({
         .single();
 
       if (result.error) {
-        setActionError(
-          `Impossible d'enregistrer le message : ${result.error.message}`,
-        );
+        setActionError(t("sendMessageError", { error: result.error.message }));
         return;
       }
       newMessage = result.data;
     } catch (error) {
       console.error("[Messaging] Unable to send message:", error);
       setActionError(
-        `Impossible d'enregistrer le message : ${error instanceof Error ? error.message : "erreur inattendue."}`,
+        t("sendMessageError", {
+          error: error instanceof Error ? error.message : t("unexpectedError"),
+        }),
       );
       return;
     }
@@ -370,14 +380,12 @@ export function useMessagingClient({
 
   const handleSelectContact = async (contact: DirectoryProfile) => {
     if (!isUuid(currentUserId) || !isUuid(contact.id)) {
-      setActionError("Le contact ne correspond pas à un profil enregistré.");
+      setActionError(t("invalidSavedContact"));
       return false;
     }
 
     if (!isStudentTeacherPair(currentUserRole, contact.role)) {
-      setActionError(
-        "Vous pouvez uniquement contacter un étudiant ou un formateur de l'autre groupe.",
-      );
+      setActionError(t("studentTeacherOnly"));
       return false;
     }
 
@@ -396,7 +404,9 @@ export function useMessagingClient({
 
         if (error || !data) {
           setActionError(
-            `Impossible d'ouvrir la conversation : ${error?.message ?? "aucun identifiant retourné par la base de données."}`,
+            t("openConversationFailure", {
+              error: error?.message ?? t("unexpectedError"),
+            }),
           );
           return false;
         }
@@ -404,14 +414,17 @@ export function useMessagingClient({
       } catch (error) {
         console.error("[Messaging] Unable to open conversation:", error);
         setActionError(
-          `Impossible d'ouvrir la conversation : ${error instanceof Error ? error.message : "erreur inattendue."}`,
+          t("openConversationFailure", {
+            error:
+              error instanceof Error ? error.message : t("unexpectedError"),
+          }),
         );
         return false;
       }
     }
 
     if (!conversationId) {
-      setActionError("La base de données n'a pas retourné de conversation.");
+      setActionError(t("noConversationReturned"));
       return false;
     }
 
@@ -434,8 +447,11 @@ export function useMessagingClient({
     setActiveConvId(conversation.id);
     setNewMessageText(
       courseTitle
-        ? `Bonjour ${contact.full_name}, j'ai découvert votre cours "${courseTitle}" et j'aimerais échanger avec vous à ce sujet : `
-        : `Bonjour ${contact.full_name}, `,
+        ? t("courseGreeting", {
+            name: contact.full_name,
+            course: courseTitle,
+          })
+        : t("contactGreeting", { name: contact.full_name }),
     );
     return true;
   };

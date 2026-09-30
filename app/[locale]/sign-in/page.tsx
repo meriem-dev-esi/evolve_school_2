@@ -80,12 +80,20 @@ export default function SignInPage() {
       }
 
       if (data.user) {
-        await supabase.from("profiles").upsert({
+        const { error: profileError } = await supabase.from("profiles").upsert({
           id: data.user.id,
           full_name: fullName.trim(),
           role: "Étudiant Evolve",
           updated_at: new Date().toISOString(),
         });
+
+        if (profileError) {
+          console.error("[SignUp] Unable to save profile:", profileError);
+          setLoading(false);
+          setIsSuccess(false);
+          setMessage(tAuth("profileSaveError"));
+          return;
+        }
       }
 
       setLoading(false);

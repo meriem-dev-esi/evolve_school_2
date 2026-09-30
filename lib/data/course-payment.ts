@@ -24,10 +24,17 @@ export async function verifyChargilyPayment(
       const data = await res.json();
       if (data.status === "paid") {
         const adminSupabase = createAdminClient();
-        await adminSupabase
+        const { error } = await adminSupabase
           .from("enrollments")
           .update({ payment_status: "paid" })
           .eq("id", enrollmentId);
+        if (error) {
+          console.error(
+            "[CoursePayment] Unable to persist verified payment:",
+            error,
+          );
+          return false;
+        }
         return true;
       }
     }

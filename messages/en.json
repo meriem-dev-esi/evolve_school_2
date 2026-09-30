@@ -171,7 +171,8 @@
     "successSignIn": "Sign-in successful! Redirecting...",
     "successSignUp": "Account created successfully! Welcome.",
     "errorSignInPrefix": "Sign-in error: ",
-    "errorSignUpPrefix": "Sign-up error: "
+    "errorSignUpPrefix": "Sign-up error: ",
+    "profileSaveError": "Your account was created, but your profile could not be saved. Please contact support."
   },
   "formations": {
     "badge": "Certified Tracks",
@@ -257,6 +258,7 @@
     "unreadCount": "{count, plural, one {# unread message} other {# unread messages}}",
     "backToConversations": "Back to conversations",
     "chooseConversation": "Choose a conversation",
+    "chooseContact": "Choose a contact",
     "chooseConversationDescription": "Select a student or teacher from your inbox to pick up a conversation.",
     "send": "Send",
     "insertCode": "Insert code snippet",
@@ -285,6 +287,25 @@
     "loginToSearch": "Sign in to search for members.",
     "contactLoadError": "Unable to load members.",
     "openingConversation": "Opening...",
-    "openConversationError": "Unable to open this conversation. Please try again."
+    "openConversationError": "Unable to open this conversation. Please try again.",
+    "contactGreeting": "Hello {name}, ",
+    "courseGreeting": "Hello {name}, I came across your course “{course}” and would like to discuss it with you: ",
+    "projectGreeting": "Hello {name}, I came across your project “{course}” in the Evolve Community! I would like to discuss it with you: ",
+    "recipientUnavailable": "This profile cannot be contacted directly. Choose a student or teacher from the list.",
+    "conversationUnavailable": "This conversation no longer exists or is unavailable.",
+    "markReadError": "Unable to mark messages as read: {error}",
+    "receivedMessageReadError": "Unable to mark the received message as read: {error}",
+    "sendMessageError": "Unable to save the message: {error}",
+    "loginBeforeSending": "Sign in and choose a contact before sending a message.",
+    "studentTeacherOnly": "Messaging is only available between students and teachers.",
+    "contactOrConversationUnavailable": "The contact or conversation is no longer available.",
+    "invalidSavedContact": "The contact is not a registered profile.",
+    "openConversationFailure": "Unable to open the conversation: {error}",
+    "noConversationReturned": "The database did not return a conversation.",
+    "unexpectedError": "an unexpected error."
+  },
+  "paymentStatus": {
+    "verified": "Payment successful! Your full access to the lessons is now unlocked.",
+    "pendingVerification": "Your payment is still being verified. Lesson access will be enabled as soon as it is confirmed."
   }
 }

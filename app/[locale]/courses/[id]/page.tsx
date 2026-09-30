@@ -1,6 +1,7 @@
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import CourseCertificateSection from "@/components/course/CourseCertificateSection";
 import CourseHeroHeader from "@/components/course/CourseHeroHeader";
 import CourseLessonsList from "@/components/course/CourseLessonsList";
@@ -58,6 +59,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CoursePage({ params, searchParams }: Props) {
   const { locale, id } = await params;
   const { payment, completed } = (await searchParams) || {};
+  const tPayment = await getTranslations({
+    locale,
+    namespace: "paymentStatus",
+  });
   const supabase = await createClient();
 
   const {
@@ -229,11 +234,19 @@ export default async function CoursePage({ params, searchParams }: Props) {
           </Link>
 
           {payment === "success" && (
-            <div className="mb-8 flex items-center gap-3 rounded-2xl border border-brand/40 bg-brand/10 p-4 text-sm font-medium text-brand">
-              <CheckCircle2 className="h-5 w-5 shrink-0" />
+            <div
+              className={`mb-8 flex items-center gap-3 rounded-2xl border p-4 text-sm font-medium ${
+                isPaid
+                  ? "border-brand/40 bg-brand/10 text-brand"
+                  : "border-amber-400/40 bg-amber-400/10 text-amber-200"
+              }`}
+              role="status"
+            >
+              {isPaid && <CheckCircle2 className="h-5 w-5 shrink-0" />}
               <span>
-                Paiement validé avec succès ! Votre accès complet aux leçons est
-                débloqué.
+                {isPaid
+                  ? tPayment("verified")
+                  : tPayment("pendingVerification")}
               </span>
             </div>
           )}

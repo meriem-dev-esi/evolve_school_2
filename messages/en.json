@@ -225,7 +225,15 @@
       "participation": "Participation",
       "free": "Free",
       "currency": "DZD",
-      "join": "Join"
+      "join": "Join",
+      "processing": "Processing...",
+      "joined": "Registration confirmed",
+      "joinedSuccess": "Your registration for “{title}” is confirmed.",
+      "paymentPending": "Your payment is being verified. Your registration will be confirmed once it is approved.",
+      "paymentFailed": "The payment did not go through. You can try again.",
+      "redirectingToPayment": "Redirecting to payment...",
+      "joinError": "Unable to confirm your registration. Please try again.",
+      "alreadyJoined": "You are already registered for this workshop."
     },
     "page": {
       "hero": {

@@ -225,7 +225,15 @@
       "participation": "Participation",
       "free": "Gratuit",
       "currency": "DA",
-      "join": "Participer"
+      "join": "Participer",
+      "processing": "Traitement...",
+      "joined": "Inscription confirmée",
+      "joinedSuccess": "Votre inscription à « {title} » est confirmée.",
+      "paymentPending": "Paiement en cours de vérification ; votre inscription sera confirmée dès validation.",
+      "paymentFailed": "Le paiement n'a pas abouti. Vous pouvez réessayer.",
+      "redirectingToPayment": "Redirection vers le paiement...",
+      "joinError": "Impossible de confirmer l'inscription. Veuillez réessayer.",
+      "alreadyJoined": "Vous êtes déjà inscrit à cet atelier."
     },
     "page": {
       "hero": {

@@ -10,6 +10,10 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 // Locale-aware Link (adds the /fr, /ar... prefix automatically)
 import { Link } from "@/i18n/navigation";
+import {
+  getWorkshopEnrollment,
+  verifyChargilyWorkshopPayment,
+} from "@/lib/data/workshop-enrollment";
 // Supabase client for server components
 import { createClient } from "@/lib/supabase/server";
 // Client component for the "Join" button (handles clicks/payment)
@@ -24,12 +28,19 @@ type Props = {
     // Workshop id taken from the URL /ateliers/[id]
     id: string;
   }>;
+  searchParams: Promise<{
+    payment?: string;
+  }>;
 };
 
 // Server component (async) : the workshop detail page
-export default async function AtelierDetailPage({ params }: Props) {
+export default async function AtelierDetailPage({
+  params,
+  searchParams,
+}: Props) {
   // Wait for params, then extract locale and id
   const { locale, id } = await params;
+  const { payment } = await searchParams;
   // Tell next-intl which locale to use (needed for static rendering)
   setRequestLocale(locale);
   // Load translations from the "ateliers.card" namespace
@@ -57,6 +68,37 @@ export default async function AtelierDetailPage({ params }: Props) {
 
   // Free if price is 0 (null/undefined treated as 0)
   const isFree = Number(workshop.price ?? 0) === 0;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  let enrollment = user
+    ? await getWorkshopEnrollment(user.id, workshop.id)
+    : null;
+  let initialFeedback: string | null = null;
+
+  if (
+    payment === "success" &&
+    user &&
+    enrollment?.payment_status !== "paid" &&
+    enrollment?.chargily_checkout_id
+  ) {
+    const verified = await verifyChargilyWorkshopPayment(
+      user.id,
+      workshop.id,
+      enrollment.chargily_checkout_id,
+    );
+    if (verified) {
+      enrollment = { ...enrollment, payment_status: "paid" };
+    } else {
+      initialFeedback = t("paymentPending");
+    }
+  } else if (payment === "success" && enrollment?.payment_status === "paid") {
+    initialFeedback = t("alreadyJoined");
+  } else if (payment === "success") {
+    initialFeedback = t("paymentPending");
+  } else if (payment === "failed") {
+    initialFeedback = t("paymentFailed");
+  }
 
   return (
     // Full-height column layout: navbar / content / footer
@@ -167,14 +209,14 @@ export default async function AtelierDetailPage({ params }: Props) {
                   workshopId={workshop.id}
                   // Title (e.g. for confirmation/payment label)
                   workshopTitle={workshop.title}
-                  // Price as a number (0 if missing)
-                  price={Number(workshop.price ?? 0)}
                   // Whether the workshop is free
                   isFree={isFree}
                   // Current locale
                   locale={locale}
                   // Translated button label
                   joinLabel={t("join")}
+                  isInitiallyJoined={enrollment?.payment_status === "paid"}
+                  initialFeedback={initialFeedback}
                 />
               </div>
             </div>

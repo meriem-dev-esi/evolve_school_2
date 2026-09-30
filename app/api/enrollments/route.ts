@@ -41,12 +41,27 @@ export async function POST(request: Request) {
     }
 
     // Check duplicate enrollment
-    const { data: existingEnrollment } = await supabase
-      .from("enrollments")
-      .select("id, payment_status")
-      .eq("user_id", user.id)
-      .eq("course_id", courseId)
-      .maybeSingle();
+    const { data: existingEnrollment, error: enrollmentLookupError } =
+      await supabase
+        .from("enrollments")
+        .select("id, payment_status")
+        .eq("user_id", user.id)
+        .eq("course_id", courseId)
+        .maybeSingle();
+
+    if (enrollmentLookupError) {
+      console.error(
+        "[Enrollments API] Unable to check existing enrollment:",
+        enrollmentLookupError,
+      );
+      return NextResponse.json(
+        {
+          error:
+            "Impossible de vérifier votre inscription. Veuillez réessayer.",
+        },
+        { status: 500 },
+      );
+    }
 
     if (existingEnrollment) {
       return NextResponse.json(
@@ -60,11 +75,22 @@ export async function POST(request: Request) {
     }
 
     // Check course existence
-    const { data: course } = await supabase
+    const { data: course, error: courseLookupError } = await supabase
       .from("courses")
       .select("id, title, price")
       .eq("id", courseId)
       .maybeSingle();
+
+    if (courseLookupError) {
+      console.error(
+        "[Enrollments API] Unable to look up course:",
+        courseLookupError,
+      );
+      return NextResponse.json(
+        { error: "Impossible de vérifier le cours. Veuillez réessayer." },
+        { status: 500 },
+      );
+    }
 
     if (!course) {
       return NextResponse.json(

@@ -49,7 +49,7 @@ export async function POST(request: Request) {
 
     const checkoutId = checkout.id;
 
-    if (!checkoutId) {
+    if (typeof checkoutId !== "string" || !checkoutId) {
       return NextResponse.json(
         { error: "Checkout ID missing" },
         { status: 400 },
@@ -58,19 +58,38 @@ export async function POST(request: Request) {
 
     const supabase = createAdminClient();
 
-    const { error } = await supabase
-      .from("enrollments")
-      .update({
-        payment_status: "paid",
-      })
-      .eq("chargily_checkout_id", checkoutId);
+    const [courseResult, workshopResult] = await Promise.all([
+      supabase
+        .from("enrollments")
+        .update({ payment_status: "paid" })
+        .eq("chargily_checkout_id", checkoutId)
+        .select("id"),
+      supabase
+        .from("workshop_enrollments")
+        .update({ payment_status: "paid" })
+        .eq("chargily_checkout_id", checkoutId)
+        .select("id"),
+    ]);
 
-    if (error) {
-      console.error("Enrollment update error:", error);
+    const matchedEnrollment =
+      (courseResult.data?.length ?? 0) > 0 ||
+      (workshopResult.data?.length ?? 0) > 0;
+    if (!matchedEnrollment) {
+      if (courseResult.error || workshopResult.error) {
+        console.error(
+          "Enrollment update errors:",
+          courseResult.error,
+          workshopResult.error,
+        );
+        return NextResponse.json(
+          { error: "Unable to update enrollment" },
+          { status: 500 },
+        );
+      }
 
       return NextResponse.json(
-        { error: "Unable to update enrollment" },
-        { status: 500 },
+        { error: "Enrollment not found" },
+        { status: 404 },
       );
     }
 

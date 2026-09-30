@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getWorkshopEnrollment } from "@/lib/data/workshop-enrollment";
 import { env } from "@/lib/env";
 import { checkRateLimit, RATE_LIMIT_TIERS } from "@/lib/rateLimiter";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -48,64 +49,115 @@ export async function POST(request: Request) {
     }
 
     const contentType = request.headers.get("content-type") || "";
-    let courseId: string;
+    let courseId = "";
+    let workshopId = "";
     let locale: string;
 
     if (contentType.includes("application/json")) {
       const body = await request.json();
-      courseId = body.courseId;
+      courseId = typeof body.courseId === "string" ? body.courseId.trim() : "";
+      workshopId =
+        typeof body.workshopId === "string" ? body.workshopId.trim() : "";
       locale = body.locale;
     } else {
       const formData = await request.formData();
       courseId = String(formData.get("courseId") || "");
+      workshopId = String(formData.get("workshopId") || "");
       locale = String(formData.get("locale") || "");
     }
 
-    if (!courseId) {
+    if (Boolean(courseId) === Boolean(workshopId)) {
       return NextResponse.json(
-        { error: "L'identifiant du cours (courseId) est requis." },
+        { error: "Un seul identifiant de cours ou d'atelier est requis." },
         { status: 400 },
       );
     }
 
+    const isWorkshop = Boolean(workshopId);
+
     if (!locale) {
+      locale = "fr";
+    }
+    if (!["fr", "en", "ar"].includes(locale)) {
       locale = "fr";
     }
 
     // 1. Prevent Duplicate Payment / Subscription
-    const { data: existingEnrollment } = await supabase
-      .from("enrollments")
-      .select("id, payment_status")
-      .eq("user_id", user.id)
-      .eq("course_id", courseId)
-      .maybeSingle();
+    let existingPaymentStatus: string | null = null;
+    if (isWorkshop) {
+      const existingEnrollment = await getWorkshopEnrollment(
+        user.id,
+        workshopId,
+      );
+      existingPaymentStatus = existingEnrollment?.payment_status ?? null;
+    } else {
+      const { data: existingEnrollment, error: enrollmentLookupError } =
+        await supabase
+          .from("enrollments")
+          .select("id, payment_status")
+          .eq("user_id", user.id)
+          .eq("course_id", courseId)
+          .maybeSingle();
 
-    if (existingEnrollment?.payment_status === "paid") {
+      if (enrollmentLookupError) {
+        console.error(
+          "[Checkout] Unable to check existing enrollment:",
+          enrollmentLookupError,
+        );
+        return NextResponse.json(
+          { error: "Impossible de vérifier votre inscription." },
+          { status: 500 },
+        );
+      }
+      existingPaymentStatus = existingEnrollment?.payment_status ?? null;
+    }
+
+    if (existingPaymentStatus === "paid") {
       return NextResponse.json(
         {
-          error: "Vous êtes déjà inscrit et avez déjà payé ce cours.",
+          error: isWorkshop
+            ? "Vous êtes déjà inscrit et avez déjà payé cet atelier."
+            : "Vous êtes déjà inscrit et avez déjà payé ce cours.",
           alreadyEnrolled: true,
         },
         { status: 409 },
       );
     }
 
-    const { data: course, error: courseError } = await supabase
-      .from("courses")
-      .select("id, title, price")
-      .eq("id", courseId)
-      .maybeSingle();
+    const { data: course, error: courseError } = isWorkshop
+      ? await supabase
+          .from("workshops")
+          .select("id, title, price")
+          .eq("id", workshopId)
+          .eq("is_published", true)
+          .maybeSingle()
+      : await supabase
+          .from("courses")
+          .select("id, title, price")
+          .eq("id", courseId)
+          .maybeSingle();
 
-    if (courseError || !course) {
+    if (courseError) {
+      console.error("[Checkout] Unable to load purchasable item:", courseError);
       return NextResponse.json(
-        { error: "Cours introuvable." },
+        { error: "Impossible de vérifier le cours ou l'atelier." },
+        { status: 500 },
+      );
+    }
+    if (!course) {
+      return NextResponse.json(
+        { error: isWorkshop ? "Atelier introuvable." : "Cours introuvable." },
         { status: 404 },
       );
     }
 
     if (!course.price || course.price <= 0) {
       return NextResponse.json(
-        { error: "Prix du cours invalide." },
+        {
+          error: isWorkshop
+            ? "Prix de l'atelier invalide."
+            : "Prix du cours invalide.",
+        },
         { status: 400 },
       );
     }
@@ -120,18 +172,77 @@ export async function POST(request: Request) {
       );
     }
 
+    const adminSupabase = createAdminClient();
     const yesterday = new Date(Date.now() - 86_400_000).toISOString();
-    const { data: recentPayments } = await supabase
+    const { data: recentPayments, error: recentPaymentsError } = await supabase
       .from("enrollments")
       .select("payment_amount")
       .eq("user_id", user.id)
       .eq("payment_status", "paid")
       .gte("enrolled_at", yesterday);
 
-    const dailyTotal = (recentPayments ?? []).reduce(
-      (sum, p) => sum + (p.payment_amount || 0),
-      0,
+    if (recentPaymentsError) {
+      console.error(
+        "[Checkout] Unable to check daily course spend:",
+        recentPaymentsError,
+      );
+      return NextResponse.json(
+        { error: "Impossible de vérifier le plafond de paiement." },
+        { status: 500 },
+      );
+    }
+
+    const { data: recentWorkshopEnrollments, error: workshopPaymentsError } =
+      await adminSupabase
+        .from("workshop_enrollments")
+        .select("workshop_id")
+        .eq("user_id", user.id)
+        .eq("payment_status", "paid")
+        .not("chargily_checkout_id", "is", null)
+        .gte("enrolled_at", yesterday);
+
+    if (workshopPaymentsError) {
+      console.error(
+        "[Checkout] Unable to check daily workshop spend:",
+        workshopPaymentsError,
+      );
+      return NextResponse.json(
+        { error: "Impossible de vérifier le plafond de paiement." },
+        { status: 500 },
+      );
+    }
+
+    const workshopIds = (recentWorkshopEnrollments ?? []).map(
+      (enrollment) => enrollment.workshop_id,
     );
+    const { data: recentWorkshopItems, error: workshopPricesError } =
+      workshopIds.length > 0
+        ? await adminSupabase
+            .from("workshops")
+            .select("price")
+            .in("id", workshopIds)
+        : { data: [], error: null };
+
+    if (workshopPricesError) {
+      console.error(
+        "[Checkout] Unable to load workshop prices for daily spend:",
+        workshopPricesError,
+      );
+      return NextResponse.json(
+        { error: "Impossible de vérifier le plafond de paiement." },
+        { status: 500 },
+      );
+    }
+
+    const dailyTotal =
+      (recentPayments ?? []).reduce(
+        (sum, p) => sum + (p.payment_amount || 0),
+        0,
+      ) +
+      (recentWorkshopItems ?? []).reduce(
+        (sum, workshop) => sum + (Number(workshop.price) || 0),
+        0,
+      );
 
     if (dailyTotal + course.price > MAX_DAILY_USER_SPENDING_DZD) {
       return NextResponse.json(
@@ -173,13 +284,16 @@ export async function POST(request: Request) {
         currency: "dzd",
         locale: locale === "ar" || locale === "fr" ? locale : "en",
         description: course.title,
-        success_url: `${origin}/${locale}/courses/${course.id}?payment=success`,
-        failure_url: `${origin}/${locale}/courses/${course.id}/checkout?payment=failed`,
+        success_url: isWorkshop
+          ? `${origin}/${locale}/ateliers/${course.id}?payment=success`
+          : `${origin}/${locale}/courses/${course.id}?payment=success`,
+        failure_url: isWorkshop
+          ? `${origin}/${locale}/ateliers/${course.id}?payment=failed`
+          : `${origin}/${locale}/courses/${course.id}/checkout?payment=failed`,
         webhook_endpoint: `${env.appUrl || origin}/api/webhooks/chargily`,
-        metadata: {
-          user_id: user.id,
-          course_id: course.id,
-        },
+        metadata: isWorkshop
+          ? { user_id: user.id, workshop_id: course.id }
+          : { user_id: user.id, course_id: course.id },
       }),
     });
 
@@ -207,28 +321,40 @@ export async function POST(request: Request) {
     }
 
     // Pre-create enrollment with pending status using admin client
-    const adminSupabase = createAdminClient();
-    const { error: enrollmentError } = await adminSupabase
-      .from("enrollments")
-      .upsert(
-        {
-          user_id: user.id,
-          course_id: course.id,
-          payment_status: "pending",
-          payment_amount: course.price,
-          payment_method: "chargily",
-          chargily_checkout_id: checkout.id,
-          enrolled_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id,course_id" },
-      );
+    const { error: enrollmentError } = isWorkshop
+      ? await adminSupabase.from("workshop_enrollments").upsert(
+          {
+            user_id: user.id,
+            workshop_id: course.id,
+            payment_status: "pending",
+            chargily_checkout_id: checkout.id,
+            enrolled_at: new Date().toISOString(),
+          },
+          { onConflict: "user_id,workshop_id" },
+        )
+      : await adminSupabase.from("enrollments").upsert(
+          {
+            user_id: user.id,
+            course_id: course.id,
+            payment_status: "pending",
+            payment_amount: course.price,
+            payment_method: "chargily",
+            chargily_checkout_id: checkout.id,
+            enrolled_at: new Date().toISOString(),
+          },
+          { onConflict: "user_id,course_id" },
+        );
     if (enrollmentError) {
       console.error(
         "[Checkout] Unable to persist pending enrollment:",
         enrollmentError,
       );
       return NextResponse.json(
-        { error: "Impossible d'enregistrer votre inscription au cours." },
+        {
+          error: isWorkshop
+            ? "Impossible d'enregistrer votre inscription à l'atelier."
+            : "Impossible d'enregistrer votre inscription au cours.",
+        },
         { status: 500 },
       );
     }

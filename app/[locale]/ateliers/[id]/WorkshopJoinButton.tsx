@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckCircle2, Loader2, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -8,10 +9,11 @@ import { createClient } from "@/lib/supabase/client";
 interface WorkshopJoinButtonProps {
   workshopId: string;
   workshopTitle: string;
-  price: number;
   isFree: boolean;
   locale: string;
   joinLabel: string;
+  isInitiallyJoined: boolean;
+  initialFeedback: string | null;
 }
 
 /**
@@ -23,15 +25,19 @@ interface WorkshopJoinButtonProps {
 export default function WorkshopJoinButton({
   workshopId,
   workshopTitle,
-  price,
   isFree,
   locale,
   joinLabel,
+  isInitiallyJoined,
+  initialFeedback,
 }: WorkshopJoinButtonProps) {
+  const t = useTranslations("ateliers.card");
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [isJoined, setIsJoined] = useState(false);
-  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [isJoined, setIsJoined] = useState(isInitiallyJoined);
+  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(
+    initialFeedback,
+  );
 
   async function handleJoin() {
     try {
@@ -41,64 +47,62 @@ export default function WorkshopJoinButton({
       const supabase = createClient();
       const {
         data: { user },
+        error: authError,
       } = await supabase.auth.getUser();
+      if (authError) throw authError;
 
-      // Si l'utilisateur n'est pas connecté, redirection vers la page de connexion
       if (!user) {
         router.push("/sign-in");
         return;
       }
 
       if (isFree) {
-        // Atelier gratuit : confirmation immédiate de la place
+        const response = await fetch("/api/workshop-enrollments", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ workshopId }),
+        });
+        if (!response.ok) {
+          console.error(
+            "[WorkshopJoinButton] Unable to enroll:",
+            await response.text(),
+          );
+          setFeedbackMessage(t("joinError"));
+          return;
+        }
         setIsJoined(true);
-        setFeedbackMessage(
-          locale === "ar"
-            ? `تم حجز مقعدك في "${workshopTitle}" بنجاح! سنرسل التفاصيل عبر البريد الإلكتروني.`
-            : `Votre place pour "${workshopTitle}" a été réservée avec succès !`,
-        );
+        setFeedbackMessage(t("joinedSuccess", { title: workshopTitle }));
       } else {
-        // Masterclass payante : intégration du flux de paiement
-        setFeedbackMessage(
-          locale === "ar"
-            ? `جاري توجيهك إلى بوابة الدفع (${price} د.ج)...`
-            : `Redirection vers le paiement (${price} DZD)...`,
-        );
-
-        // Appel API de paiement ou simulation sécurisée
+        setFeedbackMessage(t("redirectingToPayment"));
         const res = await fetch("/api/checkout", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            courseId: workshopId,
-            courseTitle: workshopTitle,
-            amount: price,
+            workshopId,
             locale,
           }),
         });
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.checkout_url) {
-            window.location.href = data.checkout_url;
-            return;
-          }
+        const data = await res.json();
+        if (
+          res.ok &&
+          typeof data.checkout_url === "string" &&
+          data.checkout_url
+        ) {
+          window.location.href = data.checkout_url;
+          return;
         }
 
-        setIsJoined(true);
-        setFeedbackMessage(
-          locale === "ar"
-            ? "تم تسجيل اهتمامك بالورشة بنجاح."
-            : "Votre demande de réservation a été prise en compte.",
+        console.error(
+          "[WorkshopJoinButton] Unable to create payment checkout:",
+          res.status,
+          data,
         );
+        setFeedbackMessage(t("joinError"));
       }
     } catch (err) {
       console.error("[WorkshopJoinButton]", err);
-      setFeedbackMessage(
-        locale === "ar"
-          ? "حدث خطأ أثناء التسجيل، يرجى المحاولة لاحقاً."
-          : "Une erreur est survenue lors de la réservation. Veuillez réessayer.",
-      );
+      setFeedbackMessage(t("joinError"));
     } finally {
       setLoading(false);
     }
@@ -119,16 +123,12 @@ export default function WorkshopJoinButton({
         {loading ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin text-black" />
-            <span>
-              {locale === "ar" ? "جاري المعالجة..." : "Traitement..."}
-            </span>
+            <span>{t("processing")}</span>
           </>
         ) : isJoined ? (
           <>
             <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-            <span>
-              {locale === "ar" ? "تم التسجيل بنجاح" : "Place Confirmée"}
-            </span>
+            <span>{t("joined")}</span>
           </>
         ) : (
           <>
@@ -140,9 +140,8 @@ export default function WorkshopJoinButton({
 
       {feedbackMessage && (
         <p
-          className={`text-xs ${
-            isJoined ? "text-emerald-400 font-medium" : "text-white/70"
-          }`}
+          className={`text-xs ${isJoined ? "text-emerald-400 font-medium" : "text-white/70"}`}
+          role={isJoined ? "status" : "alert"}
         >
           {feedbackMessage}
         </p>

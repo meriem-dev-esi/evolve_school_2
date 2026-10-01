@@ -21,6 +21,7 @@ export interface EnrollmentSeries {
   level: string | null;
   domain: string | null;
   courseIds: string[];
+  continueHref: string;
   completedCourses: number;
   progress: number;
 }
@@ -161,7 +162,7 @@ export async function getUserDashboardData(userId: string) {
     const [{ data: lessons }, { data: seriesCourses }] = await Promise.all([
       supabase
         .from("lessons")
-        .select("id, course_id")
+        .select("id, course_id, order_index")
         .in("course_id", enrolledCourseIds),
       supabase
         .from("series_courses")
@@ -231,26 +232,48 @@ export async function getUserDashboardData(userId: string) {
           .sort((a, b) => a.order_index - b.order_index)
           .map((sc) => sc.course_id);
 
-        const completedCourses = coursesInSeries.filter((courseId) => {
-          const courseLessons = (lessons ?? []).filter(
-            (l) => l.course_id === courseId,
-          );
-          if (courseLessons.length === 0) return false;
-          return courseLessons.every((l) =>
-            (progressRows ?? []).some(
-              (p) => p.lesson_id === l.id && p.completed,
-            ),
-          );
-        }).length;
+        const completedLessonIds = new Set(
+          (progressRows ?? [])
+            .filter((row) => row.completed)
+            .map((row) => row.lesson_id),
+        );
+        const completedCourseIds = new Set(
+          coursesInSeries.filter((courseId) => {
+            const courseLessons = (lessons ?? []).filter(
+              (lesson) => lesson.course_id === courseId,
+            );
+            if (courseLessons.length === 0) return false;
+            return courseLessons.every((lesson) =>
+              completedLessonIds.has(lesson.id),
+            );
+          }),
+        );
+        const completedCourses = completedCourseIds.size;
 
         const progress =
           coursesInSeries.length > 0
             ? Math.round((completedCourses / coursesInSeries.length) * 100)
             : 0;
 
+        const nextCourseId =
+          coursesInSeries.find(
+            (courseId) => !completedCourseIds.has(courseId),
+          ) ?? coursesInSeries[0];
+        const courseLessons = (lessons ?? [])
+          .filter((lesson) => lesson.course_id === nextCourseId)
+          .sort((a, b) => a.order_index - b.order_index);
+        const nextLesson =
+          courseLessons.find((lesson) => !completedLessonIds.has(lesson.id)) ??
+          courseLessons[0];
+
         return {
           ...item,
           courseIds: coursesInSeries,
+          continueHref: nextCourseId
+            ? nextLesson
+              ? `/courses/${nextCourseId}/lessons/${nextLesson.id}`
+              : `/courses/${nextCourseId}`
+            : "/formations",
           completedCourses,
           progress,
         };

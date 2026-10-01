@@ -61,7 +61,7 @@ export default function EnrollmentPathSection({
             title={tHome("emptyStates.enrollmentPath.title")}
             description={tHome("emptyStates.enrollmentPath.description")}
             actionText={tHome("emptyStates.enrollmentPath.action")}
-            actionHref="/disciplines"
+            actionHref="/formations"
           />
         </div>
       </section>

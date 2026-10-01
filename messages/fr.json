@@ -65,7 +65,7 @@
       "enrollmentPath": {
         "title": "Aucun parcours d'inscription actif",
         "description": "Inscrivez-vous à une série guidée pour suivre un cursus structuré étape par étape.",
-        "action": "Explorer les parcours"
+        "action": "Voir les formations"
       },
       "continueLearning": {
         "title": "Aucune formation en cours",
@@ -134,7 +134,8 @@
   "courseCard": {
     "priceLabel": "Tarif",
     "free": "Gratuit",
-    "practice": "Pratique"
+    "practice": "Pratique",
+    "discoverCourse": "Découvrir"
   },
   "seriesCard": {
     "learningPath": "Parcours d'Apprentissage",
@@ -287,6 +288,9 @@
     "sent": "Envoyé",
     "newChatTitle": "Nouvel échange direct",
     "newChatSubtitle": "Choisissez un étudiant ou un formateur inscrit",
+    "availableTeachers": "Formateurs disponibles",
+    "availableStudents": "Étudiants disponibles",
+    "noAvailableContacts": "Aucun contact disponible pour le moment.",
     "close": "Fermer",
     "searchContacts": "Rechercher par nom ou rôle...",
     "loadingContacts": "Chargement des membres...",

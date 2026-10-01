@@ -10,6 +10,7 @@ type Props = {
     image_url: string | null;
     level: string | null;
     domain: string | null;
+    continueHref: string;
   };
   courseCount: number;
   completedCourses: number;
@@ -31,7 +32,7 @@ export default function SeriesCard({
       {/* Top accent line on hover */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-0.5 rounded-t-3xl bg-gradient-to-r from-lime-400 to-emerald-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-      <Link href="/disciplines" prefetch={true} className="block">
+      <Link href={series.continueHref} prefetch={true} className="block">
         {/* Thumbnail Banner */}
         <div className="relative h-44 w-full overflow-hidden bg-gray-100">
           {series.image_url ? (

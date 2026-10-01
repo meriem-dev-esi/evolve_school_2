@@ -2,103 +2,30 @@
 
 import { MessageSquare, Search, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
-import {
-  type DirectoryProfile,
-  isStudentTeacherPair,
-} from "@/lib/community-directory";
-import { createClient } from "@/lib/supabase/client";
+import { useState } from "react";
+import type { DirectoryProfile } from "@/lib/community-directory";
+import { useAvailableContacts } from "./useAvailableContacts";
 
 interface NewChatModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentUserRole: string;
   onSelectContact: (contact: DirectoryProfile) => Promise<boolean>;
 }
 
 export default function NewChatModal({
   isOpen,
   onClose,
-  currentUserRole,
   onSelectContact,
 }: NewChatModalProps) {
   const t = useTranslations("messaging");
   const [search, setSearch] = useState("");
-  const [contactsList, setContactsList] = useState<DirectoryProfile[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [loadError, setLoadError] = useState("");
   const [selectionError, setSelectionError] = useState("");
   const [selectingContactId, setSelectingContactId] = useState("");
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    let cancelled = false;
-
-    async function loadRealProfiles() {
-      setIsLoading(true);
-      setLoadError("");
-      try {
-        const supabase = createClient();
-        const {
-          data: { user },
-          error: authError,
-        } = await supabase.auth.getUser();
-
-        if (authError) {
-          throw authError;
-        }
-        if (!user) {
-          throw new Error(t("loginToSearch"));
-        }
-
-        const { data: dbProfiles, error } = await supabase
-          .from("profiles")
-          .select("id, full_name, avatar_url, role");
-
-        if (error) {
-          throw error;
-        }
-
-        if (!cancelled) {
-          setContactsList(
-            (dbProfiles ?? [])
-              .filter(
-                (profile) =>
-                  profile.id !== user.id &&
-                  profile.full_name &&
-                  profile.role &&
-                  isStudentTeacherPair(currentUserRole, profile.role),
-              )
-              .map((profile) => ({
-                id: profile.id,
-                full_name: profile.full_name ?? "",
-                avatar_url: profile.avatar_url,
-                role: profile.role ?? "",
-              })),
-          );
-        }
-      } catch (error) {
-        console.error("[Messaging] Unable to load contacts:", error);
-        if (!cancelled) {
-          setContactsList([]);
-          setLoadError(
-            error instanceof Error ? error.message : t("contactLoadError"),
-          );
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    void loadRealProfiles();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [currentUserRole, isOpen, t]);
+  const {
+    contacts: contactsList,
+    isLoading,
+    error: loadError,
+  } = useAvailableContacts(isOpen);
 
   if (!isOpen) return null;
 

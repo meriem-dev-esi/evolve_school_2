@@ -236,8 +236,12 @@ export default function HorizontalCourseSection({
             ref={scrollContainerRef}
             className="flex w-full gap-5 overflow-x-auto pb-4 scroll-smooth"
           >
-            {courses.map((course) => (
-              <div key={course.id} className="min-w-[290px] shrink-0">
+            {courses.map((course, index) => (
+              <div
+                key={course.id}
+                className="course-card-enter min-w-[310px] shrink-0"
+                style={{ animationDelay: `${Math.min(index, 6) * 90}ms` }}
+              >
                 <CourseCard course={course} locale={locale} />
 
                 {/* Reason tags if available */}

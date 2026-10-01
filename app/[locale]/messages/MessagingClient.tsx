@@ -59,6 +59,8 @@ export default function MessagingClient(props: MessagingClientProps) {
           onSelectConversation={handleSelectConversation}
           searchFilter={searchFilter}
           onSearchFilterChange={setSearchFilter}
+          currentUserRole={props.currentUserRole}
+          onSelectContact={handleSelectContact}
           locale={props.locale}
           onOpenNewChat={() => setIsNewChatModalOpen(true)}
           className={activeConvId ? "hidden md:flex" : "flex"}
@@ -111,7 +113,6 @@ export default function MessagingClient(props: MessagingClientProps) {
       <NewChatModal
         isOpen={isNewChatModalOpen}
         onClose={() => setIsNewChatModalOpen(false)}
-        currentUserRole={props.currentUserRole}
         onSelectContact={handleSelectContact}
       />
     </>

@@ -65,7 +65,7 @@
       "enrollmentPath": {
         "title": "No active enrollment path",
         "description": "Enroll in a guided path to follow a structured step-by-step curriculum.",
-        "action": "Explore paths"
+        "action": "View courses"
       },
       "continueLearning": {
         "title": "No courses in progress",
@@ -134,7 +134,8 @@
   "courseCard": {
     "priceLabel": "Price",
     "free": "Free",
-    "practice": "Practical"
+    "practice": "Practical",
+    "discoverCourse": "Explore"
   },
   "seriesCard": {
     "learningPath": "Learning Path",
@@ -287,6 +288,9 @@
     "sent": "Sent",
     "newChatTitle": "Start a conversation",
     "newChatSubtitle": "Choose a registered student or teacher",
+    "availableTeachers": "Available teachers",
+    "availableStudents": "Available students",
+    "noAvailableContacts": "No contacts are available yet.",
     "close": "Close",
     "searchContacts": "Search by name or role...",
     "loadingContacts": "Loading members...",

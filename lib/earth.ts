@@ -311,7 +311,7 @@ export async function createEarth(
   points.renderOrder = 1;
   globe.add(points);
 
-  // Markers et labels interactifs déclenchés au survol (mouseenter)
+  // City markers remain keyboard reachable even while their globe side is hidden.
   const markers = CITIES.map((city) => {
     const pos = toVec(city.lat, city.lon, 1.005);
     const dot = new THREE.Mesh(
@@ -343,6 +343,7 @@ export async function createEarth(
           border-radius: 999px;
           background: rgba(10, 10, 10, 0.85);
           color: #eee; white-space: nowrap;
+          text-decoration: none;
           letter-spacing: .08em;
           font: 11px ui-monospace, Menlo, Consolas, monospace;
           transition: background .2s, border-color .2s, box-shadow .2s, opacity .3s;
@@ -364,23 +365,28 @@ export async function createEarth(
           border-color: rgba(0, 230, 118, 0.9);
           box-shadow: 0 0 25px rgba(0, 230, 118, 0.7);
         }
+        .city-label:focus-visible {
+          opacity: 1 !important;
+          visibility: visible !important;
+          pointer-events: auto !important;
+          outline: 3px solid #fff;
+          outline-offset: 4px;
+          background: rgba(0, 70, 38, 0.98);
+          box-shadow: 0 0 0 6px rgba(0, 230, 118, 0.45), 0 0 25px rgba(0, 230, 118, 0.8);
+        }
       `;
       document.head.appendChild(style);
     }
 
-    const label = document.createElement("div");
+    const label = document.createElement("a");
     label.className = "city-label";
+    label.href = city.url;
+    label.target = "_blank";
+    label.rel = "noopener noreferrer";
+    label.tabIndex = -1;
+    label.setAttribute("aria-hidden", "true");
     label.setAttribute("aria-label", `Open ${city.name} in Google Maps`);
     label.innerHTML = `<i style="width:6px;height:6px;border-radius:50%;background:#00e676;display:inline-block;box-shadow: 0 0 8px #00e676;pointer-events:none;"></i><span style="pointer-events:none;">${city.name}</span>`;
-
-    const openCity = (e: Event) => {
-      e.preventDefault();
-      e.stopPropagation();
-      window.open(city.url, "_blank", "noopener,noreferrer");
-    };
-
-    // Remplacement du clic par le survol (mouseenter)
-    label.addEventListener("mouseenter", openCity);
 
     stage.appendChild(label);
     return { city, dot, pulse, label };
@@ -517,9 +523,8 @@ export async function createEarth(
       const x = (ndc.x * 0.5 + 0.5) * w;
       const y = (-ndc.y * 0.5 + 0.5) * h;
       m.label.style.opacity = String(Math.min(1, vis * 1.6));
-      const shown = vis > 0.15;
-      m.label.style.visibility = shown ? "visible" : "hidden";
-      m.label.style.pointerEvents = shown ? "auto" : "none";
+      m.label.style.visibility = "visible";
+      m.label.style.pointerEvents = vis > 0.15 ? "auto" : "none";
 
       const lx = m.city.side > 0 ? x + 14 : x - m.label.offsetWidth - 14;
       m.label.style.transform = `translate(${lx}px, ${y - 30}px)`;

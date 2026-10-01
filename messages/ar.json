@@ -65,7 +65,7 @@
       "enrollmentPath": {
         "title": "لا يوجد مسار تسجيل نشط",
         "description": "سجل في مسار موجه لمتابعة برنامج متكامل خطوة بخطوة.",
-        "action": "استكشف المسارات"
+        "action": "عرض التكوينات"
       },
       "continueLearning": {
         "title": "لا توجد دورة قيد التقدم",
@@ -134,7 +134,8 @@
   "courseCard": {
     "priceLabel": "السعر",
     "free": "مجاني",
-    "practice": "تطبيقي"
+    "practice": "تطبيقي",
+    "discoverCourse": "اكتشف"
   },
   "seriesCard": {
     "learningPath": "مسار تعليمي",
@@ -287,6 +288,9 @@
     "sent": "مُرسلة",
     "newChatTitle": "بدء محادثة مباشرة",
     "newChatSubtitle": "اختر طالبًا أو مدرّسًا مسجلًا",
+    "availableTeachers": "المدرّسون المتاحون",
+    "availableStudents": "الطلاب المتاحون",
+    "noAvailableContacts": "لا توجد جهات اتصال متاحة حاليًا.",
     "close": "إغلاق",
     "searchContacts": "ابحث بالاسم أو الدور...",
     "loadingContacts": "جارٍ تحميل الأعضاء...",

@@ -5,32 +5,32 @@ export interface DirectoryProfile {
   role: string;
 }
 
+export function isStudentRole(role: string) {
+  return [
+    "student",
+    "étudiant",
+    "étudiante",
+    "étudiant evolve",
+    "étudiante evolve",
+  ].includes(role.trim().toLowerCase());
+}
+
+export function isTeacherRole(role: string) {
+  return [
+    "teacher",
+    "formateur",
+    "formatrice",
+    "enseignant",
+    "enseignante",
+    "instructor",
+  ].includes(role.trim().toLowerCase());
+}
+
 export function isStudentTeacherPair(firstRole: string, secondRole: string) {
   const category = (role: string) => {
     const normalizedRole = role.trim().toLowerCase();
-    if (
-      [
-        "student",
-        "étudiant",
-        "étudiante",
-        "étudiant evolve",
-        "étudiante evolve",
-      ].includes(normalizedRole)
-    ) {
-      return "student";
-    }
-    if (
-      [
-        "teacher",
-        "formateur",
-        "formatrice",
-        "enseignant",
-        "enseignante",
-        "instructor",
-      ].includes(normalizedRole)
-    ) {
-      return "teacher";
-    }
+    if (isStudentRole(normalizedRole)) return "student";
+    if (isTeacherRole(normalizedRole)) return "teacher";
     return null;
   };
 

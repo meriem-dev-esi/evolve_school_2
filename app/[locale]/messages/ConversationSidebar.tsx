@@ -2,7 +2,9 @@
 
 import { Plus, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
+import type { DirectoryProfile } from "@/lib/community-directory";
 import type { Conversation } from "@/lib/messages-shared";
+import AvailableContactsPanel from "./AvailableContactsPanel";
 
 interface ConversationSidebarProps {
   conversations: Conversation[];
@@ -10,6 +12,8 @@ interface ConversationSidebarProps {
   onSelectConversation: (id: string) => void;
   searchFilter: string;
   onSearchFilterChange: (value: string) => void;
+  currentUserRole: string;
+  onSelectContact: (contact: DirectoryProfile) => Promise<boolean>;
   locale: string;
   onOpenNewChat?: () => void;
   className?: string;
@@ -21,6 +25,8 @@ export default function ConversationSidebar({
   onSelectConversation,
   searchFilter,
   onSearchFilterChange,
+  currentUserRole,
+  onSelectContact,
   locale,
   onOpenNewChat,
   className = "",
@@ -73,7 +79,7 @@ export default function ConversationSidebar({
       </div>
 
       {/* Conversations List */}
-      <div className="flex-1 overflow-y-auto divide-y divide-white/5 scrollbar-thin">
+      <div className="min-h-0 flex-1 overflow-y-auto divide-y divide-white/5 scrollbar-thin">
         {filteredConversations.length === 0 ? (
           <div className="p-8 text-center text-xs text-white/40">
             {searchFilter ? t("noSearchResults") : t("emptyInbox")}
@@ -159,6 +165,11 @@ export default function ConversationSidebar({
           })
         )}
       </div>
+
+      <AvailableContactsPanel
+        currentUserRole={currentUserRole}
+        onSelectContact={onSelectContact}
+      />
     </aside>
   );
 }

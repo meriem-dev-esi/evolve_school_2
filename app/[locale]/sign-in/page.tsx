@@ -16,6 +16,12 @@ import Navbar from "@/components/Navbar";
 import { Link, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 
+function getRedirectTarget(): string {
+  if (typeof window === "undefined") return "/dashboard";
+  const r = new URLSearchParams(window.location.search).get("redirect");
+  return r?.startsWith("/") && !r.startsWith("//") ? r : "/dashboard";
+}
+
 export default function SignInPage() {
   const tAuth = useTranslations("auth");
   const tCommon = useTranslations("common");
@@ -52,9 +58,7 @@ export default function SignInPage() {
       setLoading(false);
       setIsSuccess(true);
       setMessage(tAuth("successSignIn"));
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 700);
+      setTimeout(() => router.push(getRedirectTarget()), 700);
     } else {
       // Sign Up
       if (!fullName.trim()) {
@@ -66,11 +70,7 @@ export default function SignInPage() {
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
-        options: {
-          data: {
-            full_name: fullName.trim(),
-          },
-        },
+        options: { data: { full_name: fullName.trim() } },
       });
 
       if (error) {
@@ -99,9 +99,7 @@ export default function SignInPage() {
       setLoading(false);
       setIsSuccess(true);
       setMessage(tAuth("successSignUp"));
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 900);
+      setTimeout(() => router.push(getRedirectTarget()), 900);
     }
   }
 

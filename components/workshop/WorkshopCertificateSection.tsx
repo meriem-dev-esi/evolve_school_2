@@ -1,6 +1,6 @@
 "use client";
 
-import { Award, CheckCircle2, Sparkles } from "lucide-react";
+import { Award, CheckCircle2, Lock, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import DashboardCertificateModal from "@/components/dashboard/DashboardCertificateModal";
@@ -14,6 +14,7 @@ interface WorkshopCertificateSectionProps {
   userName: string;
   userId: string;
   enrolledAt?: string | null;
+  isFinished: boolean;
 }
 
 export default function WorkshopCertificateSection({
@@ -21,6 +22,7 @@ export default function WorkshopCertificateSection({
   userName,
   userId,
   enrolledAt,
+  isFinished,
 }: WorkshopCertificateSectionProps) {
   const t = useTranslations("ateliers.enrolled.certificate");
   const [isOpen, setIsOpen] = useState(false);
@@ -47,9 +49,49 @@ export default function WorkshopCertificateSection({
     },
   };
 
+  if (!isFinished) {
+    return (
+      <section
+        id="workshop-certificate"
+        className="mb-12 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-8 backdrop-blur-md shadow-lg"
+      >
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-3.5 py-1 text-xs font-bold text-amber-300 uppercase tracking-wider">
+              <Lock className="h-3.5 w-3.5" />
+              <span>{t("lockedBadge")}</span>
+            </div>
+
+            <h2 className="text-xl font-bold tracking-tight text-white md:text-2xl">
+              {t("lockedTitle")}
+            </h2>
+
+            <p className="max-w-2xl text-xs md:text-sm leading-relaxed text-white/50">
+              {t("lockedDescription")}
+            </p>
+          </div>
+
+          <div className="shrink-0">
+            <button
+              type="button"
+              disabled
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-xs font-semibold text-white/40 cursor-not-allowed"
+            >
+              <Lock className="h-3.5 w-3.5" />
+              <span>{t("lockedButton")}</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <>
-      <section className="mb-12 overflow-hidden rounded-3xl border-2 border-brand/40 bg-gradient-to-r from-brand/15 via-brand/5 to-emerald-500/10 p-6 md:p-8 shadow-[0_0_50px_rgba(95,236,107,0.15)] relative">
+      <section
+        id="workshop-certificate"
+        className="mb-12 overflow-hidden rounded-3xl border-2 border-brand/40 bg-gradient-to-r from-brand/15 via-brand/5 to-emerald-500/10 p-6 md:p-8 shadow-[0_0_50px_rgba(95,236,107,0.15)] relative"
+      >
         <div className="pointer-events-none absolute -end-10 -top-10 h-40 w-40 rounded-full bg-brand/20 blur-3xl" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">

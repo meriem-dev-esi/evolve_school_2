@@ -585,7 +585,15 @@
         "badge": "Attestation officielle",
         "title": "Votre attestation de réussite est prête",
         "description": "Félicitations {name} ! Vous avez validé votre participation à l'atelier « {title} ».",
-        "view": "Obtenir mon attestation"
+        "view": "Obtenir mon attestation",
+        "lockedBadge": "Attestation verrouillée",
+        "lockedTitle": "Terminez la vidéo pour débloquer votre attestation",
+        "lockedDescription": "Visionnez la masterclass pratique pour valider votre parcours et recevoir votre attestation certifiée.",
+        "lockedButton": "À débloquer après la vidéo",
+        "markFinished": "J'ai terminé la vidéo — Débloquer mon attestation",
+        "finishedBadge": "Session terminée avec succès",
+        "videoInProgress": "Visionnage en cours",
+        "finishVideoPrompt": "Regardez la vidéo puis cliquez sur valider pour débloquer votre attestation officielle."
       },
       "project": {
         "title": "Projet pratique de l'atelier",

@@ -274,7 +274,15 @@
         "badge": "Official Certificate",
         "title": "Your completion certificate is ready",
         "description": "Congratulations {name}! You have successfully completed the workshop \"{title}\".",
-        "view": "Get my certificate"
+        "view": "Get my certificate",
+        "lockedBadge": "Certificate Locked",
+        "lockedTitle": "Finish the video to unlock your certificate",
+        "lockedDescription": "Watch the hands-on masterclass to validate your skills and receive your verified certificate.",
+        "lockedButton": "Locked until video is completed",
+        "markFinished": "I finished the video — Unlock my certificate",
+        "finishedBadge": "Session completed successfully",
+        "videoInProgress": "Watching in progress",
+        "finishVideoPrompt": "Watch the video and validate to unlock your official certificate."
       },
       "project": {
         "title": "Workshop Practical Project",

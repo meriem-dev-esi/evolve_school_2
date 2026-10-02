@@ -52,7 +52,7 @@ export default function WorkshopJoinButton({
       if (authError) throw authError;
 
       if (!user) {
-        router.push("/sign-in");
+        router.push(`/sign-in?redirect=/ateliers/${workshopId}`);
         return;
       }
 

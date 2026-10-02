@@ -2,6 +2,7 @@
 
 import { Clock3, Layers3, MessageSquare, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
 import type { WorkshopItem } from "@/components/dashboard/types";
 import { Link } from "@/i18n/navigation";
 import type { WorkshopProjectItem, WorkshopVideoItem } from "./types";
@@ -27,6 +28,30 @@ export default function WorkshopEnrolledView({
   existingProject,
 }: WorkshopEnrolledViewProps) {
   const t = useTranslations("ateliers.enrolled");
+  const storageKey = `workshop_finished_${userId}_${workshop.id}`;
+  const [isFinished, setIsFinished] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem(storageKey);
+      if (stored === "true") {
+        setIsFinished(true);
+      }
+    }
+  }, [storageKey]);
+
+  function handleFinish() {
+    setIsFinished(true);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(storageKey, "true");
+    }
+    setTimeout(() => {
+      const el = document.getElementById("workshop-certificate");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, 100);
+  }
 
   return (
     <div className="space-y-10">
@@ -87,19 +112,22 @@ export default function WorkshopEnrolledView({
         </div>
       </section>
 
-      {/* 1. Official Workshop Certificate */}
+      {/* 1. Workshop Video / Stream Player (Watch & finish) */}
+      <WorkshopVideoPlayer
+        videos={videos}
+        workshopTitle={workshop.title}
+        fallbackImageUrl={workshop.image_url}
+        isFinished={isFinished}
+        onFinish={handleFinish}
+      />
+
+      {/* 2. Official Workshop Certificate (Unlocked upon finishing) */}
       <WorkshopCertificateSection
         workshop={workshop}
         userName={userName}
         userId={userId}
         enrolledAt={enrolledAt}
-      />
-
-      {/* 2. Workshop Video / Stream Player */}
-      <WorkshopVideoPlayer
-        videos={videos}
-        workshopTitle={workshop.title}
-        fallbackImageUrl={workshop.image_url}
+        isFinished={isFinished}
       />
 
       {/* 3. Practical Project Submission */}

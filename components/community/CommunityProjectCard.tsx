@@ -1,5 +1,7 @@
 import { ArrowRight, Code2, ExternalLink, Github, Heart } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { getCommunityCategoryTranslationKey } from "@/lib/community-directory";
 import type { Profile, Project } from "./types";
 
 interface CommunityProjectCardProps {
@@ -16,6 +18,11 @@ export default function CommunityProjectCard({
   project,
   profile,
 }: CommunityProjectCardProps) {
+  const t = useTranslations("community");
+  const categoryTranslationKey = project.category
+    ? getCommunityCategoryTranslationKey(project.category)
+    : null;
+
   return (
     <article className="group glass-card flex flex-col justify-between overflow-hidden rounded-3xl border border-white/10 shadow-2xl transition-all duration-300 hover:border-brand/40 hover:-translate-y-1.5">
       <div>
@@ -44,7 +51,9 @@ export default function CommunityProjectCard({
           {project.category && (
             <div className="absolute top-3 start-3">
               <span className="rounded-full border border-white/15 bg-black/70 px-2.5 py-1 text-[10px] font-semibold text-white/90 backdrop-blur-md">
-                {project.category}
+                {categoryTranslationKey
+                  ? t(categoryTranslationKey)
+                  : project.category}
               </span>
             </div>
           )}
@@ -64,17 +73,19 @@ export default function CommunityProjectCard({
               {profile?.avatar_url ? (
                 <img
                   src={profile.avatar_url}
-                  alt={profile.full_name || "Membre"}
+                  alt={profile.full_name || t("actions.member")}
                   className="h-6 w-6 rounded-full object-cover border border-white/20"
                 />
               ) : (
                 <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand/20 text-[10px] font-bold text-brand">
-                  {(profile?.full_name || "M").charAt(0).toUpperCase()}
+                  {(profile?.full_name || t("actions.member"))
+                    .charAt(0)
+                    .toUpperCase()}
                 </div>
               )}
             </div>
             <span className="truncate font-medium text-white/80">
-              {profile?.full_name || "Membre Evolve"}
+              {profile?.full_name || t("actions.member")}
             </span>
             {profile?.role && (
               <span className="text-white/40 text-[11px]">
@@ -124,7 +135,7 @@ export default function CommunityProjectCard({
                 href={project.github_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                title="Code source GitHub"
+                title={t("actions.github")}
                 className="flex h-7 w-7 items-center justify-center rounded-full bg-white/5 text-white/70 transition hover:bg-white/10 hover:text-white"
               >
                 <Github size={13} />
@@ -135,7 +146,7 @@ export default function CommunityProjectCard({
                 href={project.demo_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                title="Démo en direct"
+                title={t("actions.demo")}
                 className="flex h-7 w-7 items-center justify-center rounded-full bg-white/5 text-white/70 transition hover:bg-white/10 hover:text-white"
               >
                 <ExternalLink size={13} />
@@ -145,7 +156,7 @@ export default function CommunityProjectCard({
               href={`/community/${project.id}`}
               className="inline-flex items-center gap-1 rounded-full bg-brand/10 border border-brand/20 px-3 py-1 text-[11px] font-bold text-brand transition hover:bg-brand hover:text-black"
             >
-              <span>Détails</span>
+              <span>{t("actions.details")}</span>
               <ArrowRight size={11} className="rtl:rotate-180" />
             </Link>
           </div>

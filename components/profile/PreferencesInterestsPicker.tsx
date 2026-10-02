@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { PREFERENCE_CATEGORIES } from "./preferencesConstants";
 
 interface PreferencesInterestsPickerProps {
@@ -15,20 +18,21 @@ export default function PreferencesInterestsPicker({
   toggleInterest,
   saving,
 }: PreferencesInterestsPickerProps) {
+  const t = useTranslations("profileUi.preferences");
+  const option = (value: string) => t(`options.${value}`);
+
   return (
     <div>
       <div className="mb-3 flex items-center justify-between">
         <div>
           <label className="block text-sm font-medium text-white/80">
-            Interests
+            {t("interests")}
           </label>
-          <p className="mt-1 text-xs text-white/35">
-            Select all topics you are interested in.
-          </p>
+          <p className="mt-1 text-xs text-white/35">{t("selectInterests")}</p>
         </div>
 
         <span className="rounded-full bg-brand/10 px-3 py-1 text-xs font-medium text-brand">
-          {interests.length} selected
+          {t("selected", { count: interests.length })}
         </span>
       </div>
 
@@ -59,7 +63,7 @@ export default function PreferencesInterestsPicker({
                 >
                   {selected ? "✓" : ""}
                 </span>
-                <span>{item}</span>
+                <span>{option(item)}</span>
               </button>
             );
           })}

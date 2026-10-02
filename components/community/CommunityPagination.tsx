@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 
 interface CommunityPaginationProps {
@@ -21,10 +22,14 @@ export default function CommunityPagination({
   technology,
   sort,
 }: CommunityPaginationProps) {
+  const t = useTranslations("community");
   if (totalPages <= 1) return null;
 
   return (
-    <div className="mt-12 flex justify-center items-center gap-2">
+    <nav
+      className="mt-12 flex justify-center items-center gap-2"
+      aria-label={t("pagination")}
+    >
       {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
         const queryParams = new URLSearchParams({
           ...(search ? { q: search } : {}),
@@ -48,6 +53,6 @@ export default function CommunityPagination({
           </Link>
         );
       })}
-    </div>
+    </nav>
   );
 }

@@ -1,6 +1,19 @@
-import { setRequestLocale } from "next-intl/server";
+import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "teacher" });
+  return {
+    title: `${t("myCoursesTitle")} | Evolve Academy`,
+  };
+}
 
 export default async function TeacherCoursesPage({
   params,
@@ -9,6 +22,7 @@ export default async function TeacherCoursesPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: "teacher" });
   const supabase = await createClient();
 
   const {
@@ -19,13 +33,13 @@ export default async function TeacherCoursesPage({
     return (
       <main className="flex min-h-dvh items-center justify-center bg-black px-6 text-white">
         <div className="text-center">
-          <h1 className="text-3xl font-bold">Please sign in</h1>
+          <h1 className="text-3xl font-bold">{t("pleaseSignIn")}</h1>
 
           <Link
             href="/sign-in"
             className="mt-6 inline-block rounded-full bg-brand px-6 py-3 font-semibold text-black"
           >
-            Sign In
+            {t("signInButton")}
           </Link>
         </div>
       </main>
@@ -42,9 +56,9 @@ export default async function TeacherCoursesPage({
     return (
       <main className="flex min-h-dvh items-center justify-center bg-black px-6 text-white">
         <div className="text-center">
-          <h1 className="text-3xl font-bold">Access denied</h1>
+          <h1 className="text-3xl font-bold">{t("accessDenied")}</h1>
 
-          <p className="mt-3 text-white/50">Teacher access is required.</p>
+          <p className="mt-3 text-white/50">{t("teacherRequired")}</p>
         </div>
       </main>
     );
@@ -64,43 +78,43 @@ export default async function TeacherCoursesPage({
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.25em] text-brand">
-              Teacher Dashboard
+              {t("dashboardBadge")}
             </p>
 
-            <h1 className="mt-4 text-4xl font-bold md:text-5xl">My Courses</h1>
+            <h1 className="mt-4 text-4xl font-bold md:text-5xl">
+              {t("myCoursesTitle")}
+            </h1>
 
-            <p className="mt-3 text-white/50">
-              Create and manage your Evolve courses.
-            </p>
+            <p className="mt-3 text-white/50">{t("myCoursesSubtitle")}</p>
           </div>
 
           <Link
             href="/teacher/courses/new"
             className="rounded-full bg-brand px-6 py-3 font-semibold text-black transition hover:opacity-90"
           >
-            + Create Course
+            {t("createCourse")}
           </Link>
         </div>
 
         {/* Error */}
         {error && (
           <div className="mt-10 rounded-3xl border border-red-400/20 bg-red-400/5 p-8 text-red-400">
-            Error: {error.message}
+            {t("errorPrefix")} {error.message}
           </div>
         )}
 
         {/* Empty */}
         {!error && courses?.length === 0 && (
           <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-10 text-center">
-            <h2 className="text-2xl font-semibold">No courses yet</h2>
+            <h2 className="text-2xl font-semibold">{t("noCoursesTitle")}</h2>
 
-            <p className="mt-3 text-white/50">Create your first course.</p>
+            <p className="mt-3 text-white/50">{t("noCoursesSubtitle")}</p>
 
             <Link
               href="/teacher/courses/new"
               className="mt-6 inline-block rounded-full bg-brand px-6 py-3 font-semibold text-black"
             >
-              Create Course
+              {t("btnCreate")}
             </Link>
           </div>
         )}
@@ -122,7 +136,7 @@ export default async function TeacherCoursesPage({
                   />
                 ) : (
                   <div className="flex h-48 items-center justify-center bg-white/5">
-                    <span className="text-white/20">No image</span>
+                    <span className="text-white/20">{t("noImage")}</span>
                   </div>
                 )}
 
@@ -131,41 +145,41 @@ export default async function TeacherCoursesPage({
                   <div className="flex flex-wrap gap-2">
                     {course.is_published ? (
                       <span className="rounded-full bg-green-500/10 px-3 py-1 text-xs text-green-400">
-                        Published
+                        {t("statusPublished")}
                       </span>
                     ) : (
                       <span className="rounded-full bg-yellow-500/10 px-3 py-1 text-xs text-yellow-400">
-                        Draft
+                        {t("statusDraft")}
                       </span>
                     )}
 
                     {course.is_beginner && (
                       <span className="rounded-full bg-blue-500/10 px-3 py-1 text-xs text-blue-400">
-                        Beginner
+                        {t("badgeBeginner")}
                       </span>
                     )}
 
                     {course.is_partner && (
                       <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs text-emerald-400">
-                        Partner
+                        {t("badgePartner")}
                       </span>
                     )}
 
                     {course.is_exclusive && (
                       <span className="rounded-full bg-brand/10 px-3 py-1 text-xs text-brand">
-                        Exclusive
+                        {t("badgeExclusive")}
                       </span>
                     )}
 
                     {course.is_trending && (
                       <span className="rounded-full bg-pink-500/10 px-3 py-1 text-xs text-pink-400">
-                        Trending
+                        {t("badgeTrending")}
                       </span>
                     )}
 
                     {course.is_coming_soon && (
                       <span className="rounded-full bg-cyan-500/10 px-3 py-1 text-xs text-cyan-400">
-                        Coming Soon
+                        {t("badgeComingSoon")}
                       </span>
                     )}
                   </div>
@@ -183,25 +197,25 @@ export default async function TeacherCoursesPage({
                   {/* Metadata */}
                   <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
                     <div className="rounded-2xl bg-white/5 p-3">
-                      <p className="text-white/30">Domain</p>
+                      <p className="text-white/30">{t("domainLabel")}</p>
 
                       <p className="mt-1 font-medium">{course.domain || "—"}</p>
                     </div>
 
                     <div className="rounded-2xl bg-white/5 p-3">
-                      <p className="text-white/30">Level</p>
+                      <p className="text-white/30">{t("levelLabel")}</p>
 
                       <p className="mt-1 font-medium">{course.level || "—"}</p>
                     </div>
 
                     <div className="rounded-2xl bg-white/5 p-3">
-                      <p className="text-white/30">Type</p>
+                      <p className="text-white/30">{t("typeLabel")}</p>
 
                       <p className="mt-1 font-medium">{course.type || "—"}</p>
                     </div>
 
                     <div className="rounded-2xl bg-white/5 p-3">
-                      <p className="text-white/30">Practice</p>
+                      <p className="text-white/30">{t("practiceLabel")}</p>
 
                       <p className="mt-1 font-medium text-brand">
                         {course.practice_percentage ?? 0}%
@@ -215,21 +229,21 @@ export default async function TeacherCoursesPage({
                       href={`/courses/${course.id}`}
                       className="rounded-full border border-white/10 px-4 py-3 text-center text-sm font-semibold transition hover:border-brand hover:text-brand"
                     >
-                      View
+                      {t("actionView")}
                     </Link>
 
                     <Link
                       href={`/teacher/courses/${course.id}/edit`}
                       className="rounded-full bg-brand px-4 py-3 text-center text-sm font-semibold text-black transition hover:opacity-90"
                     >
-                      Edit
+                      {t("actionEdit")}
                     </Link>
 
                     <Link
                       href={`/teacher/courses/${course.id}/lessons`}
                       className="rounded-full border border-white/10 px-4 py-3 text-center text-sm font-semibold transition hover:border-brand hover:text-brand"
                     >
-                      Lessons
+                      {t("actionLessons")}
                     </Link>
                   </div>
                 </div>

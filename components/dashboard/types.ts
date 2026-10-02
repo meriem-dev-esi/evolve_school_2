@@ -45,3 +45,33 @@ export interface UserStats {
 }
 
 export type DashboardTab = "all" | "in_progress" | "completed" | "workshops";
+
+export interface DbCourse {
+  id: string;
+  title: string;
+  description: string | null;
+  image_url: string | null;
+  domain?: string | null;
+  level?: string | null;
+  duration?: string | null;
+}
+
+export interface DbEnrollment {
+  course_id: string;
+  payment_status: string;
+  courses: DbCourse | DbCourse[] | null;
+}
+
+export interface DbLesson {
+  id: string;
+  course_id: string;
+  title: string;
+  order_index: number;
+  duration?: string | null;
+}
+
+export interface DbProgress {
+  lesson_id: string;
+  progress_percentage: number;
+  completed: boolean;
+}

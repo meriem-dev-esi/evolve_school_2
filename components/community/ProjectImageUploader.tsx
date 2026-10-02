@@ -1,4 +1,5 @@
 import { Upload } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface ProjectImageUploaderProps {
   previewUrl: string | null;
@@ -13,10 +14,12 @@ export default function ProjectImageUploader({
   previewUrl,
   onImageChange,
 }: ProjectImageUploaderProps) {
+  const t = useTranslations("community");
+
   return (
     <div>
       <label className="mb-1.5 block text-xs font-semibold text-white/80">
-        Capture d'écran / Aperçu visuel
+        {t("submit.imageLabel")}
       </label>
       <div className="relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/15 bg-white/[0.02] p-6 text-center transition hover:border-brand/40 hover:bg-white/[0.04]">
         <input
@@ -31,11 +34,11 @@ export default function ProjectImageUploader({
           <div className="relative aspect-video w-full max-w-xs overflow-hidden rounded-xl border border-white/20">
             <img
               src={previewUrl}
-              alt="Aperçu"
+              alt={t("submit.imagePreview")}
               className="h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition text-xs font-bold text-white">
-              Changer l'image
+              {t("submit.imageChange")}
             </div>
           </div>
         ) : (
@@ -44,10 +47,10 @@ export default function ProjectImageUploader({
               <Upload size={18} className="text-brand" />
             </div>
             <p className="text-xs font-medium text-white/80">
-              Cliquez ou glissez une image ici (PNG, JPG, WebP)
+              {t("submit.imageChoose")}
             </p>
             <p className="mt-1 text-[11px] text-white/40">
-              L'image sera automatiquement optimisée
+              {t("submit.imageHelp")}
             </p>
           </>
         )}

@@ -1,5 +1,6 @@
 import { ArrowLeft, Code2 } from "lucide-react";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import CommunityHeader from "@/components/community/CommunityHeader";
 import CommunityPagination from "@/components/community/CommunityPagination";
 import CommunityProjectCard from "@/components/community/CommunityProjectCard";
@@ -11,17 +12,6 @@ import { Link } from "@/i18n/navigation";
 import { resolveAuthorProfile } from "@/lib/community-directory";
 import { createClient } from "@/lib/supabase/server";
 import CommunityFilters from "./CommunityFilters";
-
-export const metadata: Metadata = {
-  title: "Communauté & Projets Étudiants — Evolve Academy",
-  description:
-    "Découvrez les réalisations créatives et techniques des étudiants et membres de la communauté Evolve Academy.",
-  openGraph: {
-    title: "Communauté Evolve Academy — Projets Étudiants",
-    description:
-      "Explorez les créations, portfolios et applications développés par la communauté Evolve Academy.",
-  },
-};
 
 type Props = {
   params: Promise<{
@@ -36,9 +26,23 @@ type Props = {
   }>;
 };
 
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "community" });
+  const title = t("metaTitle");
+  const description = t("metaDescription");
+
+  return {
+    title,
+    description,
+    openGraph: { title, description },
+  };
+}
+
 export default async function CommunityPage({ params, searchParams }: Props) {
   const { locale } = await params;
   const filters = await searchParams;
+  const t = await getTranslations({ locale, namespace: "community" });
 
   const supabase = await createClient();
 
@@ -163,6 +167,7 @@ export default async function CommunityPage({ params, searchParams }: Props) {
         <div className="relative mx-auto max-w-7xl">
           {/* Header & Stats Strip */}
           <CommunityHeader
+            locale={locale}
             totalCount={totalCount}
             totalLikes={totalLikes}
             totalComments={commentsCount ?? 0}
@@ -183,15 +188,15 @@ export default async function CommunityPage({ params, searchParams }: Props) {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl">
-                  Projets Récents
+                  {t("recentProjects")}
                 </h2>
                 <p className="text-xs text-white/50 mt-1">
-                  Découvrez les travaux de la promotion actuelle
+                  {t("galleryDescription")}
                 </p>
               </div>
 
               <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/70">
-                {totalCount} {totalCount === 1 ? "réalisation" : "réalisations"}
+                {t("projectCount", { count: totalCount })}
               </span>
             </div>
 
@@ -201,17 +206,16 @@ export default async function CommunityPage({ params, searchParams }: Props) {
                   <Code2 className="h-6 w-6 text-brand" />
                 </div>
                 <h3 className="text-lg font-bold text-white">
-                  Aucun projet trouvé
+                  {t("emptyTitle")}
                 </h3>
                 <p className="mt-1.5 text-xs text-white/50 max-w-sm mx-auto">
-                  Aucune création ne correspond à vos critères. Essayez
-                  d'élargir votre recherche.
+                  {t("emptyDescription")}
                 </p>
                 <Link
                   href={`/community`}
                   className="mt-6 inline-block rounded-full bg-brand px-6 py-2.5 text-xs font-bold text-black transition hover:scale-105"
                 >
-                  Réinitialiser les filtres
+                  {t("resetFilters")}
                 </Link>
               </div>
             ) : (
@@ -224,6 +228,7 @@ export default async function CommunityPage({ params, searchParams }: Props) {
                       profile={resolveAuthorProfile(
                         project.user_id,
                         profileMap,
+                        t("memberUnavailable"),
                       )}
                       locale={locale}
                     />
@@ -251,7 +256,7 @@ export default async function CommunityPage({ params, searchParams }: Props) {
               className="inline-flex items-center gap-2 text-xs font-semibold text-white/60 transition hover:text-brand"
             >
               <ArrowLeft size={14} className="rtl:rotate-180" />
-              <span>Retour aux formations</span>
+              <span>{t("backToCourses")}</span>
             </Link>
           </div>
         </div>

@@ -46,6 +46,9 @@ export function useMessagingClient({
   const [actionError, setActionError] = useState("");
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const knownConversationIdsRef = useRef(
+    new Set(initialConversations.map((conversation) => conversation.id)),
+  );
 
   // Remove conversations and messages previously cached by the demo messaging UI.
   useEffect(() => {
@@ -186,6 +189,98 @@ export function useMessagingClient({
                   ),
                 ),
             );
+
+            if (
+              newDbMsg.receiver_id === currentUserId &&
+              !knownConversationIdsRef.current.has(newDbMsg.conversation_id)
+            ) {
+              knownConversationIdsRef.current.add(newDbMsg.conversation_id);
+              void supabase
+                .rpc("get_messaging_contact_profiles", {
+                  p_user_ids: [newDbMsg.sender_id],
+                })
+                .then(
+                  ({ data, error }) => {
+                    if (error) {
+                      knownConversationIdsRef.current.delete(
+                        newDbMsg.conversation_id,
+                      );
+                      console.error(
+                        "[Messaging] Unable to load incoming conversation contact:",
+                        error,
+                      );
+                      setActionError(
+                        t("openConversationFailure", {
+                          error: error.message,
+                        }),
+                      );
+                      return;
+                    }
+
+                    const profile = data?.[0];
+                    if (!profile?.full_name || !profile.role) {
+                      knownConversationIdsRef.current.delete(
+                        newDbMsg.conversation_id,
+                      );
+                      setActionError(t("contactOrConversationUnavailable"));
+                      return;
+                    }
+
+                    setConversations((previous) => {
+                      if (
+                        previous.some(
+                          (conversation) =>
+                            conversation.id === newDbMsg.conversation_id,
+                        )
+                      ) {
+                        return previous;
+                      }
+
+                      return [
+                        {
+                          id: newDbMsg.conversation_id,
+                          participant: {
+                            id: profile.id,
+                            name: profile.full_name,
+                            avatar_url: null,
+                            role: profile.role,
+                          },
+                          last_message: {
+                            content: newDbMsg.content,
+                            created_at: newDbMsg.created_at,
+                            sender_id: newDbMsg.sender_id,
+                            is_read: newDbMsg.is_read,
+                          },
+                          unread_count:
+                            newDbMsg.conversation_id === activeConvId ? 0 : 1,
+                        },
+                        ...previous,
+                      ].sort((first, second) =>
+                        (second.last_message?.created_at ?? "").localeCompare(
+                          first.last_message?.created_at ?? "",
+                        ),
+                      );
+                    });
+                  },
+                  (caughtError: unknown) => {
+                    knownConversationIdsRef.current.delete(
+                      newDbMsg.conversation_id,
+                    );
+                    console.error(
+                      "[Messaging] Unable to load incoming conversation contact:",
+                      caughtError,
+                    );
+                    setActionError(
+                      t("openConversationFailure", {
+                        error:
+                          caughtError instanceof Error
+                            ? caughtError.message
+                            : t("unexpectedError"),
+                      }),
+                    );
+                  },
+                );
+            }
           }
         },
       )
@@ -245,44 +340,38 @@ export function useMessagingClient({
         "[Messaging] Unable to mark messages as read:",
         caughtError,
       );
-      setActionError(
-        t("markReadError", {
-          error:
-            caughtError instanceof Error
-              ? caughtError.message
-              : t("unexpectedError"),
-        }),
-      );
-      return;
-    }
-
-    if (error) {
-      setActionError(t("markReadError", { error: error.message }));
-      return;
+      error =
+        caughtError instanceof Error
+          ? caughtError
+          : new Error(t("unexpectedError"));
     }
 
     setActiveConvId(id);
-    setConversations((previous) =>
-      previous.map((conversation) =>
-        conversation.id === id
-          ? {
-              ...conversation,
-              unread_count: 0,
-              last_message: conversation.last_message
-                ? { ...conversation.last_message, is_read: true }
-                : null,
-            }
-          : conversation,
-      ),
-    );
-    setMessagesMap((previous) => ({
-      ...previous,
-      [id]: (previous[id] ?? []).map((message) =>
-        message.receiver_id === currentUserId
-          ? { ...message, is_read: true }
-          : message,
-      ),
-    }));
+    if (error) {
+      setActionError(t("markReadError", { error: error.message }));
+    } else {
+      setConversations((previous) =>
+        previous.map((conversation) =>
+          conversation.id === id
+            ? {
+                ...conversation,
+                unread_count: 0,
+                last_message: conversation.last_message
+                  ? { ...conversation.last_message, is_read: true }
+                  : null,
+              }
+            : conversation,
+        ),
+      );
+      setMessagesMap((previous) => ({
+        ...previous,
+        [id]: (previous[id] ?? []).map((message) =>
+          message.receiver_id === currentUserId
+            ? { ...message, is_read: true }
+            : message,
+        ),
+      }));
+    }
   };
 
   const handleBackToConversations = () => {
@@ -371,6 +460,7 @@ export function useMessagingClient({
         ...previous.filter((conversation) => conversation.id !== activeConvId),
       ];
     });
+    knownConversationIdsRef.current.add(activeConvId);
     setNewMessageText("");
   };
 
@@ -444,6 +534,7 @@ export function useMessagingClient({
       conversation,
       ...previous.filter((item) => item.id !== conversation.id),
     ]);
+    knownConversationIdsRef.current.add(conversation.id);
     setActiveConvId(conversation.id);
     setNewMessageText(
       courseTitle

@@ -107,6 +107,16 @@ a {
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.course-card-fallback-gradient {
+  background:
+    radial-gradient(
+      ellipse at 50% 20%,
+      rgba(132, 204, 22, 0.25),
+      transparent 55%
+    ),
+    linear-gradient(135deg, #27272a, #09090b);
+}
+
 .glass-card:hover {
   border-color: rgba(255, 255, 255, 0.2);
   box-shadow: 0 12px 35px -10px rgba(0, 0, 0, 0.7);

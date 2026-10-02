@@ -1,4 +1,5 @@
 import { Clock, Pencil, Trash2, X } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import type { ProjectComment } from "./types";
 
 interface CommentItemProps {
@@ -28,6 +29,9 @@ export default function CommentItem({
   onSaveEdit,
   onDeleteComment,
 }: CommentItemProps) {
+  const locale = useLocale();
+  const t = useTranslations("community.comments");
+
   return (
     <div className="group rounded-2xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-md transition-all hover:border-white/20">
       {isEditing ? (
@@ -45,7 +49,7 @@ export default function CommentItem({
               onClick={onCancelEditing}
               className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/70 hover:bg-white/10 transition"
             >
-              <X className="h-3 w-3" /> Annuler
+              <X className="h-3 w-3" /> {t("cancel")}
             </button>
             <button
               type="button"
@@ -53,7 +57,7 @@ export default function CommentItem({
               disabled={!editingContent.trim()}
               className="rounded-lg bg-brand px-4 py-1.5 text-xs font-bold text-black hover:opacity-90 disabled:opacity-40 transition"
             >
-              Enregistrer
+              {t("save")}
             </button>
           </div>
         </div>
@@ -64,19 +68,21 @@ export default function CommentItem({
               {comment.profile?.avatar_url ? (
                 <img
                   src={comment.profile.avatar_url}
-                  alt={comment.profile.full_name || "Membre"}
+                  alt={comment.profile.full_name || t("member")}
                   className="h-9 w-9 rounded-full object-cover border border-white/15 shadow-sm"
                 />
               ) : (
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand/15 text-xs font-bold text-brand border border-brand/30">
-                  {(comment.profile?.full_name || "E").charAt(0).toUpperCase()}
+                  {(comment.profile?.full_name || t("member"))
+                    .charAt(0)
+                    .toUpperCase()}
                 </div>
               )}
 
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-bold text-white">
-                    {comment.profile?.full_name || "Membre Evolve"}
+                    {comment.profile?.full_name || t("defaultMember")}
                   </span>
                   {comment.profile?.role && (
                     <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/60">
@@ -87,12 +93,19 @@ export default function CommentItem({
                 <div className="flex items-center gap-1.5 text-[10px] text-white/40 mt-0.5">
                   <Clock className="h-3 w-3" />
                   <span>
-                    {new Date(comment.created_at).toLocaleDateString("fr-FR", {
-                      day: "numeric",
-                      month: "short",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    {new Date(comment.created_at).toLocaleDateString(
+                      locale === "ar"
+                        ? "ar-DZ"
+                        : locale === "fr"
+                          ? "fr-FR"
+                          : "en-US",
+                      {
+                        day: "numeric",
+                        month: "short",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      },
+                    )}
                   </span>
                 </div>
               </div>
@@ -104,7 +117,7 @@ export default function CommentItem({
                   type="button"
                   onClick={() => onStartEditing(comment)}
                   className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition"
-                  title="Modifier"
+                  title={t("edit")}
                 >
                   <Pencil className="h-3.5 w-3.5" />
                 </button>
@@ -112,7 +125,7 @@ export default function CommentItem({
                   type="button"
                   onClick={() => onDeleteComment(comment.id)}
                   className="p-1.5 rounded-lg text-rose-400/70 hover:text-rose-400 hover:bg-rose-500/10 transition"
-                  title="Supprimer"
+                  title={t("delete")}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>

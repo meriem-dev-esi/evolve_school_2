@@ -9,6 +9,7 @@ import {
   Layers,
   Play,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { EnrolledCourseItem } from "./types";
 
@@ -28,6 +29,8 @@ export default function DashboardCoursesGrid({
   totalCoursesCount,
   onOpenCertificate,
 }: DashboardCoursesGridProps) {
+  const t = useTranslations("dashboardUi.courses");
+
   if (filteredCourses.length === 0) {
     return (
       <div className="rounded-3xl border border-gray-200 bg-white p-12 text-center shadow-sm">
@@ -35,27 +38,25 @@ export default function DashboardCoursesGrid({
           <BookOpen className="h-8 w-8" />
         </div>
         <h3 className="mt-4 text-lg font-bold text-gray-900">
-          {totalCoursesCount === 0
-            ? "Vous n'êtes inscrit à aucune formation pour le moment"
-            : "Aucune formation ne correspond à votre recherche"}
+          {totalCoursesCount === 0 ? t("noEnrollments") : t("noSearchResults")}
         </h3>
         <p className="mt-2 max-w-md mx-auto text-xs text-gray-500">
           {totalCoursesCount === 0
-            ? "Explorez nos cursus certifiants conçus par des experts du marché algérien et international."
-            : "Modifiez vos filtres ou effectuez une recherche différente."}
+            ? t("exploreDescription")
+            : t("changeFilters")}
         </p>
         <div className="mt-6 flex justify-center gap-3">
           <Link
             href={`/formations`}
             className="rounded-xl bg-lime-400 px-6 py-2.5 text-xs font-bold text-black hover:bg-lime-300 transition shadow-sm shadow-lime-400/30"
           >
-            Découvrir les formations
+            {t("discover")}
           </Link>
           <Link
             href={`/ateliers`}
             className="rounded-xl border border-gray-200 bg-white px-6 py-2.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition shadow-sm"
           >
-            Voir les ateliers
+            {t("workshops")}
           </Link>
         </div>
       </div>
@@ -100,7 +101,7 @@ export default function DashboardCoursesGrid({
               <div className="absolute bottom-3 end-3">
                 <span className="rounded-full bg-white/90 border border-white/60 px-2.5 py-0.5 text-[10px] font-mono text-gray-700 backdrop-blur-md flex items-center gap-1 shadow-sm">
                   <Clock className="h-3 w-3 text-lime-600" />
-                  {course.duration || "Formation certifiante"}
+                  {course.duration || t("durationFallback")}
                 </span>
               </div>
             </div>
@@ -120,7 +121,7 @@ export default function DashboardCoursesGrid({
               {/* Progress bar */}
               <div className="mt-5 space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-500">Progression</span>
+                  <span className="text-gray-500">{t("progress")}</span>
                   <span className="font-mono font-bold text-lime-700">
                     {course.progressPercentage}%
                   </span>
@@ -139,11 +140,14 @@ export default function DashboardCoursesGrid({
 
                 <div className="flex items-center justify-between text-[11px] text-gray-400">
                   <span>
-                    {course.completedLessons} / {course.totalLessons} leçons
+                    {t("lessonCount", {
+                      completed: course.completedLessons,
+                      total: course.totalLessons,
+                    })}
                   </span>
                   {course.isCompleted && (
                     <span className="text-emerald-600 font-semibold flex items-center gap-1">
-                      <CheckCircle2 className="h-3 w-3" /> Validé
+                      <CheckCircle2 className="h-3 w-3" /> {t("validated")}
                     </span>
                   )}
                 </div>
@@ -161,14 +165,14 @@ export default function DashboardCoursesGrid({
                   className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-lime-200 bg-lime-50 py-2.5 text-xs font-bold text-lime-800 transition hover:bg-lime-100"
                 >
                   <Award className="h-3.5 w-3.5" />
-                  <span>Attestation</span>
+                  <span>{t("certificate")}</span>
                 </button>
                 <Link
                   href={`/courses/${course.id}`}
                   prefetch={true}
                   className="flex items-center justify-center rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition shadow-sm"
                 >
-                  Revoir
+                  {t("review")}
                 </Link>
               </div>
             ) : course.nextLesson ? (
@@ -178,7 +182,9 @@ export default function DashboardCoursesGrid({
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-lime-400 py-2.5 text-xs font-bold text-black transition hover:bg-lime-300 active:scale-95 shadow-sm shadow-lime-400/30"
               >
                 <Play className="h-3 w-3 fill-black" />
-                <span>Continuer ({course.nextLesson.order_index})</span>
+                <span>
+                  {t("continue", { lesson: course.nextLesson.order_index })}
+                </span>
               </Link>
             ) : (
               <Link
@@ -186,7 +192,7 @@ export default function DashboardCoursesGrid({
                 prefetch={true}
                 className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-gray-50 py-2.5 text-xs font-semibold text-gray-700 hover:bg-gray-100 transition shadow-sm"
               >
-                <span>Ouvrir le cours</span>
+                <span>{t("open")}</span>
                 <ChevronRight className="h-3.5 w-3.5" />
               </Link>
             )}

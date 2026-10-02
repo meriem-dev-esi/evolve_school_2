@@ -2,6 +2,7 @@
 
 import { AlertCircle, Loader2, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import EditProjectDetailsFields from "./EditProjectDetailsFields";
 import EditProjectImageField from "./EditProjectImageField";
 import EditProjectLinksFields from "./EditProjectLinksFields";
@@ -20,6 +21,7 @@ type Props = {
 };
 
 export default function EditProjectForm(props: Props) {
+  const t = useTranslations("community");
   const router = useRouter();
   const {
     title,
@@ -87,7 +89,7 @@ export default function EditProjectForm(props: Props) {
           }
           className="rounded-2xl border border-white/15 bg-white/5 px-6 py-3 text-xs font-semibold text-white transition hover:bg-white/10"
         >
-          Annuler
+          {t("edit.cancel")}
         </button>
 
         <button
@@ -98,12 +100,12 @@ export default function EditProjectForm(props: Props) {
           {loading ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Enregistrement...</span>
+              <span>{t("edit.saving")}</span>
             </>
           ) : (
             <>
               <Sparkles className="h-4 w-4" />
-              <span>Sauvegarder les modifications</span>
+              <span>{t("edit.save")}</span>
             </>
           )}
         </button>

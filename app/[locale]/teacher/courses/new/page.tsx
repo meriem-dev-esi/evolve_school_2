@@ -1,11 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function NewCoursePage() {
   const router = useRouter();
+  const t = useTranslations("teacher");
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -35,7 +37,7 @@ export default function NewCoursePage() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      setMessage("Error: You must be signed in.");
+      setMessage(`${t("errorPrefix")} ${t("errorSignedInRequired")}`);
       setLoading(false);
       return;
     }
@@ -47,7 +49,7 @@ export default function NewCoursePage() {
       .maybeSingle();
 
     if (!profile || !["teacher", "admin"].includes(profile.role)) {
-      setMessage("Error: Teacher access required.");
+      setMessage(`${t("errorPrefix")} ${t("teacherRequired")}`);
       setLoading(false);
       return;
     }
@@ -69,12 +71,12 @@ export default function NewCoursePage() {
     });
 
     if (error) {
-      setMessage(`Error: ${error.message}`);
+      setMessage(`${t("errorPrefix")} ${error.message}`);
       setLoading(false);
       return;
     }
 
-    setMessage("Course created successfully.");
+    setMessage(t("successCreated"));
     setLoading(false);
 
     setTimeout(() => {
@@ -87,27 +89,25 @@ export default function NewCoursePage() {
     <main className="min-h-dvh bg-canvas px-6 py-24 text-white lg:px-10">
       <div className="mx-auto max-w-4xl">
         <p className="text-sm font-semibold uppercase tracking-[0.25em] text-brand">
-          Teacher Dashboard
+          {t("dashboardBadge")}
         </p>
 
-        <h1 className="mt-4 text-4xl font-bold">Create Course Ticket</h1>
+        <h1 className="mt-4 text-4xl font-bold">{t("createCourseTitle")}</h1>
 
-        <p className="mt-3 text-white/50">
-          Create a new course and define how it appears on Evolve.
-        </p>
+        <p className="mt-3 text-white/50">{t("createCourseSubtitle")}</p>
 
         <div className="mt-10 space-y-6 rounded-3xl border border-white/10 bg-white/5 p-8">
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Course title"
+            placeholder={t("placeholderTitle")}
             className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-4 outline-none focus:border-brand"
           />
 
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Course description"
+            placeholder={t("placeholderDescription")}
             rows={5}
             className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-4 outline-none focus:border-brand"
           />
@@ -116,21 +116,21 @@ export default function NewCoursePage() {
             <input
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
-              placeholder="Domain"
+              placeholder={t("placeholderDomain")}
               className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 outline-none focus:border-brand"
             />
 
             <input
               value={level}
               onChange={(e) => setLevel(e.target.value)}
-              placeholder="Level"
+              placeholder={t("placeholderLevel")}
               className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 outline-none focus:border-brand"
             />
 
             <input
               value={type}
               onChange={(e) => setType(e.target.value)}
-              placeholder="Type"
+              placeholder={t("placeholderType")}
               className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 outline-none focus:border-brand"
             />
           </div>
@@ -138,13 +138,15 @@ export default function NewCoursePage() {
           <input
             value={imageUrl}
             onChange={(e) => setImageUrl(e.target.value)}
-            placeholder="Image URL"
+            placeholder={t("placeholderImageUrl")}
             className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-4 outline-none focus:border-brand"
           />
 
           <div>
             <div className="flex justify-between">
-              <label className="font-medium">Practice percentage</label>
+              <label className="font-medium">
+                {t("practicePercentageLabel")}
+              </label>
 
               <span className="font-semibold text-brand">
                 {practicePercentage}%
@@ -168,7 +170,7 @@ export default function NewCoursePage() {
                 checked={isBeginner}
                 onChange={(e) => setIsBeginner(e.target.checked)}
               />
-              Beginner Starter Pack
+              {t("toggleBeginner")}
             </label>
 
             <label className="flex items-center gap-3">
@@ -177,7 +179,7 @@ export default function NewCoursePage() {
                 checked={isPartner}
                 onChange={(e) => setIsPartner(e.target.checked)}
               />
-              Partner Course
+              {t("togglePartner")}
             </label>
 
             <label className="flex items-center gap-3">
@@ -186,7 +188,7 @@ export default function NewCoursePage() {
                 checked={isExclusive}
                 onChange={(e) => setIsExclusive(e.target.checked)}
               />
-              Exclusive to Evolve
+              {t("toggleExclusive")}
             </label>
 
             <label className="flex items-center gap-3">
@@ -195,7 +197,7 @@ export default function NewCoursePage() {
                 checked={isTrending}
                 onChange={(e) => setIsTrending(e.target.checked)}
               />
-              Trending
+              {t("toggleTrending")}
             </label>
 
             <label className="flex items-center gap-3">
@@ -204,7 +206,7 @@ export default function NewCoursePage() {
                 checked={isComingSoon}
                 onChange={(e) => setIsComingSoon(e.target.checked)}
               />
-              Coming Soon
+              {t("toggleComingSoon")}
             </label>
           </div>
 
@@ -216,13 +218,16 @@ export default function NewCoursePage() {
             disabled={loading || !title.trim()}
             className="rounded-full bg-brand px-8 py-4 font-semibold text-black disabled:opacity-50"
           >
-            {loading ? "Creating..." : "Create Course"}
+            {loading ? t("btnCreating") : t("btnCreate")}
           </button>
 
           {message && (
             <p
               className={
-                message.startsWith("Error") ? "text-red-400" : "text-brand"
+                message.includes(t("errorPrefix")) ||
+                message.startsWith("Error")
+                  ? "text-red-400"
+                  : "text-brand"
               }
             >
               {message}

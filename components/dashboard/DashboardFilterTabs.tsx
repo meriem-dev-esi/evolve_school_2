@@ -1,6 +1,7 @@
 "use client";
 
 import { Search } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { DashboardTab } from "./types";
 
 interface DashboardFilterTabsProps {
@@ -28,6 +29,8 @@ export default function DashboardFilterTabs({
   completedCount,
   workshopsCount,
 }: DashboardFilterTabsProps) {
+  const t = useTranslations("dashboardUi.filters");
+
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200 pb-4">
       {/* Navigation Tabs */}
@@ -41,7 +44,7 @@ export default function DashboardFilterTabs({
               : "bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900"
           }`}
         >
-          Toutes mes formations ({totalCoursesCount})
+          {t("all")} ({totalCoursesCount})
         </button>
 
         <button
@@ -53,7 +56,7 @@ export default function DashboardFilterTabs({
               : "bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900"
           }`}
         >
-          En cours ({inProgressCount})
+          {t("inProgress")} ({inProgressCount})
         </button>
 
         <button
@@ -65,7 +68,7 @@ export default function DashboardFilterTabs({
               : "bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900"
           }`}
         >
-          Terminées ({completedCount})
+          {t("completed")} ({completedCount})
         </button>
 
         <button
@@ -77,7 +80,7 @@ export default function DashboardFilterTabs({
               : "bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900"
           }`}
         >
-          Ateliers &amp; Masterclasses ({workshopsCount})
+          {t("workshops")} ({workshopsCount})
         </button>
       </div>
 
@@ -88,7 +91,7 @@ export default function DashboardFilterTabs({
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Filtrer mes cours..."
+          placeholder={t("search")}
           className="w-full rounded-xl border border-gray-200 bg-white ps-10 pe-4 py-2 text-xs text-gray-800 placeholder-gray-400 focus:border-lime-400 focus:ring-2 focus:ring-lime-100 focus:outline-none shadow-sm"
         />
       </div>

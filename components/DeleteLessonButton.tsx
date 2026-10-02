@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -9,12 +10,11 @@ type Props = {
 };
 
 export default function DeleteLessonButton({ lessonId, courseId }: Props) {
+  const t = useTranslations("teacher");
   const [loading, setLoading] = useState(false);
 
   async function handleDelete() {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this lesson?",
-    );
+    const confirmed = window.confirm(t("confirmDeleteLesson"));
 
     if (!confirmed) return;
 
@@ -29,7 +29,7 @@ export default function DeleteLessonButton({ lessonId, courseId }: Props) {
       .eq("course_id", courseId);
 
     if (error) {
-      window.alert(`Error: ${error.message}`);
+      window.alert(`${t("errorPrefix")} ${error.message}`);
       setLoading(false);
       return;
     }
@@ -44,7 +44,7 @@ export default function DeleteLessonButton({ lessonId, courseId }: Props) {
       disabled={loading}
       className="rounded-full border border-red-400/20 px-5 py-2.5 text-sm font-semibold text-red-400 transition hover:bg-red-400 hover:text-white disabled:opacity-50"
     >
-      {loading ? "Deleting..." : "Delete"}
+      {loading ? t("deletingLesson") : t("btnDeleteLesson")}
     </button>
   );
 }

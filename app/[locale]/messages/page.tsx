@@ -11,15 +11,23 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import MessagingClient from "./MessagingClient";
 
-export const metadata: Metadata = {
-  title: "Messagerie & Mentorat Direct — Evolve Academy",
-  description:
-    "Échangez en direct avec vos formateurs, tuteurs et camarades de promotion au sein d'Evolve Academy.",
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "messaging" });
+
+  return {
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+    robots: {
+      index: false,
+      follow: false,
+    },
+  };
+}
 
 type Props = {
   params: Promise<{

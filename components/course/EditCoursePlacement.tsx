@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 interface EditCoursePlacementProps {
   isBeginner: boolean;
   setIsBeginner: (val: boolean) => void;
@@ -31,9 +33,11 @@ export default function EditCoursePlacement({
   isPublished,
   setIsPublished,
 }: EditCoursePlacementProps) {
+  const t = useTranslations("teacher");
+
   return (
     <section className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
-      <h2 className="text-2xl font-bold">Platform Placement</h2>
+      <h2 className="text-2xl font-bold">{t("placementTitle")}</h2>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <label className="flex items-center gap-3 rounded-2xl bg-black p-4 cursor-pointer">
@@ -43,7 +47,7 @@ export default function EditCoursePlacement({
             onChange={(e) => setIsBeginner(e.target.checked)}
             className="accent-brand"
           />
-          <span>Beginner Starter Pack</span>
+          <span>{t("toggleBeginner")}</span>
         </label>
 
         <label className="flex items-center gap-3 rounded-2xl bg-black p-4 cursor-pointer">
@@ -53,7 +57,7 @@ export default function EditCoursePlacement({
             onChange={(e) => setIsPartner(e.target.checked)}
             className="accent-brand"
           />
-          <span>Partner Course</span>
+          <span>{t("togglePartner")}</span>
         </label>
 
         <label className="flex items-center gap-3 rounded-2xl bg-black p-4 cursor-pointer">
@@ -63,7 +67,7 @@ export default function EditCoursePlacement({
             onChange={(e) => setIsExclusive(e.target.checked)}
             className="accent-brand"
           />
-          <span>Exclusive to Evolve</span>
+          <span>{t("toggleExclusive")}</span>
         </label>
 
         <label className="flex items-center gap-3 rounded-2xl bg-black p-4 cursor-pointer">
@@ -73,7 +77,7 @@ export default function EditCoursePlacement({
             onChange={(e) => setIsTrending(e.target.checked)}
             className="accent-brand"
           />
-          <span>Trending</span>
+          <span>{t("toggleTrending")}</span>
         </label>
 
         <label className="flex items-center gap-3 rounded-2xl bg-black p-4 cursor-pointer">
@@ -83,7 +87,7 @@ export default function EditCoursePlacement({
             onChange={(e) => setIsComingSoon(e.target.checked)}
             className="accent-brand"
           />
-          <span>Coming Soon</span>
+          <span>{t("toggleComingSoon")}</span>
         </label>
 
         <label className="flex items-center gap-3 rounded-2xl bg-black p-4 cursor-pointer">
@@ -93,7 +97,7 @@ export default function EditCoursePlacement({
             onChange={(e) => setIsPublished(e.target.checked)}
             className="accent-brand"
           />
-          <span>Published</span>
+          <span>{t("togglePublished")}</span>
         </label>
       </div>
     </section>

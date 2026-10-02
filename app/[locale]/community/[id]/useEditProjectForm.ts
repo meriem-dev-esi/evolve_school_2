@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { compressImage, validateUploadFile } from "@/lib/imageCompressor";
 import { createClient } from "@/lib/supabase/client";
@@ -30,6 +31,7 @@ export function useEditProjectForm({
   initialDemoUrl,
   initialImageUrl,
 }: InitialValues) {
+  const t = useTranslations("community");
   const supabase = createClient();
   const router = useRouter();
 
@@ -51,7 +53,10 @@ export function useEditProjectForm({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const validation = validateUploadFile(file);
+    const validation = validateUploadFile(file, undefined, undefined, {
+      unsupportedFormat: (type) => t("edit.imageFormatError", { type }),
+      fileTooLarge: (size, max) => t("edit.imageSizeError", { size, max }),
+    });
 
     if (!validation.valid) {
       setMessage(validation.error || "Fichier image invalide.");
@@ -93,9 +98,7 @@ export function useEditProjectForm({
 
     if (uploadError) {
       console.error("[Image Upload]", uploadError);
-      throw new Error(
-        `Impossible de télécharger l'image : ${uploadError.message}`,
-      );
+      throw new Error(t("edit.uploadError", { error: uploadError.message }));
     }
 
     const { data } = supabase.storage
@@ -116,7 +119,7 @@ export function useEditProjectForm({
     } = await supabase.auth.getUser();
 
     if (!user) {
-      setMessage("Vous devez être connecté.");
+      setMessage(t("edit.loginRequired"));
       setLoading(false);
       return;
     }
@@ -152,7 +155,7 @@ export function useEditProjectForm({
 
     if (error) {
       console.error("[Project Update]", error);
-      setMessage(`Erreur lors de la mise à jour : ${error.message}`);
+      setMessage(t("edit.updateError", { error: error.message }));
       setLoading(false);
       return;
     }

@@ -1,6 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Link } from "@/i18n/navigation";
@@ -33,7 +34,8 @@ type CommunityProject = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
+  const { id, locale } = await params;
+  const t = await getTranslations({ locale, namespace: "community" });
   const supabase = await createClient();
 
   const { data: project } = await supabase
@@ -44,20 +46,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!project) {
     return {
-      title: "Projet non trouvé — Evolve Academy",
+      title: t("detail.notFound"),
     };
   }
 
   return {
-    title: `${project.title} — Communauté Evolve`,
-    description:
-      project.description ||
-      "Découvrez ce projet développé par la communauté Evolve Academy.",
+    title: t("detailMetaTitle", { title: project.title }),
+    description: project.description || t("detailMetaDescription"),
     openGraph: {
       title: `${project.title} — Evolve Academy`,
-      description:
-        project.description ||
-        "Projet réalisé par les étudiants d'Evolve Academy.",
+      description: project.description || t("detailMetaDescription"),
       images: project.image_url ? [{ url: project.image_url }] : [],
     },
   };
@@ -65,6 +63,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CommunityProjectPage({ params }: Props) {
   const { locale, id } = await params;
+  const t = await getTranslations({ locale, namespace: "community" });
 
   const supabase = await createClient();
 
@@ -124,7 +123,11 @@ export default async function CommunityProjectPage({ params }: Props) {
       ])
     : undefined;
 
-  const resolvedAuthor = resolveAuthorProfile(project.user_id, dbMap);
+  const resolvedAuthor = resolveAuthorProfile(
+    project.user_id,
+    dbMap,
+    t("memberUnavailable"),
+  );
   const authorName = resolvedAuthor.full_name;
 
   // Check if current user has liked this project
@@ -145,7 +148,7 @@ export default async function CommunityProjectPage({ params }: Props) {
   const isOwner = user?.id === project.user_id;
 
   const formattedDate = new Date(project.created_at).toLocaleDateString(
-    locale === "ar" ? "ar-DZ" : "fr-FR",
+    locale === "ar" ? "ar-DZ" : locale === "fr" ? "fr-FR" : "en-US",
     {
       year: "numeric",
       month: "long",
@@ -169,7 +172,7 @@ export default async function CommunityProjectPage({ params }: Props) {
             className="inline-flex items-center gap-2 text-xs font-semibold text-white/60 hover:text-brand transition duration-200"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>Retour aux projets de la communauté</span>
+            <span>{t("detail.back")}</span>
           </Link>
 
           {/* Main Showcase Article */}

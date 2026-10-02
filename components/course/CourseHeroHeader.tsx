@@ -1,3 +1,5 @@
+"use client";
+
 import {
   BookOpen,
   CheckCircle2,
@@ -5,6 +7,7 @@ import {
   MessageSquare,
   Sparkles,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { CourseDetail } from "./types";
 
@@ -25,6 +28,8 @@ export default function CourseHeroHeader({
   completedLessons,
   courseProgress,
 }: CourseHeroHeaderProps) {
+  const t = useTranslations("courseUi.hero");
+
   return (
     <section className="mb-12">
       <div className="glass-card relative overflow-hidden rounded-3xl border border-white/10 p-8 md:p-10 shadow-2xl">
@@ -34,7 +39,7 @@ export default function CourseHeroHeader({
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <span className="flex items-center gap-1.5 rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-xs font-bold text-brand uppercase tracking-wider">
             <Sparkles className="h-3.5 w-3.5" />
-            Formation Certifiante
+            {t("certified")}
           </span>
           {course.level && (
             <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/80">
@@ -64,21 +69,21 @@ export default function CourseHeroHeader({
             <span className="flex items-center gap-1.5">
               <BookOpen className="h-4 w-4 text-brand" />
               <span className="text-white font-bold">{totalLessons}</span>{" "}
-              leçons
+              {t("lessons")}
             </span>
             <span className="flex items-center gap-1.5">
               <CheckCircle2 className="h-4 w-4 text-emerald-400" />
               <span className="text-white font-bold">
                 {completedLessons}/{totalLessons}
               </span>{" "}
-              complétées
+              {t("completed")}
             </span>
             <span className="flex items-center gap-1.5">
               <Clock className="h-4 w-4 text-sky-400" />
               <span className="text-brand font-extrabold">
                 {courseProgress}%
               </span>{" "}
-              complété
+              {t("complete")}
             </span>
           </div>
 
@@ -87,16 +92,14 @@ export default function CourseHeroHeader({
             className="inline-flex items-center gap-2 rounded-full border border-brand/40 bg-brand/10 px-4 py-2 text-xs font-bold text-brand transition-all hover:bg-brand hover:text-black hover:shadow-[0_0_15px_rgba(95,236,107,0.4)]"
           >
             <MessageSquare className="h-3.5 w-3.5" />
-            <span>Contacter le formateur</span>
+            <span>{t("contact")}</span>
           </Link>
         </div>
 
         {/* Course Global Progress Bar */}
         <div className="mt-6 rounded-2xl border border-white/5 bg-white/[0.02] p-4">
           <div className="mb-2 flex justify-between text-xs">
-            <span className="text-white/60 font-medium">
-              Progression du cours
-            </span>
+            <span className="text-white/60 font-medium">{t("progress")}</span>
             <span className="font-extrabold text-brand">{courseProgress}%</span>
           </div>
 

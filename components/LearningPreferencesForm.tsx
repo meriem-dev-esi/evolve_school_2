@@ -1,11 +1,13 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import PreferencesFormFields from "@/components/profile/PreferencesFormFields";
 import PreferencesInterestsPicker from "@/components/profile/PreferencesInterestsPicker";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LearningPreferencesForm() {
+  const t = useTranslations("profileUi.preferences");
   const [goal, setGoal] = useState("");
   const [level, setLevel] = useState("");
   const [category, setCategory] = useState("");
@@ -46,7 +48,7 @@ export default function LearningPreferencesForm() {
 
       if (error && !cancelled) {
         console.error("[Evolve] Error loading preferences:", error);
-        setMessage(error.message);
+        setMessage(t("loadError"));
         setMessageType("error");
       }
 
@@ -94,7 +96,7 @@ export default function LearningPreferencesForm() {
       } = await supabase.auth.getUser();
 
       if (!user) {
-        setMessage("You must be logged in.");
+        setMessage(t("signedOut"));
         setMessageType("error");
         return;
       }
@@ -123,24 +125,22 @@ export default function LearningPreferencesForm() {
 
       if (error) {
         console.error("[Evolve] Error saving preferences:", error);
-        setMessage(`Could not save preferences: ${error.message}`);
+        setMessage(t("saveError"));
         setMessageType("error");
         return;
       }
 
       if (!data || data.user_id !== user.id) {
-        setMessage(
-          "The preferences were not saved. Please check your account permissions.",
-        );
+        setMessage(t("permissionsError"));
         setMessageType("error");
         return;
       }
 
-      setMessage("Preferences saved successfully.");
+      setMessage(t("success"));
       setMessageType("success");
     } catch (error) {
       console.error("[Evolve] Unexpected preferences error:", error);
-      setMessage("Something went wrong while saving your preferences.");
+      setMessage(t("saveError"));
       setMessageType("error");
     } finally {
       setSaving(false);
@@ -151,9 +151,7 @@ export default function LearningPreferencesForm() {
     return (
       <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 text-center">
         <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-white/20 border-t-brand" />
-        <p className="mt-4 text-sm text-white/50">
-          Loading your preferences...
-        </p>
+        <p className="mt-4 text-sm text-white/50">{t("loading")}</p>
       </div>
     );
   }
@@ -190,7 +188,7 @@ export default function LearningPreferencesForm() {
         {/* Skills Tag Input */}
         <div>
           <label className="mb-2 block text-sm font-medium text-white/80">
-            Skills
+            {t("skills")}
           </label>
           <input
             type="text"
@@ -204,12 +202,10 @@ export default function LearningPreferencesForm() {
               );
             }}
             disabled={saving}
-            placeholder="Example: JavaScript, Python, SQL"
+            placeholder={t("skillsPlaceholder")}
             className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white outline-none placeholder:text-white/25 transition focus:border-brand/60 focus:ring-1 focus:ring-brand/30 disabled:opacity-50"
           />
-          <p className="mt-2 text-xs text-white/30">
-            Separate multiple skills with commas.
-          </p>
+          <p className="mt-2 text-xs text-white/30">{t("skillsHelp")}</p>
         </div>
 
         {/* Save button & status feedback */}
@@ -222,7 +218,7 @@ export default function LearningPreferencesForm() {
             disabled={saving}
             className="w-full rounded-2xl bg-brand px-6 py-3.5 font-semibold text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {saving ? "Saving preferences..." : "Save preferences"}
+            {saving ? t("saving") : t("save")}
           </button>
 
           {message && (

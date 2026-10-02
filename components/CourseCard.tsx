@@ -40,7 +40,7 @@ export default function CourseCard({ course, locale }: Props) {
               className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
             />
           ) : (
-            <div className="relative flex h-full w-full flex-col items-center justify-center gap-3 overflow-hidden bg-[radial-gradient(ellipse_at_50%_20%,rgba(132,204,22,0.25),transparent_55%),linear-gradient(135deg,#27272a,#09090b)] text-xs font-medium text-white/70">
+            <div className="relative flex h-full w-full flex-col items-center justify-center gap-3 overflow-hidden course-card-fallback-gradient text-xs font-medium text-white/70">
               <div className="absolute h-36 w-36 rounded-full border border-brand/20" />
               <div className="absolute h-24 w-24 rounded-full border border-brand/20" />
               <BookOpen className="relative h-10 w-10 text-brand/90" />

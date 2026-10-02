@@ -1,4 +1,5 @@
 import { Code2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type ProjectContentProps = {
   description: string | null;
@@ -9,6 +10,8 @@ export default function ProjectContent({
   description,
   technologies,
 }: ProjectContentProps) {
+  const t = useTranslations("community");
+
   return (
     <>
       {/* Description */}
@@ -25,7 +28,7 @@ export default function ProjectContent({
         <div className="mt-8">
           <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/50">
             <Code2 className="h-4 w-4 text-brand" />
-            Technologies & Outils
+            {t("detail.technologies")}
           </h2>
 
           <div className="mt-3 flex flex-wrap gap-2">

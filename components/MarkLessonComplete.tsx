@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -18,11 +19,14 @@ export default function MarkLessonComplete({
   formationId?: string | null;
   locale: string;
 }) {
+  const t = useTranslations("lessonUi");
   const [loading, setLoading] = useState(false);
   const [completed, setCompleted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   async function handleComplete() {
     setLoading(true);
+    setErrorMessage(null);
 
     const supabase = createClient();
 
@@ -31,6 +35,7 @@ export default function MarkLessonComplete({
     } = await supabase.auth.getUser();
 
     if (!user) {
+      setErrorMessage(t("signInFirst"));
       setLoading(false);
       return;
     }
@@ -53,6 +58,7 @@ export default function MarkLessonComplete({
     if (error) {
       console.error("[Evolve] Complete lesson error:", error);
 
+      setErrorMessage(t("saveError"));
       setLoading(false);
       return;
     }
@@ -71,6 +77,7 @@ export default function MarkLessonComplete({
     if (lessonsError) {
       console.error("[Evolve] Get course lessons error:", lessonsError);
 
+      setErrorMessage(t("saveError"));
       setLoading(false);
       return;
     }
@@ -158,7 +165,7 @@ export default function MarkLessonComplete({
   if (completed) {
     return (
       <div className="mt-6 rounded-2xl border border-green-500/20 bg-green-500/10 px-5 py-4 text-sm font-medium text-green-400">
-        ✓ Lesson completed{" "}
+        {t("completed")}
       </div>
     );
   }
@@ -170,7 +177,12 @@ export default function MarkLessonComplete({
       disabled={loading}
       className="mt-6 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-white/80 disabled:cursor-not-allowed disabled:opacity-50"
     >
-      {loading ? "Saving..." : "Mark lesson as complete ✓"}{" "}
+      {errorMessage && (
+        <p className="mt-3 text-sm text-red-400" role="alert">
+          {errorMessage}
+        </p>
+      )}
+      {loading ? t("saving") : t("markComplete")}
     </button>
   );
 }

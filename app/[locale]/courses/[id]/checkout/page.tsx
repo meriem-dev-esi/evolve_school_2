@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import CheckoutButton from "@/components/CheckoutButton";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
@@ -22,7 +23,8 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
+  const { id, locale } = await params;
+  const t = await getTranslations({ locale, namespace: "siteUi.checkout" });
   const supabase = await createClient();
 
   const { data: course } = await supabase
@@ -33,13 +35,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: course
-      ? `Inscription & Paiement — ${course.title}`
-      : "Paiement Formation",
+      ? t("metaTitle", { title: course.title })
+      : t("metaTitleFallback"),
   };
 }
 
 export default async function CheckoutPage({ params }: Props) {
   const { locale, id } = await params;
+  const t = await getTranslations({ locale, namespace: "siteUi.checkout" });
 
   const supabase = await createClient();
 
@@ -90,7 +93,7 @@ export default async function CheckoutPage({ params }: Props) {
             className="mb-6 inline-flex items-center gap-2 text-xs font-semibold text-white/60 transition hover:text-brand"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>Retour au cours</span>
+            <span>{t("back")}</span>
           </Link>
 
           <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
@@ -98,7 +101,7 @@ export default async function CheckoutPage({ params }: Props) {
             <div className="flex items-center justify-between gap-4">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-brand/30 bg-brand/10 px-3.5 py-1 text-xs font-bold text-brand uppercase tracking-wider">
                 <Sparkles className="h-3.5 w-3.5" />
-                Paiement Sécurisé Chargily Pay
+                {t("secure")}
               </span>
 
               <span className="text-2xl font-black text-brand font-mono">
@@ -107,7 +110,7 @@ export default async function CheckoutPage({ params }: Props) {
             </div>
 
             <h1 className="mt-4 text-2xl sm:text-3xl font-black tracking-tight text-white">
-              Débloquer la formation
+              {t("unlock")}
             </h1>
 
             <p className="mt-2 text-sm text-white/60">{course.title}</p>
@@ -115,45 +118,33 @@ export default async function CheckoutPage({ params }: Props) {
             {/* Course inclusion summary */}
             <div className="mt-6 space-y-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-xs text-white/80">
               <p className="font-semibold text-white uppercase tracking-wider text-[11px] mb-2">
-                Ce qui est inclus dans votre inscription :
+                {t("includes")}
               </p>
 
               <div className="flex items-center gap-2.5">
                 <Video className="h-4 w-4 text-brand shrink-0" />
-                <span>
-                  1 Vidéo d&apos;introduction gratuite (accessible tout de
-                  suite)
-                </span>
+                <span>{t("introLesson")}</span>
               </div>
 
               <div className="flex items-center gap-2.5">
                 <Lock className="h-4 w-4 text-emerald-400 shrink-0" />
-                <span>
-                  1 Leçon complète et pratique (débloquée immédiatement après
-                  règlement)
-                </span>
+                <span>{t("fullLesson")}</span>
               </div>
 
               <div className="flex items-center gap-2.5">
                 <Award className="h-4 w-4 text-yellow-400 shrink-0" />
-                <span>
-                  Attestation & Certificat officiel Evolve Academy après
-                  complétion
-                </span>
+                <span>{t("certificate")}</span>
               </div>
 
               <div className="flex items-center gap-2.5">
                 <ShieldCheck className="h-4 w-4 text-sky-400 shrink-0" />
-                <span>
-                  Paiement en direct avec Carte Edahabia ou CIB (Passerelle
-                  Chargily Live)
-                </span>
+                <span>{t("paymentMethods")}</span>
               </div>
             </div>
 
             {/* Pricing Details */}
             <div className="mt-6 flex items-center justify-between border-t border-white/10 pt-4 text-sm">
-              <span className="text-white/60">Total à payer :</span>
+              <span className="text-white/60">{t("total")}</span>
               <span className="text-xl font-bold text-white font-mono">
                 {coursePrice} DA
               </span>
@@ -165,9 +156,7 @@ export default async function CheckoutPage({ params }: Props) {
             <div className="mt-4 text-center">
               <p className="text-[11px] text-white/40 flex items-center justify-center gap-1.5">
                 <ShieldCheck className="h-3.5 w-3.5 text-white/50" />
-                <span>
-                  Transaction chiffrée SSL conforme aux normes SATIM / Chargily
-                </span>
+                <span>{t("secureTransaction")}</span>
               </p>
             </div>
           </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import EditCourseBasicInfo from "@/components/course/EditCourseBasicInfo";
 import EditCoursePlacement from "@/components/course/EditCoursePlacement";
@@ -12,6 +13,7 @@ export default function EditCoursePage({
   params: Promise<{ locale: string; id: string }>;
 }) {
   const router = useRouter();
+  const t = useTranslations("teacher");
 
   const [courseId, setCourseId] = useState("");
   const [title, setTitle] = useState("");
@@ -55,7 +57,7 @@ export default function EditCoursePage({
         .maybeSingle();
 
       if (!profile || !["teacher", "admin"].includes(profile.role)) {
-        setMessage("Access denied.");
+        setMessage(t("accessDenied"));
         setLoading(false);
         return;
       }
@@ -69,7 +71,7 @@ export default function EditCoursePage({
         .maybeSingle();
 
       if (error || !course) {
-        setMessage("Course not found.");
+        setMessage(t("courseNotFound"));
         setLoading(false);
         return;
       }
@@ -124,19 +126,19 @@ export default function EditCoursePage({
       .eq("id", courseId);
 
     if (error) {
-      setMessage(`Error: ${error.message}`);
+      setMessage(`${t("errorPrefix")} ${error.message}`);
       setSaving(false);
       return;
     }
 
-    setMessage("Course updated successfully.");
+    setMessage(t("courseUpdatedSuccess"));
     setSaving(false);
   }
 
   if (loading) {
     return (
       <main className="flex min-h-dvh items-center justify-center bg-black text-white">
-        Loading...
+        {t("loading")}
       </main>
     );
   }
@@ -146,12 +148,10 @@ export default function EditCoursePage({
       <div className="mx-auto max-w-4xl">
         <div className="mb-10">
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-brand">
-            Teacher Dashboard
+            {t("dashboardBadge")}
           </p>
-          <h1 className="mt-4 text-4xl font-bold">Edit Course</h1>
-          <p className="mt-3 text-white/50">
-            Update your course information and platform placement.
-          </p>
+          <h1 className="mt-4 text-4xl font-bold">{t("actionEdit")}</h1>
+          <p className="mt-3 text-white/50">{t("createCourseSubtitle")}</p>
         </div>
 
         <div className="space-y-8">
@@ -174,7 +174,9 @@ export default function EditCoursePage({
           {/* Practice percentage slider */}
           <section className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Practice Percentage</h2>
+              <h2 className="text-2xl font-bold">
+                {t("practicePercentageLabel")}
+              </h2>
               <span className="text-2xl font-bold text-brand">
                 {practicePercentage}%
               </span>
@@ -218,7 +220,7 @@ export default function EditCoursePage({
               onClick={() => router.push(`/teacher/courses`)}
               className="rounded-full border border-white/10 px-6 py-3 font-semibold transition hover:bg-white/5"
             >
-              Cancel
+              {t("btnCancel")}
             </button>
 
             <button
@@ -227,7 +229,7 @@ export default function EditCoursePage({
               disabled={saving}
               className="rounded-full bg-brand px-7 py-3 font-semibold text-black transition hover:opacity-90 disabled:opacity-50"
             >
-              {saving ? "Saving..." : "Save Changes"}
+              {saving ? t("savingChanges") : t("saveChanges")}
             </button>
           </div>
         </div>

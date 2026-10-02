@@ -1,6 +1,7 @@
 "use client";
 
 import { Github, Globe } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface EditProjectLinksFieldsProps {
   githubUrl: string;
@@ -16,6 +17,8 @@ export default function EditProjectLinksFields({
   demoUrl,
   setDemoUrl,
 }: EditProjectLinksFieldsProps) {
+  const t = useTranslations("community");
+
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       <div>
@@ -24,7 +27,7 @@ export default function EditProjectLinksFields({
           className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-white/70"
         >
           <Github className="h-3.5 w-3.5 text-brand" />
-          <span>Lien GitHub (Optionnel)</span>
+          <span>{t("edit.githubLabel")}</span>
         </label>
         <input
           id="github"
@@ -42,14 +45,14 @@ export default function EditProjectLinksFields({
           className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-white/70"
         >
           <Globe className="h-3.5 w-3.5 text-cyan-400" />
-          <span>Lien Démo en ligne (Optionnel)</span>
+          <span>{t("edit.demoLabel")}</span>
         </label>
         <input
           id="demo"
           type="url"
           value={demoUrl}
           onChange={(e) => setDemoUrl(e.target.value)}
-          placeholder="https://mon-projet.vercel.app"
+          placeholder={t("edit.demoPlaceholder")}
           className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 focus:border-brand focus:outline-none"
         />
       </div>

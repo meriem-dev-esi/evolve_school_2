@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -17,6 +18,7 @@ export default function ProfileForm({
   initialName,
   initialAvatar,
 }: ProfileFormProps) {
+  const t = useTranslations("profileUi.form");
   const router = useRouter();
   const [fullName, setFullName] = useState(initialName);
   const [avatarUrl, setAvatarUrl] = useState(initialAvatar);
@@ -47,22 +49,23 @@ export default function ProfileForm({
       } = await supabase.auth.getUser();
 
       if (authError) {
-        throw new Error(authError.message);
+        console.error("[Evolve] Profile auth error:", authError);
+        throw new Error(t("saveError"));
       }
 
       if (!user) {
-        throw new Error("You are not signed in.");
+        throw new Error(t("signedOut"));
       }
 
       // Make sure this is the correct profile
       if (user.id !== userId) {
-        throw new Error("Your session does not match this profile.");
+        throw new Error(t("sessionMismatch"));
       }
 
       const cleanName = fullName.trim();
 
       if (!cleanName) {
-        throw new Error("Please enter your full name.");
+        throw new Error(t("nameRequired"));
       }
 
       let finalAvatarUrl = avatarUrl;
@@ -70,13 +73,13 @@ export default function ProfileForm({
       // Upload new avatar
       if (selectedFile) {
         if (selectedFile.size > 5 * 1024 * 1024) {
-          throw new Error("Profile picture must be smaller than 5 MB.");
+          throw new Error(t("avatarTooLarge"));
         }
 
         const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
 
         if (!allowedTypes.includes(selectedFile.type)) {
-          throw new Error("Only JPG, PNG, and WebP images are allowed.");
+          throw new Error(t("invalidImage"));
         }
 
         const extension =
@@ -92,7 +95,8 @@ export default function ProfileForm({
           });
 
         if (uploadError) {
-          throw new Error(`Avatar upload failed: ${uploadError.message}`);
+          console.error("[Evolve] Avatar upload error:", uploadError);
+          throw new Error(t("avatarUploadFailed"));
         }
 
         const {
@@ -115,11 +119,12 @@ export default function ProfileForm({
         .single();
 
       if (updateError) {
-        throw new Error(`Profile update failed: ${updateError.message}`);
+        console.error("[Evolve] Profile update error:", updateError);
+        throw new Error(t("profileUpdateFailed"));
       }
 
       if (!savedProfile) {
-        throw new Error("No profile was updated.");
+        throw new Error(t("profileNotUpdated"));
       }
 
       // Update local UI using the actual database result.
@@ -128,18 +133,14 @@ export default function ProfileForm({
       setSelectedFile(null);
 
       setMessageType("success");
-      setMessage("Your profile has been updated successfully.");
+      setMessage(t("success"));
       router.refresh();
     } catch (error) {
       console.error("[Evolve] Profile save error:", error);
 
       setMessageType("error");
 
-      setMessage(
-        error instanceof Error
-          ? error.message
-          : "Something went wrong while saving.",
-      );
+      setMessage(error instanceof Error ? error.message : t("saveError"));
     } finally {
       setSaving(false);
     }
@@ -154,7 +155,7 @@ export default function ProfileForm({
             {avatarUrl ? (
               <img
                 src={avatarUrl}
-                alt="Profile avatar"
+                alt={t("avatarAlt")}
                 className="h-32 w-32 rounded-full border border-white/10 object-cover"
               />
             ) : (
@@ -170,7 +171,7 @@ export default function ProfileForm({
                   : "hover:border-brand hover:text-brand"
               }`}
             >
-              Change photo
+              {t("changePhoto")}
               <input
                 type="file"
                 accept="image/png,image/jpeg,image/webp"
@@ -192,9 +193,9 @@ export default function ProfileForm({
             )}
 
             <p className="mt-2 text-center text-xs text-white/25">
-              JPG, PNG or WebP
+              {t("imageTypes")}
               <br />
-              Maximum 5 MB
+              {t("maxSize")}
             </p>
           </div>
 
@@ -203,7 +204,7 @@ export default function ProfileForm({
             {/* Email */}
             <div>
               <label className="mb-2 block text-sm font-medium text-white/70">
-                Email address
+                {t("email")}
               </label>
 
               <input
@@ -213,15 +214,13 @@ export default function ProfileForm({
                 className="w-full rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-3 text-white/40 outline-none"
               />
 
-              <p className="mt-2 text-xs text-white/25">
-                Your email is managed by your Evolve account.
-              </p>
+              <p className="mt-2 text-xs text-white/25">{t("emailManaged")}</p>
             </div>
 
             {/* Full name */}
             <div>
               <label className="mb-2 block text-sm font-medium text-white/70">
-                Full name
+                {t("fullName")}
               </label>
 
               <input
@@ -229,7 +228,7 @@ export default function ProfileForm({
                 value={fullName}
                 disabled={saving}
                 onChange={(event) => setFullName(event.target.value)}
-                placeholder="Enter your full name"
+                placeholder={t("namePlaceholder")}
                 className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white outline-none placeholder:text-white/25 transition focus:border-brand/60 focus:ring-1 focus:ring-brand/30 disabled:opacity-50"
               />
             </div>
@@ -243,7 +242,7 @@ export default function ProfileForm({
               disabled={saving}
               className="w-full rounded-2xl bg-brand px-6 py-3.5 font-semibold text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
             >
-              {saving ? "Saving..." : "Save changes"}
+              {saving ? t("saving") : t("save")}
             </button>
 
             {/* Message */}

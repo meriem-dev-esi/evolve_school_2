@@ -1,4 +1,5 @@
 import { Github, Globe } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface ProjectUrlInputsProps {
   githubUrl: string;
@@ -15,14 +16,16 @@ export default function ProjectUrlInputs({
   githubUrl,
   setGithubUrl,
   demoUrl,
-  demoPlaceholder = "https://mon-projet.dz ou Figma",
+  demoPlaceholder,
   setDemoUrl,
 }: ProjectUrlInputsProps) {
+  const t = useTranslations("community");
+
   return (
     <div className="grid gap-4 sm:grid-cols-2 pt-1">
       <div>
         <label className="mb-1.5 block text-xs font-semibold text-white/80">
-          Lien Code Source / GitHub
+          {t("submit.githubLabel")}
         </label>
         <div className="relative">
           <Github
@@ -41,7 +44,7 @@ export default function ProjectUrlInputs({
 
       <div>
         <label className="mb-1.5 block text-xs font-semibold text-white/80">
-          Lien Démo / Prototype
+          {t("submit.demoLabel")}
         </label>
         <div className="relative">
           <Globe
@@ -52,7 +55,7 @@ export default function ProjectUrlInputs({
             type="url"
             value={demoUrl}
             onChange={(e) => setDemoUrl(e.target.value)}
-            placeholder={demoPlaceholder}
+            placeholder={demoPlaceholder ?? t("submit.demoPlaceholder")}
             className="w-full rounded-2xl border border-white/10 bg-white/5 ps-10 pe-4 py-3 text-xs text-white placeholder:text-white/30 outline-none transition focus:border-brand/50"
           />
         </div>

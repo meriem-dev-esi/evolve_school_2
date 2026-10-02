@@ -1,4 +1,6 @@
 import { Calendar, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { getCommunityCategoryTranslationKey } from "@/lib/community-directory";
 import LikeButton from "./LikeButton";
 
 type ProjectHeaderProps = {
@@ -24,13 +26,18 @@ export default function ProjectHeader({
   initialLikes,
   initiallyLiked,
 }: ProjectHeaderProps) {
+  const t = useTranslations("community");
+  const categoryTranslationKey = category
+    ? getCommunityCategoryTranslationKey(category)
+    : null;
+
   return (
     <>
       {/* Meta tags & Category */}
       <div className="flex flex-wrap items-center gap-3">
         {category && (
           <span className="rounded-full border border-brand/30 bg-brand/10 px-3.5 py-1 text-xs font-bold text-brand tracking-wide">
-            {category}
+            {categoryTranslationKey ? t(categoryTranslationKey) : category}
           </span>
         )}
 
@@ -41,7 +48,7 @@ export default function ProjectHeader({
 
         <span className="flex items-center gap-1 text-xs text-emerald-400 font-medium">
           <Sparkles className="h-3.5 w-3.5" />
-          Vérifié Evolve Showcase
+          {t("detail.verified")}
         </span>
       </div>
 
@@ -74,7 +81,7 @@ export default function ProjectHeader({
                 </span>
               )}
             </div>
-            <p className="text-xs text-white/40">Créateur du projet</p>
+            <p className="text-xs text-white/40">{t("detail.creator")}</p>
           </div>
         </div>
 

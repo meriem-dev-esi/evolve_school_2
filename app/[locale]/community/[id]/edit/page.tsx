@@ -1,5 +1,6 @@
 import { ArrowLeft, Pencil } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Link } from "@/i18n/navigation";
@@ -15,6 +16,7 @@ type Props = {
 
 export default async function EditProjectPage({ params }: Props) {
   const { locale, id } = await params;
+  const t = await getTranslations({ locale, namespace: "community" });
 
   const supabase = await createClient();
 
@@ -71,22 +73,21 @@ export default async function EditProjectPage({ params }: Props) {
             className="inline-flex items-center gap-2 text-xs font-semibold text-white/60 hover:text-brand transition duration-200"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>Retour au projet</span>
+            <span>{t("edit.back")}</span>
           </Link>
 
           <div className="mt-6">
             <div className="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-3.5 py-1 text-xs font-bold text-brand uppercase tracking-wider">
               <Pencil className="h-3.5 w-3.5" />
-              Édition de projet
+              {t("edit.badge")}
             </div>
 
             <h1 className="mt-4 text-3xl font-black tracking-tight text-white sm:text-4xl">
-              Modifier votre réalisation
+              {t("edit.title")}
             </h1>
 
             <p className="mt-2 text-sm text-white/50">
-              Mettez à jour les informations, liens de démonstration et
-              technologies de votre projet.
+              {t("edit.description")}
             </p>
           </div>
 

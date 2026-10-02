@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 const SUGGESTED_TECHS = [
   "React",
   "Next.js",
@@ -20,9 +22,13 @@ interface ProjectTechSuggestionsProps {
 export default function ProjectTechSuggestions({
   onAddTech,
 }: ProjectTechSuggestionsProps) {
+  const t = useTranslations("community");
+
   return (
     <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-      <span className="text-[10px] text-white/40">Suggestions rapides :</span>
+      <span className="text-[10px] text-white/40">
+        {t("submit.suggestions")}
+      </span>
       {SUGGESTED_TECHS.map((tech) => (
         <button
           key={tech}

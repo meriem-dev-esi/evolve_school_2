@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, BookOpen, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { EnrolledCourseItem } from "./types";
 
@@ -16,6 +17,8 @@ interface DashboardRecommendationsSectionProps {
 export default function DashboardRecommendationsSection({
   recommendedCourses,
 }: DashboardRecommendationsSectionProps) {
+  const t = useTranslations("dashboardUi.recommendations");
+
   if (recommendedCourses.length === 0) return null;
 
   return (
@@ -25,11 +28,11 @@ export default function DashboardRecommendationsSection({
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-lime-600" />
             <span className="text-xs font-semibold uppercase tracking-wider text-lime-700">
-              Progression continue
+              {t("eyebrow")}
             </span>
           </div>
           <h3 className="mt-1 text-2xl font-bold text-gray-900">
-            Recommandé pour approfondir vos compétences
+            {t("title")}
           </h3>
         </div>
 
@@ -38,7 +41,7 @@ export default function DashboardRecommendationsSection({
           prefetch={true}
           className="text-xs font-semibold text-gray-500 hover:text-lime-600 transition flex items-center gap-1"
         >
-          Consulter tout le catalogue <ArrowRight className="h-3.5 w-3.5" />
+          {t("allCourses")} <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
 
@@ -85,7 +88,7 @@ export default function DashboardRecommendationsSection({
                 prefetch={true}
                 className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-gray-50 py-2.5 text-xs font-semibold text-gray-700 hover:bg-lime-400 hover:border-lime-400 hover:text-black transition shadow-sm"
               >
-                Découvrir le cursus
+                {t("discover")}
               </Link>
             </div>
           </div>

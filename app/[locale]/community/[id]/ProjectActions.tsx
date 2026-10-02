@@ -2,6 +2,7 @@
 
 import { Loader2, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export default function ProjectActions({ projectId, locale }: Props) {
+  const t = useTranslations("community");
   const supabase = createClient();
   const router = useRouter();
 
@@ -21,9 +23,7 @@ export default function ProjectActions({ projectId, locale }: Props) {
   }
 
   async function handleDelete() {
-    const confirmed = window.confirm(
-      "Êtes-vous sûr de vouloir supprimer définitivement ce projet ?",
-    );
+    const confirmed = window.confirm(t("actions.deleteConfirm"));
 
     if (!confirmed) return;
 
@@ -34,7 +34,7 @@ export default function ProjectActions({ projectId, locale }: Props) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      alert("Vous devez être connecté.");
+      alert(t("actions.loginRequired"));
       setLoading(false);
       return;
     }
@@ -47,7 +47,7 @@ export default function ProjectActions({ projectId, locale }: Props) {
 
     if (error) {
       console.error("[Project Delete]", error);
-      alert(error.message);
+      alert(t("actions.deleteError", { error: error.message }));
       setLoading(false);
       return;
     }
@@ -64,7 +64,7 @@ export default function ProjectActions({ projectId, locale }: Props) {
         className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold text-white hover:bg-white/10 hover:border-white/25 transition"
       >
         <Pencil className="h-3.5 w-3.5 text-brand" />
-        <span>Modifier le projet</span>
+        <span>{t("actions.edit")}</span>
       </button>
 
       <button
@@ -76,12 +76,12 @@ export default function ProjectActions({ projectId, locale }: Props) {
         {loading ? (
           <>
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            <span>Suppression...</span>
+            <span>{t("actions.deleting")}</span>
           </>
         ) : (
           <>
             <Trash2 className="h-3.5 w-3.5" />
-            <span>Supprimer</span>
+            <span>{t("actions.delete")}</span>
           </>
         )}
       </button>

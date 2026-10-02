@@ -5,6 +5,41 @@ export interface DirectoryProfile {
   role: string;
 }
 
+export type CommunityCategoryTranslationKey =
+  | "categoryOptions.webApp"
+  | "categoryOptions.mobileApp"
+  | "categoryOptions.uiux"
+  | "categoryOptions.ai"
+  | "categoryOptions.portfolio"
+  | "categoryOptions.openSource"
+  | "categoryOptions.ecommerce";
+
+export function getCommunityCategoryTranslationKey(
+  category: string,
+): CommunityCategoryTranslationKey | null {
+  switch (category.trim().toLowerCase()) {
+    case "web app":
+      return "categoryOptions.webApp";
+    case "mobile app":
+      return "categoryOptions.mobileApp";
+    case "ui/ux design":
+      return "categoryOptions.uiux";
+    case "intelligence artificielle":
+    case "artificial intelligence":
+    case "الذكاء الاصطناعي":
+      return "categoryOptions.ai";
+    case "portfolio":
+      return "categoryOptions.portfolio";
+    case "outil open source":
+    case "open-source tool":
+      return "categoryOptions.openSource";
+    case "e-commerce":
+      return "categoryOptions.ecommerce";
+    default:
+      return null;
+  }
+}
+
 export function isStudentRole(role: string) {
   return [
     "student",
@@ -53,12 +88,13 @@ export function resolveAuthorProfile(
       role: string | null;
     }
   >,
+  unavailableLabel = "Profil indisponible",
 ): DirectoryProfile {
   const profile = dbProfilesMap?.get(id);
 
   return {
     id,
-    full_name: profile?.full_name || "Profil indisponible",
+    full_name: profile?.full_name || unavailableLabel,
     avatar_url: profile?.avatar_url ?? null,
     role: profile?.role ?? "",
   };

@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, Calendar, Clock } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { WorkshopItem } from "./types";
 
@@ -14,20 +15,21 @@ interface DashboardWorkshopsSectionProps {
  * and quick-link reservations for the student.
  */
 export default function DashboardWorkshopsSection({
+  locale,
   upcomingWorkshops,
 }: DashboardWorkshopsSectionProps) {
+  const t = useTranslations("dashboardUi.workshops");
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold text-gray-900">
-          Ateliers &amp; Masterclasses Disponibles
-        </h3>
+        <h3 className="text-xl font-bold text-gray-900">{t("title")}</h3>
         <Link
           href={`/ateliers`}
           prefetch={true}
           className="text-xs font-semibold text-lime-700 hover:underline flex items-center gap-1"
         >
-          Voir tout le calendrier <ArrowRight className="h-3.5 w-3.5" />
+          {t("calendar")} <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
 
@@ -51,7 +53,7 @@ export default function DashboardWorkshopsSection({
                   </div>
                 )}
                 <span className="absolute top-2.5 start-2.5 rounded-full bg-white/90 border border-white/60 px-2.5 py-0.5 text-[10px] font-semibold text-gray-700 backdrop-blur-md shadow-sm">
-                  {workshop.domain || "Atelier Pratique"}
+                  {workshop.domain || t("fallbackDomain")}
                 </span>
               </div>
 
@@ -68,12 +70,12 @@ export default function DashboardWorkshopsSection({
               <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
                 <span className="flex items-center gap-1">
                   <Clock className="h-3.5 w-3.5 text-lime-600" />{" "}
-                  {workshop.duration || "Samedi 10h"}
+                  {workshop.duration || t("fallbackDuration")}
                 </span>
                 <span className="font-mono font-bold text-lime-700">
                   {workshop.price
-                    ? `${workshop.price.toLocaleString("fr-DZ")} DZD`
-                    : "Inclus"}
+                    ? `${new Intl.NumberFormat(locale).format(workshop.price)} DZD`
+                    : t("included")}
                 </span>
               </div>
             </div>
@@ -84,7 +86,7 @@ export default function DashboardWorkshopsSection({
                 prefetch={true}
                 className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-gray-50 py-2.5 text-xs font-semibold text-gray-700 hover:bg-lime-400 hover:border-lime-400 hover:text-black transition shadow-sm"
               >
-                Réserver ma place
+                {t("reserve")}
               </Link>
             </div>
           </div>

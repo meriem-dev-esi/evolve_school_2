@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, Play, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { EnrolledCourseItem } from "./types";
 
@@ -24,6 +25,8 @@ export default function DashboardHeroBanner({
   userRole,
   resumeCourse,
 }: DashboardHeroBannerProps) {
+  const t = useTranslations("dashboardUi.hero");
+
   return (
     <section className="relative overflow-hidden rounded-3xl border border-gray-200 bg-white p-6 md:p-8 shadow-sm">
       <div className="absolute top-0 right-0 -me-20 -mt-20 h-80 w-80 rounded-full bg-lime-200 blur-3xl pointer-events-none opacity-35" />
@@ -51,7 +54,7 @@ export default function DashboardHeroBanner({
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="rounded-full border border-lime-200 bg-lime-50 px-3 py-0.5 text-[11px] font-semibold text-lime-800 tracking-wide">
-                {userRole || "Étudiant Evolve"}
+                {userRole || t("defaultRole")}
               </span>
               <span className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-[11px] text-gray-500">
                 {userEmail}
@@ -59,14 +62,12 @@ export default function DashboardHeroBanner({
             </div>
 
             <h1 className="mt-2 text-2xl font-black tracking-tight text-gray-900 sm:text-3xl lg:text-4xl">
-              Ravi de vous revoir,{" "}
-              <span className="text-lime-600">{userName}</span> 👋
+              {t.rich("greeting", {
+                name: () => <span className="text-lime-600">{userName}</span>,
+              })}
             </h1>
 
-            <p className="mt-1 text-sm text-gray-500">
-              Continuez votre parcours d&apos;excellence tech &amp; design au
-              sein de la communauté algérienne.
-            </p>
+            <p className="mt-1 text-sm text-gray-500">{t("description")}</p>
           </div>
         </div>
 
@@ -78,7 +79,7 @@ export default function DashboardHeroBanner({
               className="group relative inline-flex items-center gap-3 rounded-2xl bg-lime-400 px-6 py-3.5 text-sm font-bold text-black shadow-lg shadow-lime-400/30 transition-all duration-300 hover:bg-lime-300 hover:scale-[1.02] active:scale-95"
             >
               <Play className="h-4 w-4 fill-black transition-transform group-hover:scale-110" />
-              <span>Reprendre ma leçon</span>
+              <span>{t("resume")}</span>
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>

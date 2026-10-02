@@ -93,7 +93,7 @@ list nobody reviews is a guard that has stopped working.
 The template asks four questions. The third is the one that matters.
 
 **"How was this verified"** is not for "tests pass" — that is what CI already
-says. It is for what CI *cannot* check: which screen you exercised and at what
+says. It is for what CI _cannot_ check: which screen you exercised and at what
 width, whether you loaded the Arabic page and the layout survived, what you
 checked against real data rather than assumed, what is still unverified.
 

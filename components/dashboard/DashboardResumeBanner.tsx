@@ -1,6 +1,7 @@
 "use client";
 
 import { BookOpen, Play } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { EnrolledCourseItem } from "./types";
 
@@ -18,6 +19,8 @@ export default function DashboardResumeBanner({
   resumeCourse,
   onOpenCertificate,
 }: DashboardResumeBannerProps) {
+  const t = useTranslations("dashboardUi.resume");
+
   return (
     <section className="relative overflow-hidden rounded-3xl border border-lime-200 bg-gradient-to-r from-lime-50/70 via-white to-white p-6 md:p-8 shadow-sm">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -44,7 +47,7 @@ export default function DashboardResumeBanner({
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <span className="rounded-full bg-lime-100 border border-lime-200 px-2.5 py-0.5 text-[10px] font-bold text-lime-800 uppercase tracking-wider">
-                En cours actuellement
+                {t("inProgress")}
               </span>
               {resumeCourse.domain && (
                 <span className="rounded-full bg-gray-100 border border-gray-200 px-2.5 py-0.5 text-[10px] text-gray-600">
@@ -60,7 +63,7 @@ export default function DashboardResumeBanner({
             {resumeCourse.nextLesson ? (
               <p className="mt-1 text-xs text-gray-600 flex items-center gap-1.5 truncate">
                 <span className="text-lime-700 font-semibold">
-                  Leçon suivante :
+                  {t("nextLesson")}
                 </span>
                 <span className="truncate">
                   {resumeCourse.nextLesson.title}
@@ -68,7 +71,7 @@ export default function DashboardResumeBanner({
               </p>
             ) : (
               <p className="mt-1 text-xs text-emerald-600 font-medium">
-                Toutes les leçons de ce cours ont été complétées avec succès !
+                {t("allComplete")}
               </p>
             )}
 
@@ -84,8 +87,10 @@ export default function DashboardResumeBanner({
                 {resumeCourse.progressPercentage}%
               </span>
               <span className="text-[11px] text-gray-400">
-                ({resumeCourse.completedLessons}/{resumeCourse.totalLessons}{" "}
-                leçons)
+                {t("lessonCount", {
+                  completed: resumeCourse.completedLessons,
+                  total: resumeCourse.totalLessons,
+                })}
               </span>
             </div>
           </div>
@@ -98,21 +103,21 @@ export default function DashboardResumeBanner({
               onClick={() => onOpenCertificate(resumeCourse)}
               className="rounded-2xl border border-lime-200 bg-lime-50 px-6 py-3 text-sm font-bold text-lime-800 transition-all hover:bg-lime-100"
             >
-              Voir mon attestation 🎓
+              {t("certificate")}
             </button>
           ) : resumeCourse.nextLesson ? (
             <Link
               href={`/courses/${resumeCourse.id}/lessons/${resumeCourse.nextLesson.id}`}
               className="rounded-2xl bg-lime-400 px-6 py-3 text-sm font-bold text-black transition-all hover:bg-lime-300 active:scale-95 shadow-lg shadow-lime-400/30"
             >
-              Continuer la leçon
+              {t("continue")}
             </Link>
           ) : (
             <Link
               href={`/courses/${resumeCourse.id}`}
               className="rounded-2xl bg-lime-400 px-6 py-3 text-sm font-bold text-black transition-all hover:bg-lime-300 active:scale-95 shadow-lg shadow-lime-400/30"
             >
-              Ouvrir le cours
+              {t("openCourse")}
             </Link>
           )}
 
@@ -120,7 +125,7 @@ export default function DashboardResumeBanner({
             href={`/courses/${resumeCourse.id}`}
             className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 transition shadow-sm"
           >
-            Programme complet
+            {t("fullProgram")}
           </Link>
         </div>
       </div>

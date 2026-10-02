@@ -2,6 +2,8 @@
 
 import { Search, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { getCommunityCategoryTranslationKey } from "@/lib/community-directory";
 
 type Props = {
   categories: string[];
@@ -9,6 +11,7 @@ type Props = {
 };
 
 export default function CommunityFilters({ categories, technologies }: Props) {
+  const t = useTranslations("community");
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -48,7 +51,7 @@ export default function CommunityFilters({ categories, technologies }: Props) {
           <input
             defaultValue={searchParams.get("q") ?? ""}
             onChange={(e) => updateFilter("q", e.target.value)}
-            placeholder="Rechercher par titre, description, techno..."
+            placeholder={t("filters.search")}
             className="w-full rounded-2xl border border-white/10 bg-white/5 ps-10 pe-4 py-2.5 text-xs text-white placeholder:text-white/40 outline-none transition focus:border-brand/50 focus:bg-white/[0.08]"
           />
         </div>
@@ -61,13 +64,20 @@ export default function CommunityFilters({ categories, technologies }: Props) {
             className="w-full rounded-2xl border border-white/10 bg-zinc-900/90 px-3.5 py-2.5 text-xs text-white/90 outline-none transition focus:border-brand/50 cursor-pointer appearance-none"
           >
             <option value="" className="bg-zinc-950 text-white">
-              Toutes les spécialités
+              {t("filters.allCategories")}
             </option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat} className="bg-zinc-950 text-white">
-                {cat}
-              </option>
-            ))}
+            {categories.map((cat) => {
+              const translationKey = getCommunityCategoryTranslationKey(cat);
+              return (
+                <option
+                  key={cat}
+                  value={cat}
+                  className="bg-zinc-950 text-white"
+                >
+                  {translationKey ? t(translationKey) : cat}
+                </option>
+              );
+            })}
           </select>
           <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] text-white/40">
             ▼
@@ -82,7 +92,7 @@ export default function CommunityFilters({ categories, technologies }: Props) {
             className="w-full rounded-2xl border border-white/10 bg-zinc-900/90 px-3.5 py-2.5 text-xs text-white/90 outline-none transition focus:border-brand/50 cursor-pointer appearance-none"
           >
             <option value="" className="bg-zinc-950 text-white">
-              Toutes les technologies
+              {t("filters.allTechnologies")}
             </option>
             {technologies.map((tech) => (
               <option
@@ -107,10 +117,10 @@ export default function CommunityFilters({ categories, technologies }: Props) {
             className="w-full rounded-2xl border border-white/10 bg-zinc-900/90 px-3.5 py-2.5 text-xs text-white/90 outline-none transition focus:border-brand/50 cursor-pointer appearance-none"
           >
             <option value="newest" className="bg-zinc-950 text-white">
-              Plus récents
+              {t("filters.newest")}
             </option>
             <option value="likes" className="bg-zinc-950 text-white">
-              Plus populaires ❤️
+              {t("filters.popular")} ❤️
             </option>
           </select>
           <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] text-white/40">
@@ -122,7 +132,9 @@ export default function CommunityFilters({ categories, technologies }: Props) {
       {/* Active filters pill list */}
       {hasActiveFilters && (
         <div className="flex items-center gap-2 flex-wrap pt-1 text-xs">
-          <span className="text-white/40 text-[11px]">Filtres actifs :</span>
+          <span className="text-white/40 text-[11px]">
+            {t("filters.active")}
+          </span>
           {searchParams.get("q") && (
             <span className="inline-flex items-center gap-1 rounded-full border border-brand/30 bg-brand/10 px-2.5 py-1 text-[11px] font-semibold text-brand">
               <span>"{searchParams.get("q")}"</span>
@@ -164,7 +176,7 @@ export default function CommunityFilters({ categories, technologies }: Props) {
             onClick={resetAll}
             className="text-xs text-white/50 hover:text-white underline transition ms-1"
           >
-            Effacer tous les filtres
+            {t("filters.clearAll")}
           </button>
         </div>
       )}

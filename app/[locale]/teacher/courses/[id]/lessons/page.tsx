@@ -1,7 +1,30 @@
-import { setRequestLocale } from "next-intl/server";
+import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import DeleteLessonButton from "@/components/DeleteLessonButton";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{
+    locale: string;
+    id: string;
+  }>;
+}): Promise<Metadata> {
+  const { locale, id } = await params;
+  const t = await getTranslations({ locale, namespace: "teacher" });
+  const supabase = await createClient();
+  const { data: course } = await supabase
+    .from("courses")
+    .select("title")
+    .eq("id", id)
+    .maybeSingle();
+
+  return {
+    title: `${course?.title || t("lessonsTitle")} | Evolve Academy`,
+  };
+}
 
 export default async function TeacherLessonsPage({
   params,
@@ -13,6 +36,7 @@ export default async function TeacherLessonsPage({
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: "teacher" });
   const supabase = await createClient();
 
   const {
@@ -23,13 +47,13 @@ export default async function TeacherLessonsPage({
     return (
       <main className="flex min-h-dvh items-center justify-center bg-black px-6 text-white">
         <div className="text-center">
-          <h1 className="text-3xl font-bold">Please sign in</h1>
+          <h1 className="text-3xl font-bold">{t("pleaseSignIn")}</h1>
 
           <Link
             href="/sign-in"
             className="mt-6 inline-block rounded-full bg-brand px-6 py-3 font-semibold text-black"
           >
-            Sign In
+            {t("signInButton")}
           </Link>
         </div>
       </main>
@@ -46,9 +70,9 @@ export default async function TeacherLessonsPage({
     return (
       <main className="flex min-h-dvh items-center justify-center bg-black px-6 text-white">
         <div className="text-center">
-          <h1 className="text-3xl font-bold">Access denied</h1>
+          <h1 className="text-3xl font-bold">{t("accessDenied")}</h1>
 
-          <p className="mt-3 text-white/50">Teacher access is required.</p>
+          <p className="mt-3 text-white/50">{t("teacherRequired")}</p>
         </div>
       </main>
     );
@@ -75,51 +99,47 @@ export default async function TeacherLessonsPage({
           href="/teacher/courses"
           className="text-sm text-white/50 transition hover:text-brand"
         >
-          ← Back to Courses
+          {t("backToCourses")}
         </Link>
 
         <div className="mt-6 flex flex-wrap items-end justify-between gap-6">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.25em] text-brand">
-              Teacher Dashboard
+              {t("dashboardBadge")}
             </p>
 
             <h1 className="mt-4 text-4xl font-bold md:text-5xl">
-              {course?.title || "Course Lessons"}
+              {course?.title || t("lessonsTitle")}
             </h1>
 
-            <p className="mt-3 text-white/50">
-              Manage lessons, videos and course content.
-            </p>
+            <p className="mt-3 text-white/50">{t("lessonsSubtitle")}</p>
           </div>
 
           <Link
             href={`/teacher/courses/${id}/lessons/new`}
             className="rounded-full bg-brand px-6 py-3 font-semibold text-black transition hover:opacity-90"
           >
-            + Add Lesson
+            {t("addLesson")}
           </Link>
         </div>
 
         {error && (
           <div className="mt-10 rounded-3xl border border-red-400/20 bg-red-400/5 p-8 text-red-400">
-            Error: {error.message}
+            {t("errorPrefix")} {error.message}
           </div>
         )}
 
         {!error && lessons?.length === 0 && (
           <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-10 text-center">
-            <h2 className="text-2xl font-semibold">No lessons yet</h2>
+            <h2 className="text-2xl font-semibold">{t("noLessonsTitle")}</h2>
 
-            <p className="mt-3 text-white/50">
-              Add your first lesson to this course.
-            </p>
+            <p className="mt-3 text-white/50">{t("noLessonsSubtitle")}</p>
 
             <Link
               href={`/teacher/courses/${id}/lessons/new`}
               className="mt-6 inline-block rounded-full bg-brand px-6 py-3 font-semibold text-black"
             >
-              Add Lesson
+              {t("addLesson")}
             </Link>
           </div>
         )}
@@ -135,18 +155,18 @@ export default async function TeacherLessonsPage({
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand">
-                        Lesson {lesson.order_index}
+                        {t("lessonIndex", { order: lesson.order_index })}
                       </span>
 
                       {lesson.is_free && (
                         <span className="rounded-full bg-green-500/10 px-3 py-1 text-xs text-green-400">
-                          Free
+                          {t("badgeFree")}
                         </span>
                       )}
 
                       {lesson.youtube_url && (
                         <span className="rounded-full bg-red-500/10 px-3 py-1 text-xs text-red-400">
-                          YouTube
+                          {t("badgeYoutube")}
                         </span>
                       )}
                     </div>
@@ -160,7 +180,8 @@ export default async function TeacherLessonsPage({
                     )}
 
                     <p className="mt-3 text-sm text-white/30">
-                      Duration: {lesson.duration || 0} seconds
+                      {t("durationLabel")}{" "}
+                      {t("seconds", { seconds: lesson.duration || 0 })}
                     </p>
                   </div>
 
@@ -169,7 +190,7 @@ export default async function TeacherLessonsPage({
                       href={`/teacher/courses/${id}/lessons/${lesson.id}/edit`}
                       className="rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-black transition hover:opacity-90"
                     >
-                      Edit
+                      {t("btnEditLesson")}
                     </Link>
 
                     <DeleteLessonButton lessonId={lesson.id} courseId={id} />

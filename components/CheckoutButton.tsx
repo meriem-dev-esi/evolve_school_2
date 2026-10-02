@@ -1,6 +1,7 @@
 "use client";
 
 import { CreditCard, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 export default function CheckoutButton({
@@ -12,6 +13,7 @@ export default function CheckoutButton({
   locale: string;
   price?: number;
 }) {
+  const t = useTranslations("siteUi.checkoutButton");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -36,23 +38,19 @@ export default function CheckoutButton({
       if (!response.ok) {
         console.error("CHECKOUT API RESPONSE:", data);
 
-        throw new Error(
-          data.details
-            ? JSON.stringify(data.details)
-            : data.error || "L'initialisation du paiement a échoué",
-        );
+        throw new Error(t("initError"));
       }
 
       const checkoutUrl = data.checkout_url;
 
       if (!checkoutUrl) {
-        throw new Error("L'URL de paiement Chargily n'a pas été retournée");
+        throw new Error(t("missingUrl"));
       }
 
       window.location.href = checkoutUrl;
     } catch (err) {
       console.error(err);
-      setError(err instanceof Error ? err.message : "Une erreur est survenue");
+      setError(err instanceof Error ? err.message : t("error"));
       setLoading(false);
     }
   }
@@ -68,13 +66,17 @@ export default function CheckoutButton({
         {loading ? (
           <>
             <Loader2 className="h-5 w-5 animate-spin" />
-            <span>Redirection vers Chargily Pay...</span>
+            <span>{t("redirecting")}</span>
           </>
         ) : (
           <>
             <CreditCard className="h-5 w-5" />
             <span>
-              Payer {price ? `${price} DZD` : "maintenant"} avec Edahabia / CIB
+              {price
+                ? t("payAmount", {
+                    price: new Intl.NumberFormat(locale).format(price),
+                  })
+                : t("payNow")}
             </span>
           </>
         )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { Award, CheckCircle2, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import DashboardCertificateModal from "@/components/dashboard/DashboardCertificateModal";
 import type { EnrolledCourseItem } from "@/components/dashboard/types";
@@ -16,6 +17,7 @@ export default function CourseCertificateSection({
   userName,
   autoOpen = false,
 }: CourseCertificateSectionProps) {
+  const t = useTranslations("courseUi.certificate");
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -37,18 +39,16 @@ export default function CourseCertificateSection({
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 rounded-full border border-brand/40 bg-brand/20 px-3.5 py-1 text-xs font-bold text-brand uppercase tracking-wider">
               <Sparkles className="h-3.5 w-3.5" />
-              <span>Formation Validée avec Succès</span>
+              <span>{t("badge")}</span>
             </div>
 
             <h2 className="text-2xl font-black tracking-tight text-white md:text-3xl flex items-center gap-2.5">
-              <span>Votre Certificat Evolve Academy est Prêt !</span>
+              <span>{t("title")}</span>
               <CheckCircle2 className="h-6 w-6 text-brand" />
             </h2>
 
             <p className="text-sm text-white/70 max-w-2xl leading-relaxed">
-              Félicitations <strong>{userName}</strong> ! Vous avez complété
-              100% des modules de cette formation. Votre attestation officielle
-              et vérifiée est désormais disponible.
+              {t("description", { name: userName })}
             </p>
           </div>
 
@@ -59,7 +59,7 @@ export default function CourseCertificateSection({
               className="inline-flex items-center justify-center gap-2.5 rounded-full bg-brand px-7 py-3.5 text-sm font-bold text-black transition-all hover:scale-105 hover:bg-lime-300 shadow-[0_0_25px_rgba(95,236,107,0.4)]"
             >
               <Award className="h-4 w-4" />
-              <span>Voir mon Certificat</span>
+              <span>{t("view")}</span>
             </button>
           </div>
         </div>

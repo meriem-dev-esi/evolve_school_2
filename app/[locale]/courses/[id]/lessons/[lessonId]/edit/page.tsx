@@ -1,4 +1,5 @@
 "use client";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -13,6 +14,7 @@ export default function EditLessonPage({
   }>;
 }) {
   const router = useRouter();
+  const t = useTranslations("teacher");
 
   const [courseId, setCourseId] = useState("");
   const [lessonId, setLessonId] = useState("");
@@ -54,7 +56,7 @@ export default function EditLessonPage({
         .maybeSingle();
 
       if (!profile || !["teacher", "admin"].includes(profile.role)) {
-        setMessage("Access denied.");
+        setMessage(t("accessDenied"));
         setLoading(false);
         return;
       }
@@ -69,7 +71,7 @@ export default function EditLessonPage({
         .maybeSingle();
 
       if (error || !lesson) {
-        setMessage("Lesson not found.");
+        setMessage(t("lessonNotFound"));
         setLoading(false);
         return;
       }
@@ -86,11 +88,11 @@ export default function EditLessonPage({
     }
 
     void loadLesson();
-  }, [router, params]);
+  }, [router, params, t]);
 
   async function handleSave() {
     if (!lessonId || !courseId || !title.trim()) {
-      setMessage("Please enter a lesson title.");
+      setMessage(t("titleRequiredError"));
       return;
     }
 
@@ -115,19 +117,19 @@ export default function EditLessonPage({
       .eq("course_id", courseId);
 
     if (error) {
-      setMessage(`Error: ${error.message}`);
+      setMessage(`${t("errorPrefix")} ${error.message}`);
       setSaving(false);
       return;
     }
 
-    setMessage("Lesson updated successfully.");
+    setMessage(t("lessonUpdatedSuccess"));
     setSaving(false);
   }
 
   if (loading) {
     return (
       <main className="flex min-h-dvh items-center justify-center bg-black text-white">
-        Loading...
+        {t("loading")}
       </main>
     );
   }
@@ -136,28 +138,26 @@ export default function EditLessonPage({
     <main className="min-h-dvh bg-black px-6 py-28 text-white lg:px-10">
       <div className="mx-auto max-w-4xl">
         <p className="text-sm font-semibold uppercase tracking-[0.25em] text-brand">
-          Teacher Dashboard
+          {t("dashboardBadge")}
         </p>
 
-        <h1 className="mt-4 text-4xl font-bold">Edit Lesson</h1>
+        <h1 className="mt-4 text-4xl font-bold">{t("editLessonTitle")}</h1>
 
-        <p className="mt-3 text-white/50">
-          Update lesson information and video settings.
-        </p>
+        <p className="mt-3 text-white/50">{t("editLessonSubtitle")}</p>
 
         <section className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <div className="space-y-5">
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Lesson title"
+              placeholder={t("placeholderLessonTitle")}
               className="w-full rounded-2xl border border-white/10 bg-black px-5 py-4 outline-none focus:border-brand"
             />
 
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Lesson description"
+              placeholder={t("placeholderLessonDesc")}
               rows={5}
               className="w-full rounded-2xl border border-white/10 bg-black px-5 py-4 outline-none focus:border-brand"
             />
@@ -165,21 +165,21 @@ export default function EditLessonPage({
             <input
               value={youtubeUrl}
               onChange={(e) => setYoutubeUrl(e.target.value)}
-              placeholder="YouTube URL"
+              placeholder={t("placeholderYoutubeUrl")}
               className="w-full rounded-2xl border border-white/10 bg-black px-5 py-4 outline-none focus:border-brand"
             />
 
             <input
               value={videoUrl}
               onChange={(e) => setVideoUrl(e.target.value)}
-              placeholder="Direct video URL (optional)"
+              placeholder={t("placeholderVideoUrl")}
               className="w-full rounded-2xl border border-white/10 bg-black px-5 py-4 outline-none focus:border-brand"
             />
 
             <div className="grid gap-5 md:grid-cols-2">
               <div>
                 <label className="mb-2 block text-sm text-white/50">
-                  Duration (seconds)
+                  {t("durationSecondsLabel")}
                 </label>
 
                 <input
@@ -193,7 +193,7 @@ export default function EditLessonPage({
 
               <div>
                 <label className="mb-2 block text-sm text-white/50">
-                  Order
+                  {t("orderIndexLabel")}
                 </label>
 
                 <input
@@ -213,7 +213,7 @@ export default function EditLessonPage({
                 onChange={(e) => setIsFree(e.target.checked)}
               />
 
-              <span>Free lesson</span>
+              <span>{t("freePreviewLabel")}</span>
             </label>
           </div>
         </section>
@@ -230,7 +230,7 @@ export default function EditLessonPage({
             onClick={() => router.push(`/teacher/courses/${courseId}/lessons`)}
             className="rounded-full border border-white/10 px-6 py-3 font-semibold"
           >
-            Cancel
+            {t("btnCancel")}
           </button>
 
           <button
@@ -239,7 +239,7 @@ export default function EditLessonPage({
             disabled={saving}
             className="rounded-full bg-brand px-7 py-3 font-semibold text-black disabled:opacity-50"
           >
-            {saving ? "Saving..." : "Save Changes"}
+            {saving ? t("savingChanges") : t("saveChanges")}
           </button>
         </div>
       </div>

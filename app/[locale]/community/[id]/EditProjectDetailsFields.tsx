@@ -1,4 +1,5 @@
 import { Tag } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const SUGGESTED_TAGS = [
   "Next.js",
@@ -13,15 +14,15 @@ const SUGGESTED_TAGS = [
   "Mobile",
 ];
 
-export const CATEGORIES = [
-  "Web App",
-  "Mobile App",
-  "UI/UX Design",
-  "Intelligence Artificielle",
-  "Portfolio",
-  "Outil Open Source",
-  "E-Commerce",
-];
+const CATEGORIES = [
+  { value: "Web App", label: "webApp" },
+  { value: "Mobile App", label: "mobileApp" },
+  { value: "UI/UX Design", label: "uiux" },
+  { value: "Intelligence Artificielle", label: "ai" },
+  { value: "Portfolio", label: "portfolio" },
+  { value: "Outil Open Source", label: "openSource" },
+  { value: "E-Commerce", label: "ecommerce" },
+] as const;
 
 interface EditProjectDetailsFieldsProps {
   title: string;
@@ -50,6 +51,8 @@ export default function EditProjectDetailsFields({
   setTechnologies,
   addTechnologyTag,
 }: EditProjectDetailsFieldsProps) {
+  const t = useTranslations("community");
+
   return (
     <>
       {/* Title */}
@@ -58,14 +61,14 @@ export default function EditProjectDetailsFields({
           htmlFor="title"
           className="mb-2 block text-xs font-bold uppercase tracking-wider text-white/70"
         >
-          Titre du projet *
+          {t("edit.titleLabel")} *
         </label>
         <input
           id="title"
           required
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="ex: Plateforme SaaS de Facturation pour PME Algériennes"
+          placeholder={t("edit.titlePlaceholder")}
           className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 focus:border-brand focus:outline-none"
         />
       </div>
@@ -76,21 +79,21 @@ export default function EditProjectDetailsFields({
           htmlFor="category"
           className="mb-2 block text-xs font-bold uppercase tracking-wider text-white/70"
         >
-          Catégorie
+          {t("edit.categoryLabel")}
         </label>
         <div className="flex flex-wrap gap-2 mb-2">
-          {CATEGORIES.map((c) => (
+          {CATEGORIES.map((categoryOption) => (
             <button
-              key={c}
+              key={categoryOption.value}
               type="button"
-              onClick={() => setCategory(c)}
+              onClick={() => setCategory(categoryOption.value)}
               className={`rounded-xl px-3 py-1.5 text-xs transition ${
-                category === c
+                category === categoryOption.value
                   ? "bg-brand text-black font-bold"
                   : "border border-white/10 bg-white/5 text-white/70 hover:bg-white/10"
               }`}
             >
-              {c}
+              {t(`categoryOptions.${categoryOption.label}`)}
             </button>
           ))}
         </div>
@@ -98,7 +101,7 @@ export default function EditProjectDetailsFields({
           id="category"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          placeholder="Ou saisissez une catégorie personnalisée..."
+          placeholder={t("edit.categoryPlaceholder")}
           className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs text-white placeholder-white/30 focus:border-brand focus:outline-none"
         />
       </div>
@@ -109,7 +112,7 @@ export default function EditProjectDetailsFields({
           htmlFor="description"
           className="mb-2 block text-xs font-bold uppercase tracking-wider text-white/70"
         >
-          Description & Présentation *
+          {t("edit.descriptionLabel")} *
         </label>
         <textarea
           id="description"
@@ -117,7 +120,7 @@ export default function EditProjectDetailsFields({
           rows={5}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Expliquez la problématique résolue, votre démarche technique et ce que vous avez appris durant ce projet..."
+          placeholder={t("edit.descriptionPlaceholder")}
           className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 focus:border-brand focus:outline-none"
         />
       </div>
@@ -129,7 +132,7 @@ export default function EditProjectDetailsFields({
           className="mb-2 block text-xs font-bold uppercase tracking-wider text-white/70 flex items-center gap-1.5"
         >
           <Tag className="h-3.5 w-3.5 text-brand" />
-          <span>Technologies employées (séparées par des virgules)</span>
+          <span>{t("edit.technologiesLabel")}</span>
         </label>
         <input
           id="technologies"
@@ -139,7 +142,9 @@ export default function EditProjectDetailsFields({
           className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 focus:border-brand focus:outline-none"
         />
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
-          <span className="text-[11px] text-white/40">Suggestions :</span>
+          <span className="text-[11px] text-white/40">
+            {t("edit.suggestions")}
+          </span>
           {SUGGESTED_TAGS.map((tag) => (
             <button
               key={tag}

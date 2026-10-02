@@ -1,6 +1,6 @@
 "use client";
 
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import EarthGlobe from "@/components/EarthGlobe";
 import HeroCarouselControls from "@/components/hero/HeroCarouselControls";
@@ -15,6 +15,7 @@ export default function Hero() {
   const [error, setError] = useState<string | null>(null);
 
   const locale = useLocale();
+  const t = useTranslations("hero");
 
   // Load featured published courses
   useEffect(() => {
@@ -86,7 +87,7 @@ export default function Hero() {
             <div className="h-14 w-14 animate-spin rounded-full border-4 border-white/10 border-t-white" />
           </div>
           <p className="text-xs font-medium uppercase tracking-widest text-white/50">
-            Chargement des formations d&apos;élite...
+            {t("loadingText")}
           </p>
         </div>
       </section>
@@ -102,10 +103,10 @@ export default function Hero() {
             !
           </div>
           <h2 className="mt-4 text-xl font-bold text-white">
-            Impossible de charger les formations
+            {t("errorTitle")}
           </h2>
           <p className="mt-2 text-sm leading-6 text-white/50">
-            Une erreur réseau est survenue. Veuillez rafraîchir la page.
+            {t("errorText")}
           </p>
         </div>
       </section>
@@ -115,14 +116,13 @@ export default function Hero() {
   // Active or fallback course
   const activeCourse: HeroCourse = courses[active] ?? {
     id: "default-course",
-    title: "Maîtrisez les Compétences du Futur",
-    description:
-      "Formations d'élite en UI/UX Design, Développement Web Fullstack et Technologies Créatives conçues pour le marché algérien et international.",
+    title: t("fallbackTitle"),
+    description: t("fallbackDescription"),
     image_url: null,
     price: 15000,
-    duration: "8 Semaines",
-    level: "Tous Niveaux",
-    type: "FORMATION DIPLÔMANTE",
+    duration: t("fallbackDuration"),
+    level: t("fallbackLevel"),
+    type: t("fallbackType"),
   };
 
   return (

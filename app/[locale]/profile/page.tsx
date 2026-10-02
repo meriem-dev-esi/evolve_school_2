@@ -1,4 +1,4 @@
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import LearningPreferencesForm from "@/components/LearningPreferencesForm";
 import ProfileForm from "@/components/ProfileForm";
 import { Link } from "@/i18n/navigation";
@@ -13,6 +13,7 @@ export default async function ProfilePage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: "profileUi.page" });
 
   const supabase = await createClient();
 
@@ -31,18 +32,16 @@ export default async function ProfilePage({
           </div>
 
           <h1 className="mt-6 text-3xl font-bold text-gray-900">
-            Sign in to your profile
+            {t("signInRequired")}
           </h1>
 
-          <p className="mt-3 text-gray-500">
-            Access your account information and learning preferences.
-          </p>
+          <p className="mt-3 text-gray-500">{t("accessDescription")}</p>
 
           <Link
             href="/sign-in"
             className="mt-8 inline-flex rounded-full bg-lime-400 px-7 py-3 font-semibold text-black transition hover:bg-lime-300 hover:shadow-lg hover:shadow-lime-400/20"
           >
-            Sign In
+            {t("signIn")}
           </Link>
         </div>
       </main>
@@ -59,7 +58,7 @@ export default async function ProfilePage({
   const displayName =
     profile?.full_name?.trim() ||
     user.user_metadata?.full_name ||
-    "Evolve Student";
+    t("defaultName");
 
   const email = user.email ?? "";
 
@@ -73,12 +72,11 @@ export default async function ProfilePage({
           </p>
 
           <h1 className="mt-3 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-            My Profile
+            {t("title")}
           </h1>
 
           <p className="mt-4 max-w-2xl text-base leading-7 text-gray-500">
-            Manage your account, personal information, and learning preferences
-            in one place.
+            {t("description")}
           </p>
         </header>
 
@@ -108,7 +106,7 @@ export default async function ProfilePage({
             </div>
 
             <div className="rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-sm text-gray-600 shadow-sm">
-              Student Account
+              {t("role")}
             </div>
           </div>
         </section>
@@ -117,11 +115,11 @@ export default async function ProfilePage({
         <section className="mb-8">
           <div className="mb-5">
             <h2 className="text-2xl font-bold text-gray-900">
-              Account Information
+              {t("accountInfo")}
             </h2>
 
             <p className="mt-2 text-sm text-gray-500">
-              Update your name and profile picture.
+              {t("accountInfoDescription")}
             </p>
           </div>
 
@@ -137,16 +135,15 @@ export default async function ProfilePage({
         <section className="mt-14 border-t border-gray-200 pt-14">
           <div className="mb-5">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-lime-600 dark:text-lime-400">
-              Personalization
+              {t("personalization")}
             </p>
 
             <h2 className="mt-2 text-2xl font-bold text-gray-900">
-              Learning Preferences
+              {t("preferencesTitle")}
             </h2>
 
             <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">
-              Tell Evolve what you want to learn so we can personalize your
-              course recommendations.
+              {t("preferencesDescription")}
             </p>
           </div>
 

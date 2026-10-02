@@ -1,6 +1,7 @@
 "use client";
 
 import { Loader2, MessageSquare } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import CommentComposer from "@/components/community/CommentComposer";
 import CommentItem from "@/components/community/CommentItem";
@@ -13,6 +14,7 @@ type Props = {
 };
 
 export default function Comments({ projectId }: Props) {
+  const t = useTranslations("community.comments");
   const supabase = createClient();
 
   const [comments, setComments] = useState<ProjectComment[]>([]);
@@ -58,7 +60,7 @@ export default function Comments({ projectId }: Props) {
     const profileMap = new Map(profiles.map((p) => [p.id, p]));
 
     const commentsWithProfiles: ProjectComment[] = commentList.map((c) => {
-      const resolved = resolveAuthorProfile(c.user_id, profileMap);
+      const resolved = resolveAuthorProfile(c.user_id, profileMap, t("member"));
       return {
         ...c,
         profile: {
@@ -71,7 +73,7 @@ export default function Comments({ projectId }: Props) {
 
     setComments(commentsWithProfiles);
     setLoading(false);
-  }, [projectId, supabase]);
+  }, [projectId, supabase, t]);
 
   const loadUser = useCallback(async () => {
     const {
@@ -117,7 +119,7 @@ export default function Comments({ projectId }: Props) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      alert("Veuillez vous connecter pour publier un retour sur ce projet.");
+      alert(t("loginRequired"));
       setSubmitting(false);
       return;
     }
@@ -130,7 +132,7 @@ export default function Comments({ projectId }: Props) {
 
     if (error) {
       console.error("[Comments]", error);
-      alert(`Erreur lors de l'envoi du commentaire : ${error.message}`);
+      alert(t("submitError", { error: error.message }));
       setSubmitting(false);
       return;
     }
@@ -172,7 +174,7 @@ export default function Comments({ projectId }: Props) {
   }
 
   async function deleteComment(commentId: string) {
-    const confirmed = window.confirm("Supprimer ce commentaire ?");
+    const confirmed = window.confirm(t("deleteConfirm"));
     if (!confirmed) return;
 
     const { error } = await supabase
@@ -199,14 +201,12 @@ export default function Comments({ projectId }: Props) {
           </div>
           <div>
             <h2 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-              Commentaires & Retours
+              {t("title")}
               <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-mono font-normal text-brand">
                 {comments.length}
               </span>
             </h2>
-            <p className="text-xs text-white/50">
-              Partagez vos impressions et suggestions constructives.
-            </p>
+            <p className="text-xs text-white/50">{t("description")}</p>
           </div>
         </div>
       </div>
@@ -224,15 +224,15 @@ export default function Comments({ projectId }: Props) {
         {loading ? (
           <div className="flex items-center justify-center py-10 text-white/40 gap-2 text-xs">
             <Loader2 className="h-4 w-4 animate-spin text-brand" />
-            Chargement des discussions...
+            {t("loading")}
           </div>
         ) : comments.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.01] p-10 text-center">
             <p className="text-sm font-medium text-white/70">
-              Aucun retour pour l'instant
+              {t("emptyTitle")}
             </p>
             <p className="mt-1 text-xs text-white/40">
-              Soyez le premier à féliciter l'auteur ou à poser une question !
+              {t("emptyDescription")}
             </p>
           </div>
         ) : (

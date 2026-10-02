@@ -1,4 +1,7 @@
+"use client";
+
 import { Lock } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 
 interface LessonListItem {
@@ -23,9 +26,11 @@ export default function CourseLessonsList({
   currentLessonId,
   isEnrolled,
 }: CourseLessonsListProps) {
+  const t = useTranslations("lessonUi");
+
   return (
     <div className="mt-12">
-      <h2 className="mb-4 text-xl font-semibold">Leçons du cours</h2>
+      <h2 className="mb-4 text-xl font-semibold">{t("listTitle")}</h2>
 
       <div className="flex flex-col gap-4">
         {lessons.map((l) => {
@@ -61,9 +66,11 @@ export default function CourseLessonsList({
                     <span
                       className={unlocked ? "font-medium text-foreground" : ""}
                     >
-                      {unlocked ? "Gratuit" : "Formation Complète"}
+                      {unlocked ? t("free") : t("fullCourse")}
                     </span>
-                    {l.duration != null && <span>{l.duration} min</span>}
+                    {l.duration != null && (
+                      <span>{t("minutes", { count: l.duration })}</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -73,7 +80,7 @@ export default function CourseLessonsList({
                   href={`/courses/${courseId}/lessons/${l.id}`}
                   className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black"
                 >
-                  {isCurrent ? "En cours" : "Commencer"}
+                  {isCurrent ? t("current") : t("start")}
                 </Link>
               ) : (
                 <Link
@@ -81,7 +88,7 @@ export default function CourseLessonsList({
                   className="flex items-center gap-1 rounded-full border px-5 py-2 text-sm font-semibold text-muted-foreground"
                 >
                   <Lock className="h-3.5 w-3.5" />
-                  Débloquer
+                  {t("unlock")}
                 </Link>
               )}
             </div>

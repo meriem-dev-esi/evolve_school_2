@@ -1,6 +1,7 @@
 "use client";
 
 import { Heart, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -15,6 +16,7 @@ export default function LikeButton({
   initialLikes,
   initiallyLiked,
 }: Props) {
+  const t = useTranslations("community");
   const supabase = createClient();
 
   const [likes, setLikes] = useState(initialLikes);
@@ -56,7 +58,7 @@ export default function LikeButton({
     } = await supabase.auth.getUser();
 
     if (!user) {
-      alert("Connectez-vous pour aimer ce projet.");
+      alert(t("like.signIn"));
       setLoading(false);
       return;
     }
@@ -87,7 +89,7 @@ export default function LikeButton({
       type="button"
       onClick={handleLike}
       disabled={loading}
-      aria-label={liked ? "Je n'aime plus" : "J'aime ce projet"}
+      aria-label={liked ? t("like.unlike") : t("like.like")}
       className={`group relative inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold backdrop-blur-md transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 border ${
         liked
           ? "border-rose-500/40 bg-rose-500/15 text-rose-300 shadow-[0_0_20px_rgba(244,63,94,0.25)] hover:bg-rose-500/25"
@@ -107,7 +109,7 @@ export default function LikeButton({
       )}
       <span className="tabular-nums font-mono">{likes}</span>
       <span className="text-[11px] font-normal text-white/40 group-hover:text-white/60 transition-colors">
-        {likes <= 1 ? "coup de cœur" : "coups de cœur"}
+        {likes === 1 ? t("like.one") : t("like.other")}
       </span>
     </button>
   );

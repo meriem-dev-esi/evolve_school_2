@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import {
   PREFERENCE_CATEGORIES,
   PREFERENCE_DIFFICULTIES,
@@ -45,18 +46,21 @@ export default function PreferencesFormFields({
   setLanguage,
   saving,
 }: PreferencesFormFieldsProps) {
+  const t = useTranslations("profileUi.preferences");
+  const option = (value: string) => t(`options.${value}`);
+
   return (
     <>
       {/* Learning goal */}
       <div>
         <label className="mb-2 block text-sm font-medium text-white/80">
-          What is your learning goal?
+          {t("goal")}
         </label>
         <input
           type="text"
           value={goal}
           onChange={(e) => setGoal(e.target.value)}
-          placeholder="Example: Become a full-stack developer"
+          placeholder={t("goalPlaceholder")}
           disabled={saving}
           className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white outline-none placeholder:text-white/25 transition focus:border-brand/60 focus:ring-1 focus:ring-brand/30 disabled:opacity-50"
         />
@@ -66,7 +70,7 @@ export default function PreferencesFormFields({
       <div className="grid gap-6 md:grid-cols-2">
         <div>
           <label className="mb-2 block text-sm font-medium text-white/80">
-            Current level
+            {t("level")}
           </label>
           <select
             value={level}
@@ -74,10 +78,10 @@ export default function PreferencesFormFields({
             disabled={saving}
             className="w-full rounded-2xl border border-white/10 bg-surface px-4 py-3 text-white outline-none focus:border-brand/60 disabled:opacity-50"
           >
-            <option value="">Select your level</option>
+            <option value="">{t("selectLevel")}</option>
             {PREFERENCE_LEVELS.map((item) => (
               <option key={item} value={item}>
-                {item}
+                {option(item)}
               </option>
             ))}
           </select>
@@ -85,7 +89,7 @@ export default function PreferencesFormFields({
 
         <div>
           <label className="mb-2 block text-sm font-medium text-white/80">
-            Preferred category
+            {t("category")}
           </label>
           <select
             value={category}
@@ -93,10 +97,10 @@ export default function PreferencesFormFields({
             disabled={saving}
             className="w-full rounded-2xl border border-white/10 bg-surface px-4 py-3 text-white outline-none focus:border-brand/60 disabled:opacity-50"
           >
-            <option value="">Select a category</option>
+            <option value="">{t("selectCategory")}</option>
             {PREFERENCE_CATEGORIES.map((item) => (
               <option key={item} value={item}>
-                {item}
+                {option(item)}
               </option>
             ))}
           </select>
@@ -107,7 +111,7 @@ export default function PreferencesFormFields({
       <div className="grid gap-6 md:grid-cols-2">
         <div>
           <label className="mb-2 block text-sm font-medium text-white/80">
-            Preferred difficulty
+            {t("difficulty")}
           </label>
           <select
             value={difficulty}
@@ -115,10 +119,10 @@ export default function PreferencesFormFields({
             disabled={saving}
             className="w-full rounded-2xl border border-white/10 bg-surface px-4 py-3 text-white outline-none focus:border-brand/60 disabled:opacity-50"
           >
-            <option value="">Select difficulty</option>
+            <option value="">{t("selectDifficulty")}</option>
             {PREFERENCE_DIFFICULTIES.map((item) => (
               <option key={item} value={item}>
-                {item}
+                {option(item)}
               </option>
             ))}
           </select>
@@ -126,7 +130,7 @@ export default function PreferencesFormFields({
 
         <div>
           <label className="mb-2 block text-sm font-medium text-white/80">
-            Preferred learning format
+            {t("format")}
           </label>
           <select
             value={format}
@@ -134,10 +138,10 @@ export default function PreferencesFormFields({
             disabled={saving}
             className="w-full rounded-2xl border border-white/10 bg-surface px-4 py-3 text-white outline-none focus:border-brand/60 disabled:opacity-50"
           >
-            <option value="">Select format</option>
+            <option value="">{t("selectFormat")}</option>
             {PREFERENCE_FORMATS.map((item) => (
               <option key={item} value={item}>
-                {item}
+                {option(item)}
               </option>
             ))}
           </select>
@@ -148,21 +152,21 @@ export default function PreferencesFormFields({
       <div className="grid gap-6 md:grid-cols-2">
         <div>
           <label className="mb-2 block text-sm font-medium text-white/80">
-            Available learning time
+            {t("availableTime")}
           </label>
           <input
             type="text"
             value={learningTime}
             onChange={(e) => setLearningTime(e.target.value)}
             disabled={saving}
-            placeholder="Example: 1 hour per day"
+            placeholder={t("timePlaceholder")}
             className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white outline-none placeholder:text-white/25 transition focus:border-brand/60 focus:ring-1 focus:ring-brand/30 disabled:opacity-50"
           />
         </div>
 
         <div>
           <label className="mb-2 block text-sm font-medium text-white/80">
-            Preferred language
+            {t("language")}
           </label>
           <select
             value={language}
@@ -170,10 +174,10 @@ export default function PreferencesFormFields({
             disabled={saving}
             className="w-full rounded-2xl border border-white/10 bg-surface px-4 py-3 text-white outline-none focus:border-brand/60 disabled:opacity-50"
           >
-            <option value="">Select language</option>
+            <option value="">{t("selectLanguage")}</option>
             {PREFERENCE_LANGUAGES.map((item) => (
               <option key={item} value={item}>
-                {item}
+                {option(item)}
               </option>
             ))}
           </select>

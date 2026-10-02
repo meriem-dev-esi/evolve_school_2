@@ -1,4 +1,7 @@
+"use client";
+
 import { CheckCircle2, Clock, Lock, Play } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { LessonItem, LessonProgressItem } from "./types";
 
@@ -19,19 +22,19 @@ export default function CourseLessonsList({
   progressList,
   isPaid,
 }: CourseLessonsListProps) {
+  const t = useTranslations("courseUi.lessons");
+
   return (
     <section>
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold tracking-tight text-white md:text-2xl">
-            Programme des Leçons
+            {t("title")}
           </h2>
-          <p className="mt-1 text-xs text-white/40">
-            Accédez aux cours vidéo, exercices pratiques et quiz
-          </p>
+          <p className="mt-1 text-xs text-white/40">{t("description")}</p>
         </div>
         <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/60">
-          {lessonList.length} modules
+          {t("moduleCount", { count: lessonList.length })}
         </span>
       </div>
 
@@ -89,28 +92,30 @@ export default function CourseLessonsList({
                       <span>
                         {lesson.is_free ? (
                           <span className="text-brand font-semibold">
-                            Gratuit
+                            {t("free")}
                           </span>
                         ) : (
-                          "Formation Complète"
+                          t("fullCourse")
                         )}
                       </span>
 
                       {lesson.duration && (
                         <span className="flex items-center gap-1">
                           <Clock className="h-3 w-3 text-sky-400" />
-                          {lesson.duration} min
+                          {t("minutes", { count: lesson.duration })}
                         </span>
                       )}
 
                       {percentage > 0 && !completed && (
                         <span className="text-brand font-semibold">
-                          {percentage}% visionné
+                          {t("watched", { percent: percentage })}
                         </span>
                       )}
 
                       {completed && (
-                        <span className="text-brand font-bold">Complété ✓</span>
+                        <span className="text-brand font-bold">
+                          {t("completed")}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -129,10 +134,10 @@ export default function CourseLessonsList({
                     >
                       <span>
                         {completed
-                          ? "Revoir"
+                          ? t("review")
                           : percentage > 0
-                            ? "Reprendre"
-                            : "Commencer"}
+                            ? t("resume")
+                            : t("start")}
                       </span>
                       <Play className="h-3 w-3 fill-current ms-0.5" />
                     </Link>
@@ -142,7 +147,7 @@ export default function CourseLessonsList({
                       className="inline-flex items-center gap-1.5 rounded-full border border-brand/30 bg-brand/10 px-4 py-2 text-xs font-bold text-brand transition-all hover:bg-brand hover:text-black"
                     >
                       <Lock className="h-3 w-3" />
-                      <span>Débloquer</span>
+                      <span>{t("unlock")}</span>
                     </Link>
                   )}
                 </div>

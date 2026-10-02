@@ -12,15 +12,23 @@ export interface FileValidationResult {
   error?: string;
 }
 
+export interface FileValidationMessages {
+  unsupportedFormat: (type: string) => string;
+  fileTooLarge: (sizeMb: string, maxMb: string) => string;
+}
+
 export function validateUploadFile(
   file: File,
   maxSizeBytes = MAX_UPLOAD_SIZE_BYTES,
   allowedTypes = ALLOWED_IMAGE_TYPES,
+  messages?: FileValidationMessages,
 ): FileValidationResult {
   if (!allowedTypes.includes(file.type)) {
     return {
       valid: false,
-      error: `Format de fichier non supporté (${file.type || "inconnu"}). Formats autorisés : JPG, PNG, WEBP.`,
+      error: messages
+        ? messages.unsupportedFormat(file.type || "inconnu")
+        : `Format de fichier non supporté (${file.type || "inconnu"}). Formats autorisés : JPG, PNG, WEBP.`,
     };
   }
 
@@ -29,7 +37,9 @@ export function validateUploadFile(
     const maxMb = (maxSizeBytes / (1024 * 1024)).toFixed(0);
     return {
       valid: false,
-      error: `Le fichier est trop lourd (${sizeMb} Mo). La taille maximale autorisée est de ${maxMb} Mo.`,
+      error: messages
+        ? messages.fileTooLarge(sizeMb, maxMb)
+        : `Le fichier est trop lourd (${sizeMb} Mo). La taille maximale autorisée est de ${maxMb} Mo.`,
     };
   }
 

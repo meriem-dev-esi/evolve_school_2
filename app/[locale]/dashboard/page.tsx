@@ -1,6 +1,10 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import DashboardGuestView from "@/components/dashboard/DashboardGuestView";
 import type {
+  DbEnrollment,
+  DbLesson,
+  DbProgress,
   EnrolledCourseItem,
   UserStats,
   WorkshopItem,
@@ -10,51 +14,25 @@ import Navbar from "@/components/Navbar";
 import { createClient } from "@/lib/supabase/server";
 import DashboardClient from "./DashboardClient";
 
-export const metadata: Metadata = {
-  title: "Mon Espace Étudiant & Tableau de Bord — Evolve Academy",
-  description:
-    "Suivez votre progression, reprenez vos cours, consultez vos attestations et accédez à vos ateliers.",
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
-
 type Props = {
   params: Promise<{
     locale: string;
   }>;
 };
 
-type DbCourse = {
-  id: string;
-  title: string;
-  description: string | null;
-  image_url: string | null;
-  domain?: string | null;
-  level?: string | null;
-  duration?: string | null;
-};
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "dashboardUi.meta" });
 
-type DbEnrollment = {
-  course_id: string;
-  payment_status: string;
-  courses: DbCourse | DbCourse[] | null;
-};
-
-type DbLesson = {
-  id: string;
-  course_id: string;
-  title: string;
-  order_index: number;
-  duration?: string | null;
-};
-
-type DbProgress = {
-  lesson_id: string;
-  progress_percentage: number;
-  completed: boolean;
-};
+  return {
+    title: t("title"),
+    description: t("description"),
+    robots: {
+      index: false,
+      follow: false,
+    },
+  };
+}
 
 export default async function DashboardPage({ params }: Props) {
   const { locale } = await params;

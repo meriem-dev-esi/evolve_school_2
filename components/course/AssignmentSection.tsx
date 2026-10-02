@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckCircle2, Clock, FileText, Upload } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useRef, useState, useTransition } from "react";
 import { submitAssignmentAction } from "@/lib/data/assignments";
 import type { AssignmentItem, AssignmentSubmissionItem } from "./types";
@@ -11,12 +12,6 @@ interface AssignmentSectionProps {
   assignment: AssignmentItem;
   submission: AssignmentSubmissionItem | null;
 }
-
-const STATUS_LABEL: Record<AssignmentSubmissionItem["status"], string> = {
-  submitted: "Soumis",
-  late: "En retard",
-  graded: "Noté",
-};
 
 /**
  * AssignmentSection affiche l'énoncé d'un devoir lié à une leçon, permet à
@@ -30,6 +25,8 @@ export default function AssignmentSection({
   assignment,
   submission,
 }: AssignmentSectionProps) {
+  const t = useTranslations("courseUi.assignment");
+  const locale = useLocale();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -47,7 +44,7 @@ export default function AssignmentSection({
     startTransition(async () => {
       const result = await submitAssignmentAction(formData);
       if (!result.success) {
-        setError(result.error ?? "Une erreur est survenue.");
+        setError(result.error ?? t("error"));
         return;
       }
       setSuccess(true);
@@ -62,7 +59,7 @@ export default function AssignmentSection({
       <div className="flex items-center gap-2">
         <FileText className="h-4 w-4 text-brand" />
         <span className="text-xs font-bold uppercase tracking-wider text-brand">
-          Devoir
+          {t("title")}
         </span>
       </div>
 
@@ -79,15 +76,17 @@ export default function AssignmentSection({
       <div className="mt-3 flex flex-wrap items-center gap-3 text-[11px] text-white/50">
         {assignment.due_date && (
           <span className="flex items-center gap-1">
-            <Clock className="h-3 w-3 text-sky-400" />À rendre avant le{" "}
-            {new Date(assignment.due_date).toLocaleDateString("fr-FR", {
-              day: "2-digit",
-              month: "long",
-              year: "numeric",
+            <Clock className="h-3 w-3 text-sky-400" />
+            {t("due", {
+              date: new Date(assignment.due_date).toLocaleDateString(locale, {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              }),
             })}
           </span>
         )}
-        <span>Noté sur {assignment.max_score}</span>
+        <span>{t("score", { score: assignment.max_score })}</span>
       </div>
 
       {submission && (
@@ -108,14 +107,17 @@ export default function AssignmentSection({
                     : "bg-white/10 text-white/60"
               }`}
             >
-              {STATUS_LABEL[submission.status]}
+              {t(`status.${submission.status}`)}
             </span>
           </div>
 
           {submission.status === "graded" && (
             <div className="mt-3 border-t border-white/10 pt-3">
               <p className="text-sm font-bold text-white">
-                Note : {submission.grade} / {assignment.max_score}
+                {t("grade", {
+                  grade: submission.grade ?? "",
+                  max: assignment.max_score,
+                })}
               </p>
               {submission.feedback && (
                 <p className="mt-1 whitespace-pre-line text-xs leading-relaxed text-white/60">
@@ -146,7 +148,11 @@ export default function AssignmentSection({
             className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full bg-brand px-5 py-2 text-xs font-bold text-black transition-all hover:scale-105 disabled:opacity-50"
           >
             <Upload className="h-3 w-3" />
-            {isPending ? "Envoi..." : submission ? "Renvoyer" : "Soumettre"}
+            {isPending
+              ? t("sending")
+              : submission
+                ? t("resubmit")
+                : t("submit")}
           </button>
         </form>
       )}
@@ -155,9 +161,7 @@ export default function AssignmentSection({
         <p className="mt-2 text-xs font-semibold text-red-400">{error}</p>
       )}
       {success && (
-        <p className="mt-2 text-xs font-semibold text-brand">
-          Devoir envoyé avec succès.
-        </p>
+        <p className="mt-2 text-xs font-semibold text-brand">{t("success")}</p>
       )}
     </section>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { compressImage, validateUploadFile } from "@/lib/imageCompressor";
 import { createClient } from "@/lib/supabase/client";
@@ -8,7 +9,8 @@ type Message = { text: string; type: "success" | "error" };
 
 // All form state, handlers and the submit flow for SubmitProjectForm.
 // Kept separate so the component file stays under the size limit.
-export function useSubmitProjectForm(locale: string) {
+export function useSubmitProjectForm() {
+  const t = useTranslations("community");
   const supabase = createClient();
 
   const [title, setTitle] = useState("");
@@ -53,7 +55,15 @@ export function useSubmitProjectForm(locale: string) {
   };
 
   async function uploadProjectImage(userId: string) {
-    const validation = validateUploadFile(imageFile as File);
+    const validation = validateUploadFile(
+      imageFile as File,
+      undefined,
+      undefined,
+      {
+        unsupportedFormat: (type) => t("submit.imageFormatError", { type }),
+        fileTooLarge: (size, max) => t("submit.imageSizeError", { size, max }),
+      },
+    );
     if (!validation.valid) {
       throw new Error(validation.error || "Fichier image invalide.");
     }
@@ -102,10 +112,7 @@ export function useSubmitProjectForm(locale: string) {
 
     if (!user) {
       setMessage({
-        text:
-          locale === "ar"
-            ? "يجب تسجيل الدخول لنشر مشروع"
-            : "Vous devez être connecté pour publier un projet.",
+        text: t("submit.loginRequired"),
         type: "error",
       });
       setLoading(false);
@@ -121,7 +128,7 @@ export function useSubmitProjectForm(locale: string) {
 
     if (duplicate) {
       setMessage({
-        text: "Vous avez déjà publié un projet avec ce titre.",
+        text: t("submit.duplicate"),
         type: "error",
       });
       setLoading(false);
@@ -135,7 +142,7 @@ export function useSubmitProjectForm(locale: string) {
         imageUrl = await uploadProjectImage(user.id);
       } catch (err) {
         setMessage({
-          text: err instanceof Error ? err.message : "Erreur d'upload.",
+          text: err instanceof Error ? err.message : t("submit.uploadError"),
           type: "error",
         });
         setLoading(false);
@@ -159,14 +166,17 @@ export function useSubmitProjectForm(locale: string) {
 
     if (error) {
       console.error("[Project Create]", error);
-      setMessage({ text: error.message, type: "error" });
+      setMessage({
+        text: t("submit.publishError", { error: error.message }),
+        type: "error",
+      });
       setLoading(false);
       return;
     }
 
     resetForm();
     setMessage({
-      text: "Félicitations ! Votre projet a été publié avec succès dans la communauté.",
+      text: t("submit.success"),
       type: "success",
     });
     setLoading(false);

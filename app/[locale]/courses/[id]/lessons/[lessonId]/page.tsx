@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import LessonVideo from "@/components/LessonVideo";
 import CourseLessonsList from "@/components/lesson/CourseLessonsList";
 import MarkLessonComplete from "@/components/MarkLessonComplete";
@@ -17,6 +18,7 @@ type Props = {
 
 export default async function LessonPage({ params }: Props) {
   const { locale, id, lessonId } = await params;
+  const t = await getTranslations({ locale, namespace: "lessonUi" });
 
   const supabase = await createClient();
 
@@ -204,12 +206,12 @@ export default async function LessonPage({ params }: Props) {
           href={`/courses/${id}`}
           className="mb-8 inline-flex text-sm font-medium text-muted-foreground transition hover:text-foreground"
         >
-          ← Back to course
+          ← {t("backToCourse")}
         </Link>
 
         <div className="mb-8">
           <p className="mb-2 text-sm font-medium text-primary">
-            Lesson {lesson.order_index}
+            {t("lessonNumber", { number: lesson.order_index })}
           </p>
 
           <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
@@ -253,9 +255,7 @@ export default async function LessonPage({ params }: Props) {
           /* ================================================= */
 
           <div className="mt-10 rounded-3xl border p-10 text-center">
-            <p className="text-muted-foreground">
-              No video is available for this lesson yet.
-            </p>
+            <p className="text-muted-foreground">{t("missingVideo")}</p>
 
             <MarkLessonComplete
               lessonId={lesson.id}

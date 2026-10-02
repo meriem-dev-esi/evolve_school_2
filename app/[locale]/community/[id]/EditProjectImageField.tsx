@@ -1,6 +1,7 @@
 "use client";
 
 import { Upload } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface EditProjectImageFieldProps {
   imagePreview: string | null;
@@ -14,20 +15,22 @@ export default function EditProjectImageField({
   imageFileName,
   onImageChange,
 }: EditProjectImageFieldProps) {
+  const t = useTranslations("community");
+
   return (
     <div>
       <label
         htmlFor="project-image"
         className="mb-2 block text-xs font-bold uppercase tracking-wider text-white/70"
       >
-        Capture d'écran ou Visuel du projet
+        {t("edit.imageLabel")}
       </label>
 
       {imagePreview && (
         <div className="relative mb-4 h-52 w-full overflow-hidden rounded-2xl border border-white/10 bg-zinc-900">
           <img
             src={imagePreview}
-            alt="Aperçu du projet"
+            alt={t("edit.imageAlt")}
             className="h-full w-full object-cover"
           />
         </div>
@@ -40,11 +43,11 @@ export default function EditProjectImageField({
         <Upload className="mb-2 h-6 w-6 text-brand/80" />
         <span className="text-xs font-semibold text-white">
           {imageFileName
-            ? `Nouveau fichier : ${imageFileName}`
-            : "Cliquez pour remplacer l'image (PNG, JPG, WebP)"}
+            ? t("edit.newImage", { name: imageFileName })
+            : t("edit.replaceImage")}
         </span>
         <span className="mt-1 text-[10px] text-white/40">
-          Recommandé : format 16:9, max 5 Mo (compression auto)
+          {t("edit.imageHelp")}
         </span>
         <input
           id="project-image"

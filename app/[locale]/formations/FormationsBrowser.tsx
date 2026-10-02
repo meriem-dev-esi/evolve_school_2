@@ -1,7 +1,7 @@
 "use client";
 
 import { Search } from "lucide-react";
-
+import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import FormationCard from "@/components/formations/FormationCard";
 import FormationsMobileCategories from "@/components/formations/FormationsMobileCategories";
@@ -26,6 +26,7 @@ export default function FormationsBrowser({
   locale,
   completedFormationIds,
 }: Props) {
+  const t = useTranslations("formationsBrowse");
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All Formations");
 
@@ -85,16 +86,11 @@ export default function FormationsBrowser({
           <div className="mb-8 flex items-end justify-between gap-4">
             <div>
               <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl">
-                {category === "All Formations"
-                  ? "Parcours Disponibles"
-                  : category}
+                {category === "All Formations" ? t("availablePaths") : category}
               </h2>
 
               <p className="mt-1 text-xs text-white/50">
-                {filteredFormations.length}{" "}
-                {filteredFormations.length === 1
-                  ? "parcours certifiant"
-                  : "parcours certifiants"}
+                {t("pathCount", { count: filteredFormations.length })}
               </p>
             </div>
 
@@ -104,7 +100,7 @@ export default function FormationsBrowser({
                 onClick={resetFilters}
                 className="shrink-0 text-xs font-semibold text-brand transition hover:underline"
               >
-                Réinitialiser les filtres
+                {t("reset")}
               </button>
             )}
           </div>
@@ -115,12 +111,11 @@ export default function FormationsBrowser({
               <Search size={36} className="mx-auto text-white/20" />
 
               <h3 className="mt-4 text-lg font-bold text-white">
-                Aucune formation trouvée
+                {t("emptyTitle")}
               </h3>
 
               <p className="mx-auto mt-2 max-w-sm text-xs leading-5 text-white/40">
-                Nous n'avons trouvé aucun parcours correspondant à vos critères.
-                Essayez un autre mot-clé ou catégorie.
+                {t("emptyDescription")}
               </p>
 
               <button
@@ -128,7 +123,7 @@ export default function FormationsBrowser({
                 onClick={resetFilters}
                 className="mt-6 rounded-full bg-brand px-6 py-2.5 text-xs font-bold text-black transition hover:scale-105"
               >
-                Voir toutes les formations
+                {t("viewAll")}
               </button>
             </div>
           ) : (

@@ -7,6 +7,7 @@ export interface WorkshopEnrollment {
   id: string;
   payment_status: string;
   chargily_checkout_id: string | null;
+  enrolled_at?: string | null;
 }
 
 export async function getWorkshopEnrollment(
@@ -16,7 +17,7 @@ export async function getWorkshopEnrollment(
   const adminSupabase = createAdminClient();
   const { data, error } = await adminSupabase
     .from("workshop_enrollments")
-    .select("id, payment_status, chargily_checkout_id")
+    .select("id, payment_status, chargily_checkout_id, enrolled_at")
     .eq("user_id", userId)
     .eq("workshop_id", workshopId)
     .maybeSingle();

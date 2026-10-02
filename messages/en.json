@@ -259,6 +259,55 @@
         "text": "Are you a trainer or an expert? Join Evolve's team of workshop hosts or pitch a masterclass to our community.",
         "cta": "Join the community"
       }
+    },
+    "enrolled": {
+      "enrolledBadge": "FULL ACCESS UNLOCKED",
+      "handsOnFormat": "100% Hands-on Workshop",
+      "contactMentor": "Contact mentor",
+      "videoSectionTitle": "Workshop Video & HD Replay",
+      "videoSectionDesc": "Follow the live practical demonstration, practice step by step and complete the exercises.",
+      "noVideoYet": "The full recording of this session will be available here shortly.",
+      "hdMasterclass": "Interactive Masterclass",
+      "chapters": "Chapters & sessions",
+      "part": "Part",
+      "certificate": {
+        "badge": "Official Certificate",
+        "title": "Your completion certificate is ready",
+        "description": "Congratulations {name}! You have successfully completed the workshop \"{title}\".",
+        "view": "Get my certificate"
+      },
+      "project": {
+        "title": "Workshop Practical Project",
+        "description": "Put your learnings into practice by submitting the project created during this workshop.",
+        "editOrNew": "Edit or submit another project",
+        "submittedBadge": "Project Submitted",
+        "liveDemo": "Live Demo",
+        "sourceCode": "Source Code",
+        "viewInCommunity": "View in Community",
+        "formProjectTitle": "Project Title",
+        "titlePlaceholder": "e.g. Evolve Dashboard Redesign",
+        "formDescription": "Description / What you built",
+        "descPlaceholder": "Explain your approach, the tech stack and outcomes...",
+        "formGithubUrl": "GitHub Link / Source code",
+        "formDemoUrl": "Live Demo Link",
+        "formScreenshot": "Screenshot / Preview (optional)",
+        "submitting": "Publishing...",
+        "submitButton": "Publish my project",
+        "cancel": "Cancel",
+        "titleRequired": "Please enter a project title.",
+        "submitError": "An error occurred while submitting the project."
+      },
+      "features": {
+        "header": "What is included in this workshop",
+        "videoTitle": "Video Session & HD Replay",
+        "videoDesc": "Continuous lifetime access to the recorded session and step-by-step guidance.",
+        "certTitle": "Certified Attestation",
+        "certDesc": "Official verifiable certificate ready to download upon participation.",
+        "projectTitle": "Hands-on Project & Feedback",
+        "projectDesc": "Real-world implementation and showcase in the community.",
+        "mentorTitle": "Mentor Guidance",
+        "mentorDesc": "Direct messaging with the workshop instructor to ask questions."
+      }
     }
   },
   "community": {

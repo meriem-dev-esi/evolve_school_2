@@ -570,6 +570,55 @@
         "text": "Vous êtes formateur ou expert ? Rejoignez l'équipe d'animateurs d'ateliers Evolve ou proposez une masterclass à notre communauté.",
         "cta": "Rejoindre la communauté"
       }
+    },
+    "enrolled": {
+      "enrolledBadge": "ACCÈS COMPLET DÉBLOQUÉ",
+      "handsOnFormat": "Atelier 100% Pratique",
+      "contactMentor": "Contacter le mentor",
+      "videoSectionTitle": "Session vidéo & Replay HD",
+      "videoSectionDesc": "Suivez la démonstration pratique, manipulez en même temps et complétez les exercices.",
+      "noVideoYet": "L'enregistrement complet de la session sera disponible ici très prochainement.",
+      "hdMasterclass": "Masterclass interactive",
+      "chapters": "Chapitres et sessions",
+      "part": "Partie",
+      "certificate": {
+        "badge": "Attestation officielle",
+        "title": "Votre attestation de réussite est prête",
+        "description": "Félicitations {name} ! Vous avez validé votre participation à l'atelier « {title} ».",
+        "view": "Obtenir mon attestation"
+      },
+      "project": {
+        "title": "Projet pratique de l'atelier",
+        "description": "Validez votre apprentissage en publiant le projet réalisé durant cet atelier.",
+        "editOrNew": "Modifier ou soumettre un autre projet",
+        "submittedBadge": "Projet soumis",
+        "liveDemo": "Voir la démo",
+        "sourceCode": "Code source",
+        "viewInCommunity": "Voir dans la communauté",
+        "formProjectTitle": "Titre du projet",
+        "titlePlaceholder": "Ex: Refonte Dashboard Evolve",
+        "formDescription": "Description / Ce que vous avez réalisé",
+        "descPlaceholder": "Expliquez votre approche, les technologies utilisées et le résultat obtenu...",
+        "formGithubUrl": "Lien GitHub / Code source",
+        "formDemoUrl": "Lien de démonstration en direct",
+        "formScreenshot": "Capture d'écran / Aperçu (optionnel)",
+        "submitting": "Publication...",
+        "submitButton": "Publier mon projet",
+        "cancel": "Annuler",
+        "titleRequired": "Veuillez renseigner le titre du projet.",
+        "submitError": "Une erreur est survenue lors de la soumission du projet."
+      },
+      "features": {
+        "header": "Ce qui est inclus dans cet atelier",
+        "videoTitle": "Session Vidéo & Replay HD",
+        "videoDesc": "Accès continu à la session enregistrée et aux explications pas à pas.",
+        "certTitle": "Attestation certifiée",
+        "certDesc": "Certificat officiel et vérifiable à télécharger dès votre participation.",
+        "projectTitle": "Projet pratique & Feedback",
+        "projectDesc": "Mise en pratique concrète et publication dans la communauté.",
+        "mentorTitle": "Accompagnement Mentor",
+        "mentorDesc": "Messagerie directe avec l'animateur de l'atelier pour poser vos questions."
+      }
     }
   },
   "community": {

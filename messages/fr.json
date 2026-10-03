@@ -198,7 +198,7 @@
     },
     "hero": {
       "defaultRole": "Étudiant Evolve",
-      "greeting": "Ravi de vous revoir, {name} 👋",
+      "greeting": "Ravi de vous revoir, <hl>{name}</hl> 👋",
       "description": "Continuez votre parcours d'excellence en technologie et design au sein de la communauté algérienne.",
       "resume": "Reprendre ma leçon"
     },

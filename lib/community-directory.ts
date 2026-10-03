@@ -73,10 +73,10 @@ export function isStudentTeacherPair(firstRole: string, secondRole: string) {
   const secondCategory = category(secondRole);
   return (
     (firstCategory === "student" && secondCategory === "teacher") ||
-    (firstCategory === "teacher" && secondCategory === "student")
+    (firstCategory === "teacher" && secondCategory === "student") ||
+    (firstCategory === "student" && secondCategory === "student")
   );
 }
-
 export function resolveAuthorProfile(
   id: string,
   dbProfilesMap?: Map<

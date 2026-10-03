@@ -63,7 +63,8 @@ export default function DashboardHeroBanner({
 
             <h1 className="mt-2 text-2xl font-black tracking-tight text-gray-900 sm:text-3xl lg:text-4xl">
               {t.rich("greeting", {
-                name: () => <span className="text-lime-600">{userName}</span>,
+                name: userName,
+                hl: (chunks) => <span className="text-lime-600">{chunks}</span>,
               })}
             </h1>
 

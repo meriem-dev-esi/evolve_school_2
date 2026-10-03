@@ -600,7 +600,7 @@
     },
     "hero": {
       "defaultRole": "Evolve student",
-      "greeting": "Welcome back, {name} 👋",
+      "greeting": "Welcome back, <hl>{name}</hl> 👋",
       "description": "Continue your journey in technology and design with Algeria's learning community.",
       "resume": "Resume my lesson"
     },

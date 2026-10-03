@@ -6,6 +6,7 @@ import {
   type DirectMessage,
   isUuid,
 } from "@/lib/messages-shared";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export async function getConversations(
@@ -42,7 +43,7 @@ export async function getConversations(
     | undefined;
 
   if (isUuid(recipientId) && recipientId !== userId) {
-    const { data: recipient, error: recipientError } = await supabase
+    const { data: recipient, error: recipientError } = await createAdminClient()
       .from("profiles")
       .select("id, full_name, avatar_url, role")
       .eq("id", recipientId)
@@ -132,7 +133,7 @@ export async function getConversations(
     return [];
   }
 
-  const { data: profiles, error: profilesError } = await supabase
+  const { data: profiles, error: profilesError } = await createAdminClient()
     .from("profiles")
     .select("id, full_name, avatar_url, role")
     .in("id", Array.from(otherUserIds));

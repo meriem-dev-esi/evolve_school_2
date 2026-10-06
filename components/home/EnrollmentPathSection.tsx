@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { GraduationCap } from "lucide-react";
 import { useTranslations } from "next-intl";
 import HorizontalCourseSection from "@/components/HorizontalCourseSection";
@@ -5,6 +9,7 @@ import SectionEmptyState from "@/components/SectionEmptyState";
 import SectionErrorState from "@/components/SectionErrorState";
 import SeriesCard from "@/components/SeriesCard";
 import type { EnrollmentSeries } from "@/lib/data/dashboard";
+import { createClient } from "@/lib/supabase/client";
 
 interface Props {
   user: unknown;
@@ -20,6 +25,52 @@ export default function EnrollmentPathSection({
   error,
 }: Props) {
   const tHome = useTranslations("home");
+  const router = useRouter();
+  const [, startTransition] = useTransition();
+
+  useEffect(() => {
+    const userId =
+      user && typeof user === "object" && "id" in user
+        ? (user.id as string)
+        : null;
+
+    if (!userId) return;
+
+    const supabase = createClient();
+
+    const refreshData = () => {
+      startTransition(() => {
+        router.refresh();
+      });
+    };
+
+    const channel = supabase
+      .channel(`user_progress_${userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "lesson_progress",
+          filter: `user_id=eq.${userId}`,
+        },
+        () => {
+          refreshData();
+        },
+      )
+      .subscribe();
+
+    const onFocus = () => {
+      refreshData();
+    };
+
+    window.addEventListener("focus", onFocus);
+
+    return () => {
+      void supabase.removeChannel(channel);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [user, router]);
 
   if (error) {
     return (

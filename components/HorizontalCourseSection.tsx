@@ -32,6 +32,8 @@ type Course = {
   domain: string | null;
   practice_percentage: number | null;
   reasons?: string[];
+  is_coming_soon?: boolean | null;
+  release_date?: string | null;
 };
 
 type Props = {

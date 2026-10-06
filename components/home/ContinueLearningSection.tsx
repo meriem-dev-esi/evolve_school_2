@@ -9,7 +9,7 @@ import type { ContinueLearning } from "@/lib/data/dashboard";
 interface Props {
   user: unknown;
   locale: string;
-  continueLearning: ContinueLearning | null;
+  continueLearning: ContinueLearning[] | ContinueLearning | null;
   error?: Error | null;
 }
 
@@ -45,7 +45,15 @@ export default function ContinueLearningSection({
     );
   }
 
-  if (!continueLearning) {
+  const items = Array.isArray(continueLearning)
+    ? continueLearning
+    : continueLearning
+      ? [continueLearning]
+      : [];
+
+  const lessonPrefix = locale === "en" ? "Lesson" : "Leçon";
+
+  if (items.length === 0) {
     return (
       <section className="w-full px-6 py-8 lg:px-10">
         <div className="mx-auto max-w-7xl">
@@ -80,14 +88,18 @@ export default function ContinueLearningSection({
           </h2>
         </div>
         <div className="flex gap-5 overflow-x-auto pb-4">
-          <ContinueLearningCard
-            data={continueLearning}
-            labels={{
-              inProgress: tHome("inProgress"),
-              progress: tHome("progress"),
-              continueButton: tHome("continueButton"),
-            }}
-          />
+          {items.map((item) => (
+            <ContinueLearningCard
+              key={item.courseId}
+              data={item}
+              labels={{
+                inProgress: tHome("inProgress"),
+                progress: tHome("progress"),
+                continueButton: tHome("continueButton"),
+                lessonPrefix,
+              }}
+            />
+          ))}
         </div>
       </div>
     </section>

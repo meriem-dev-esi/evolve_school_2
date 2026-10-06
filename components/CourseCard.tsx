@@ -1,4 +1,7 @@
-import { ArrowUpRight, Award, BookOpen, Zap } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { ArrowUpRight, Award, BookOpen, Clock, Zap } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 
@@ -11,6 +14,8 @@ type Course = {
   level: string | null;
   domain: string | null;
   practice_percentage: number | null;
+  is_coming_soon?: boolean | null;
+  release_date?: string | null;
 };
 
 type Props = {
@@ -18,9 +23,23 @@ type Props = {
   locale: string;
 };
 
+const isPlaceholderDescription = (desc: string | null | undefined) => {
+  if (!desc || !desc.trim()) return true;
+  const lower = desc.trim().toLowerCase();
+  return (
+    lower.startsWith("description complète du cours") ||
+    lower.startsWith("description complete du cours") ||
+    lower.startsWith("complete description of the course") ||
+    lower === "description" ||
+    lower === "no description"
+  );
+};
+
 export default function CourseCard({ course, locale }: Props) {
   const t = useTranslations("courseCard");
+  const [imgError, setImgError] = useState(false);
   const isFree = !course.price || course.price === 0;
+  const showFallbackImage = !course.image_url || imgError;
 
   return (
     <article className="group relative w-[310px] shrink-0 overflow-hidden rounded-[1.75rem] border border-white/10 bg-gradient-to-b from-zinc-800/90 via-zinc-900 to-zinc-950 shadow-[0_16px_48px_rgba(0,0,0,0.28)] transition-all duration-300 hover:-translate-y-2 hover:border-brand/50 hover:shadow-[0_24px_56px_rgba(132,204,22,0.16)]">
@@ -32,11 +51,12 @@ export default function CourseCard({ course, locale }: Props) {
         className="relative block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
       >
         <div className="relative h-48 w-full overflow-hidden bg-zinc-800">
-          {course.image_url ? (
+          {!showFallbackImage && course.image_url ? (
             <img
               src={course.image_url}
               alt={course.title}
               loading="lazy"
+              onError={() => setImgError(true)}
               className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
             />
           ) : (
@@ -86,30 +106,75 @@ export default function CourseCard({ course, locale }: Props) {
             </h3>
           </div>
 
-          {course.description && (
+          {!isPlaceholderDescription(course.description) && (
             <p className="mt-3 line-clamp-2 min-h-9 text-xs leading-relaxed text-white/55">
               {course.description}
             </p>
           )}
 
           <div className="mt-auto flex items-end justify-between gap-3 border-t border-white/10 pt-4">
-            <div>
-              <span className="mb-1 block text-[9px] font-semibold uppercase tracking-[0.18em] text-white/40">
-                {t("priceLabel")}
-              </span>
-              <span className="text-base font-extrabold text-white">
-                {isFree ? (
-                  <span className="text-brand">{t("free")}</span>
-                ) : (
-                  `${course.price?.toLocaleString(locale === "ar" ? "ar-DZ" : locale === "en" ? "en-US" : "fr-DZ")} DA`
-                )}
-              </span>
-            </div>
+            {course.is_coming_soon ? (
+              <>
+                <div>
+                  <span className="mb-1 block text-[9px] font-semibold uppercase tracking-[0.18em] text-white/40">
+                    {course.release_date
+                      ? locale === "ar"
+                        ? "تاريخ الإصدار"
+                        : "Date de sortie"
+                      : locale === "ar"
+                        ? "الحالة"
+                        : "Statut"}
+                  </span>
+                  <span className="text-xs font-semibold text-white/70">
+                    {course.release_date
+                      ? new Date(course.release_date).toLocaleDateString(
+                          locale === "ar"
+                            ? "ar-DZ"
+                            : locale === "en"
+                              ? "en-US"
+                              : "fr-DZ",
+                          { month: "short", day: "numeric", year: "numeric" },
+                        )
+                      : locale === "ar"
+                        ? "قريباً"
+                        : locale === "en"
+                          ? "Coming Soon"
+                          : "Bientôt disponible"}
+                  </span>
+                </div>
 
-            <span className="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-3.5 py-2 text-[10px] font-bold text-brand transition-all group-hover:border-brand group-hover:bg-brand group-hover:text-black">
-              {t("discoverCourse")}
-              <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
-            </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-lime-400/40 bg-lime-400/10 px-3.5 py-2 text-[10px] font-bold text-lime-400 shadow-sm">
+                  <Clock className="h-3.5 w-3.5 text-lime-400" />
+                  <span>
+                    {locale === "ar"
+                      ? "قريباً"
+                      : locale === "en"
+                        ? "Coming Soon"
+                        : "Bientôt"}
+                  </span>
+                </span>
+              </>
+            ) : (
+              <>
+                <div>
+                  <span className="mb-1 block text-[9px] font-semibold uppercase tracking-[0.18em] text-white/40">
+                    {t("priceLabel")}
+                  </span>
+                  <span className="text-base font-extrabold text-white">
+                    {isFree ? (
+                      <span className="text-brand">{t("free")}</span>
+                    ) : (
+                      `${course.price?.toLocaleString(locale === "ar" ? "ar-DZ" : locale === "en" ? "en-US" : "fr-DZ")} DA`
+                    )}
+                  </span>
+                </div>
+
+                <span className="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-3.5 py-2 text-[10px] font-bold text-brand transition-all group-hover:border-brand group-hover:bg-brand group-hover:text-black">
+                  {t("discoverCourse")}
+                  <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
+                </span>
+              </>
+            )}
           </div>
         </div>
       </Link>

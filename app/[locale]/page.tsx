@@ -55,9 +55,10 @@ export default async function HomePage({
   let recommendedCourses: Course[] = [];
   let watchlistCourses: Course[] = [];
   let becauseYouCompleted: Course[] = [];
+  let becauseYouCompletedCourseTitle: string | null = null;
   let mostSearchedCourses: Course[] = [];
   let enrollmentPaths: EnrollmentSeries[] = [];
-  let continueLearning: ContinueLearning | null = null;
+  let continueLearning: ContinueLearning[] = [];
 
   let recommendationsError: Error | null = null;
   let userDataError: Error | null = null;
@@ -86,6 +87,8 @@ export default async function HomePage({
     if (userRes.status === "fulfilled") {
       watchlistCourses = userRes.value.watchlistCourses;
       becauseYouCompleted = userRes.value.becauseYouCompleted;
+      becauseYouCompletedCourseTitle =
+        userRes.value.becauseYouCompletedCourseTitle ?? null;
       enrollmentPaths = userRes.value.enrollmentPaths;
       mostSearchedCourses = userRes.value.mostSearchedCourses;
     } else {
@@ -145,19 +148,25 @@ export default async function HomePage({
         />
 
         {/* 4. BECAUSE YOU COMPLETED */}
-        <HorizontalCourseSection
-          title={tHome("becauseYouCompleted")}
-          courses={becauseYouCompleted}
-          locale={locale}
-          locked={!user}
-          error={userDataError}
-          emptyTitle={tHome("emptyStates.becauseYouCompleted.title")}
-          emptyDescription={tHome(
-            "emptyStates.becauseYouCompleted.description",
-          )}
-          emptyActionText={tHome("emptyStates.becauseYouCompleted.action")}
-          emptyActionHref="/formations"
-        />
+        {user && becauseYouCompleted.length > 0 && (
+          <HorizontalCourseSection
+            title={
+              becauseYouCompletedCourseTitle
+                ? `${tHome("becauseYouCompleted")} « ${becauseYouCompletedCourseTitle} »`
+                : tHome("becauseYouCompleted")
+            }
+            courses={becauseYouCompleted}
+            locale={locale}
+            locked={false}
+            error={userDataError}
+            emptyTitle={tHome("emptyStates.becauseYouCompleted.title")}
+            emptyDescription={tHome(
+              "emptyStates.becauseYouCompleted.description",
+            )}
+            emptyActionText={tHome("emptyStates.becauseYouCompleted.action")}
+            emptyActionHref="/formations"
+          />
+        )}
 
         {/* 5. BEGINNER STARTER PACK */}
         <HorizontalCourseSection
@@ -226,28 +235,32 @@ export default async function HomePage({
         />
 
         {/* 10. TRENDING */}
-        <HorizontalCourseSection
-          title={tHome("trending")}
-          courses={publicCourses.trendingCourses}
-          locale={locale}
-          error={publicError}
-          emptyTitle={tHome("emptyStates.trending.title")}
-          emptyDescription={tHome("emptyStates.trending.description")}
-          emptyActionText={tHome("emptyStates.trending.action")}
-          emptyActionHref="/formations"
-        />
+        {publicCourses.trendingCourses.length > 0 && (
+          <HorizontalCourseSection
+            title={tHome("trending")}
+            courses={publicCourses.trendingCourses}
+            locale={locale}
+            error={publicError}
+            emptyTitle={tHome("emptyStates.trending.title")}
+            emptyDescription={tHome("emptyStates.trending.description")}
+            emptyActionText={tHome("emptyStates.trending.action")}
+            emptyActionHref="/formations"
+          />
+        )}
 
         {/* 11. COMING SOON */}
-        <HorizontalCourseSection
-          title={tHome("comingSoon")}
-          courses={publicCourses.comingSoonCourses}
-          locale={locale}
-          error={publicError}
-          emptyTitle={tHome("emptyStates.comingSoon.title")}
-          emptyDescription={tHome("emptyStates.comingSoon.description")}
-          emptyActionText={tHome("emptyStates.comingSoon.action")}
-          emptyActionHref="/formations"
-        />
+        {publicCourses.comingSoonCourses.length > 0 && (
+          <HorizontalCourseSection
+            title={tHome("comingSoon")}
+            courses={publicCourses.comingSoonCourses}
+            locale={locale}
+            error={publicError}
+            emptyTitle={tHome("emptyStates.comingSoon.title")}
+            emptyDescription={tHome("emptyStates.comingSoon.description")}
+            emptyActionText={tHome("emptyStates.comingSoon.action")}
+            emptyActionHref="/formations"
+          />
+        )}
       </div>
     </main>
   );

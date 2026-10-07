@@ -301,8 +301,6 @@ export async function POST(request: Request) {
 
     const checkout = await checkoutResponse.json();
 
-    // Logs the raw Chargily response
-    console.log("CHARGILY RESPONSE:", JSON.stringify(checkout));
 
     if (!checkoutResponse.ok) {
       console.error("CHARGILY ERROR:", checkout);
@@ -327,6 +325,8 @@ export async function POST(request: Request) {
             user_id: user.id,
             workshop_id: course.id,
             payment_status: "pending",
+            payment_amount: course.price,
+            payment_method: "chargily",
             chargily_checkout_id: checkout.id,
             enrolled_at: new Date().toISOString(),
           },

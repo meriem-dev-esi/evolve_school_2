@@ -26,7 +26,7 @@ export async function verifyChargilyPayment(
         const adminSupabase = createAdminClient();
         const { error } = await adminSupabase
           .from("enrollments")
-          .update({ payment_status: "paid" })
+          .update({ payment_status: "paid", paid_at: new Date().toISOString() })
           .eq("id", enrollmentId);
         if (error) {
           console.error(

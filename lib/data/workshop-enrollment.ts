@@ -39,6 +39,8 @@ export async function enrollInFreeWorkshop(
       user_id: userId,
       workshop_id: workshopId,
       payment_status: "paid",
+      payment_amount: 0,
+      paid_at: new Date().toISOString(),
       chargily_checkout_id: null,
       enrolled_at: new Date().toISOString(),
     },
@@ -76,7 +78,7 @@ export async function verifyChargilyWorkshopPayment(
     const adminSupabase = createAdminClient();
     const { data, error } = await adminSupabase
       .from("workshop_enrollments")
-      .update({ payment_status: "paid" })
+      .update({ payment_status: "paid", paid_at: new Date().toISOString() })
       .eq("user_id", userId)
       .eq("workshop_id", workshopId)
       .eq("chargily_checkout_id", checkoutId)

@@ -28,6 +28,7 @@ export async function POST(request: Request) {
       .digest("hex");
 
     if (
+      signature.length !== expectedSignature.length ||
       !crypto.timingSafeEqual(
         Buffer.from(signature),
         Buffer.from(expectedSignature),
@@ -39,6 +40,23 @@ export async function POST(request: Request) {
     const payload = JSON.parse(body);
 
     const checkout = payload.data ?? payload;
+
+    if (["failed", "canceled", "expired"].includes(checkout.status)) {
+      const failedClient = createAdminClient();
+      await Promise.all([
+        failedClient
+          .from("enrollments")
+          .update({ payment_status: "failed" })
+          .eq("chargily_checkout_id", checkout.id)
+          .neq("payment_status", "paid"),
+        failedClient
+          .from("workshop_enrollments")
+          .update({ payment_status: "failed" })
+          .eq("chargily_checkout_id", checkout.id)
+          .neq("payment_status", "paid"),
+      ]);
+      return NextResponse.json({ received: true, status: checkout.status });
+    }
 
     if (checkout.status !== "paid") {
       return NextResponse.json({
@@ -61,12 +79,12 @@ export async function POST(request: Request) {
     const [courseResult, workshopResult] = await Promise.all([
       supabase
         .from("enrollments")
-        .update({ payment_status: "paid" })
+        .update({ payment_status: "paid", paid_at: new Date().toISOString() })
         .eq("chargily_checkout_id", checkoutId)
         .select("id"),
       supabase
         .from("workshop_enrollments")
-        .update({ payment_status: "paid" })
+        .update({ payment_status: "paid", paid_at: new Date().toISOString() })
         .eq("chargily_checkout_id", checkoutId)
         .select("id"),
     ]);

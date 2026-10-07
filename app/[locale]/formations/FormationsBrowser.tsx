@@ -144,6 +144,7 @@ export default function FormationsBrowser({
                     formation={formation}
                     locale={locale}
                     isFormationCompleted={isFormationCompleted}
+                    search={search}
                   />
                 );
               })}

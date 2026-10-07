@@ -2,10 +2,12 @@
 
 import { CheckCircle2, Lock } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { logSearch } from "@/lib/analytics/log-search";
 import { t } from "./i18n";
 import type { Formation } from "./types";
 
 interface FormationCurriculumProps {
+  search?: string;
   formation: Formation;
   locale: string;
 }
@@ -13,6 +15,7 @@ interface FormationCurriculumProps {
 // Bottom part of the card: the ordered list of courses/modules,
 // each locked until the previous one is completed.
 export default function FormationCurriculum({
+  search,
   formation,
   locale,
 }: FormationCurriculumProps) {
@@ -93,6 +96,10 @@ export default function FormationCurriculum({
                 </span>
               ) : (
                 <Link
+                  onClick={() => {
+                    if (search?.trim())
+                      void logSearch(course.id, search.trim());
+                  }}
                   href={
                     course.nextLessonId
                       ? `/courses/${course.id}/lessons/${course.nextLessonId}`

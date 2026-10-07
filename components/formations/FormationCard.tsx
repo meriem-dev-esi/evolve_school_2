@@ -5,6 +5,7 @@ import FormationHeader from "./Formationheader";
 import type { Formation } from "./types";
 
 interface FormationCardProps {
+  search?: string;
   formation: Formation;
   locale: string;
   isFormationCompleted: boolean;
@@ -19,6 +20,7 @@ interface FormationCardProps {
  * - FormationCurriculum: the ordered list of courses/modules
  */
 export default function FormationCard({
+  search,
   formation,
   locale,
   isFormationCompleted,
@@ -52,7 +54,11 @@ export default function FormationCard({
         nextCourse={nextCourse}
       />
 
-      <FormationCurriculum formation={formation} locale={locale} />
+      <FormationCurriculum
+        formation={formation}
+        locale={locale}
+        search={search}
+      />
     </article>
   );
 }

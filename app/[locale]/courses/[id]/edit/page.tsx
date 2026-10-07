@@ -95,7 +95,7 @@ export default function EditCoursePage({
     }
 
     void loadCourse();
-  }, [router, params]);
+  }, [router, params, t]);
 
   async function handleSave() {
     if (!courseId) return;

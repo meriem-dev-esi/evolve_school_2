@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { BookOpen } from "lucide-react";
+import { useState } from "react";
 import { Link } from "@/i18n/navigation";
 import type { ContinueLearning } from "@/lib/data/dashboard";
 
@@ -68,9 +68,7 @@ export default function ContinueLearningCard({ data, labels }: Props) {
         <div className="mt-4">
           <div className="flex justify-between text-xs">
             <span className="text-white/70">{labels.progress}</span>
-            <span className="font-semibold text-white">
-              {data.progress}%
-            </span>
+            <span className="font-semibold text-white">{data.progress}%</span>
           </div>
           <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
             <div

@@ -242,7 +242,9 @@ export async function getUserDashboardData(userId: string) {
 
       const completedLessonIds = new Set(
         (progressRows ?? [])
-          .filter((r) => Boolean(r.completed) || (r.progress_percentage ?? 0) >= 95)
+          .filter(
+            (r) => Boolean(r.completed) || (r.progress_percentage ?? 0) >= 95,
+          )
           .map((r) => r.lesson_id),
       );
 
@@ -261,25 +263,31 @@ export async function getUserDashboardData(userId: string) {
 
       if (completedCourseIds.size > 0) {
         // Pick the most recently completed course
-        const sortedCompletedCourseIds = [...completedCourseIds].sort((a, b) => {
-          const aRows = (progressRows ?? []).filter((r) => {
-            const l = (lessons ?? []).find((lesson) => lesson.id === r.lesson_id);
-            return l?.course_id === a;
-          });
-          const bRows = (progressRows ?? []).filter((r) => {
-            const l = (lessons ?? []).find((lesson) => lesson.id === r.lesson_id);
-            return l?.course_id === b;
-          });
-          const aDate = Math.max(
-            ...aRows.map((r) => new Date(r.updated_at ?? 0).getTime()),
-            0,
-          );
-          const bDate = Math.max(
-            ...bRows.map((r) => new Date(r.updated_at ?? 0).getTime()),
-            0,
-          );
-          return bDate - aDate;
-        });
+        const sortedCompletedCourseIds = [...completedCourseIds].sort(
+          (a, b) => {
+            const aRows = (progressRows ?? []).filter((r) => {
+              const l = (lessons ?? []).find(
+                (lesson) => lesson.id === r.lesson_id,
+              );
+              return l?.course_id === a;
+            });
+            const bRows = (progressRows ?? []).filter((r) => {
+              const l = (lessons ?? []).find(
+                (lesson) => lesson.id === r.lesson_id,
+              );
+              return l?.course_id === b;
+            });
+            const aDate = Math.max(
+              ...aRows.map((r) => new Date(r.updated_at ?? 0).getTime()),
+              0,
+            );
+            const bDate = Math.max(
+              ...bRows.map((r) => new Date(r.updated_at ?? 0).getTime()),
+              0,
+            );
+            return bDate - aDate;
+          },
+        );
 
         const targetCourseId = sortedCompletedCourseIds[0];
 
@@ -408,20 +416,26 @@ export async function getUserDashboardData(userId: string) {
       ]);
 
       const allCourseIds = [
-        ...new Set((allSeriesCourses ?? []).map((sc) => sc.course_id).filter(Boolean)),
+        ...new Set(
+          (allSeriesCourses ?? []).map((sc) => sc.course_id).filter(Boolean),
+        ),
       ];
 
-      const { data: allLessons } = allCourseIds.length > 0
-        ? await supabase
-            .from("lessons")
-            .select("id, course_id, order_index")
-            .in("course_id", allCourseIds)
-            .order("order_index", { ascending: true })
-        : { data: [] };
+      const { data: allLessons } =
+        allCourseIds.length > 0
+          ? await supabase
+              .from("lessons")
+              .select("id, course_id, order_index")
+              .in("course_id", allCourseIds)
+              .order("order_index", { ascending: true })
+          : { data: [] };
 
       const completedLessonIds = new Set(
         (progressRows ?? [])
-          .filter((row) => Boolean(row.completed) || (row.progress_percentage ?? 0) >= 95)
+          .filter(
+            (row) =>
+              Boolean(row.completed) || (row.progress_percentage ?? 0) >= 95,
+          )
           .map((row) => row.lesson_id),
       );
 
@@ -534,7 +548,9 @@ export async function getContinueLearning(
 
   const { data: progressRows } = await supabase
     .from("lesson_progress")
-    .select("lesson_id, completed, progress_percentage, last_position, updated_at")
+    .select(
+      "lesson_id, completed, progress_percentage, last_position, updated_at",
+    )
     .eq("user_id", userId)
     .order("updated_at", { ascending: false });
 
@@ -579,10 +595,12 @@ export async function getContinueLearning(
     if (!lessonsByCourse.has(l.course_id)) {
       lessonsByCourse.set(l.course_id, []);
     }
-    lessonsByCourse.get(l.course_id)!.push(l);
+    lessonsByCourse.get(l.course_id)?.push(l);
   }
 
-  const lessonToCourse = new Map(touchedLessons.map((l) => [l.id, l.course_id]));
+  const lessonToCourse = new Map(
+    touchedLessons.map((l) => [l.id, l.course_id]),
+  );
   const progressByCourse = new Map<string, typeof progressRows>();
   for (const r of progressRows) {
     const cId = lessonToCourse.get(r.lesson_id);
@@ -590,7 +608,7 @@ export async function getContinueLearning(
       if (!progressByCourse.has(cId)) {
         progressByCourse.set(cId, []);
       }
-      progressByCourse.get(cId)!.push(r);
+      progressByCourse.get(cId)?.push(r);
     }
   }
 
@@ -601,7 +619,11 @@ export async function getContinueLearning(
     const courseLessons = lessonsByCourse.get(courseId) ?? [];
     const courseProgressRows = progressByCourse.get(courseId) ?? [];
 
-    if (!course || courseLessons.length === 0 || courseProgressRows.length === 0) {
+    if (
+      !course ||
+      courseLessons.length === 0 ||
+      courseProgressRows.length === 0
+    ) {
       continue;
     }
 
@@ -612,7 +634,9 @@ export async function getContinueLearning(
 
     const completedLessonIds = new Set(
       courseProgressRows
-        .filter((r) => Boolean(r.completed) || (r.progress_percentage ?? 0) >= 95)
+        .filter(
+          (r) => Boolean(r.completed) || (r.progress_percentage ?? 0) >= 95,
+        )
         .map((r) => r.lesson_id),
     );
 

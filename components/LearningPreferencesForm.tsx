@@ -74,7 +74,7 @@ export default function LearningPreferencesForm() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [t]);
 
   const toggleInterest = (interest: string) => {
     setInterests((current) => {

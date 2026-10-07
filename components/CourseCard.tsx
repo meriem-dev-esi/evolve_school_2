@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { ArrowUpRight, Award, BookOpen, Clock, Zap } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 import { Link } from "@/i18n/navigation";
 
 type Course = {
@@ -24,7 +24,7 @@ type Props = {
 };
 
 const isPlaceholderDescription = (desc: string | null | undefined) => {
-  if (!desc || !desc.trim()) return true;
+  if (!desc?.trim()) return true;
   const lower = desc.trim().toLowerCase();
   return (
     lower.startsWith("description complète du cours") ||

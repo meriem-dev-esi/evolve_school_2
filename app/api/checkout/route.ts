@@ -301,7 +301,6 @@ export async function POST(request: Request) {
 
     const checkout = await checkoutResponse.json();
 
-
     if (!checkoutResponse.ok) {
       console.error("CHARGILY ERROR:", checkout);
       return NextResponse.json(

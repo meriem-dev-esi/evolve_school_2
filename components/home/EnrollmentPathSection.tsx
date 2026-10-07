@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { GraduationCap } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useEffect, useTransition } from "react";
 import HorizontalCourseSection from "@/components/HorizontalCourseSection";
 import SectionEmptyState from "@/components/SectionEmptyState";
 import SectionErrorState from "@/components/SectionErrorState";

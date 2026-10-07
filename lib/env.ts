@@ -66,13 +66,13 @@ export const env = {
       process.env.NEXT_PUBLIC_SITE_URL ||
       process.env.APP_URL ||
       "https://evolve-academy.dz"
-    );
+    ).replace(/\/+$/, "");
   },
   get appUrl(): string {
     return (
       process.env.APP_URL ||
       process.env.NEXT_PUBLIC_SITE_URL ||
       "http://localhost:3000"
-    );
+    ).replace(/\/+$/, "");
   },
 };

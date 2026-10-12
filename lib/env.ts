@@ -44,14 +44,10 @@ export const env = {
     return mode === "live" ? "live" : "test";
   },
   get chargilySecretKey(): string {
-    return (
-      process.env.CHARGILY_SECRET_KEY || process.env.CHARGILY_API_KEY || ""
-    );
+    return process.env.CHARGILY_SECRET_KEY || "";
   },
   get chargilyApiKey(): string {
-    return (
-      process.env.CHARGILY_API_KEY || process.env.CHARGILY_SECRET_KEY || ""
-    );
+    return process.env.CHARGILY_API_KEY || "";
   },
   get chargilyApiUrl(): string {
     if (process.env.CHARGILY_API_URL) {

@@ -88,7 +88,10 @@ export async function POST(request: Request) {
         raw_payload: payload,
       });
     } catch (auditErr) {
-      console.warn("[Webhook Audit] Notice: unable to log webhook event:", auditErr);
+      console.warn(
+        "[Webhook Audit] Notice: unable to log webhook event:",
+        auditErr,
+      );
     }
 
     const providerPaidAt = checkout.paid_at ?? checkout.updated_at;

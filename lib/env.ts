@@ -45,12 +45,14 @@ export const env = {
   },
   get chargilySecretKey(): string {
     return (
-      process.env.CHARGILY_SECRET_KEY || process.env.CHARGILY_API_KEY || ""
+      process.env.CHARGILY_SECRET_KEY ||
+      ""
     );
   },
   get chargilyApiKey(): string {
     return (
-      process.env.CHARGILY_API_KEY || process.env.CHARGILY_SECRET_KEY || ""
+      process.env.CHARGILY_API_KEY ||
+      ""
     );
   },
   get chargilyApiUrl(): string {

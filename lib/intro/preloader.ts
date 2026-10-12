@@ -1,4 +1,8 @@
-const STEPS = ["Discover", "Diagnose", "Design", "Deliver", "Evolve"] as const;
+const STEPS_BY_LOCALE: Record<string, readonly string[]> = {
+  fr: ["Découvrir", "Diagnostiquer", "Concevoir", "Délivrer", "Évoluer"],
+  ar: ["اكتشف", "شخّص", "صمّم", "أنجز", "تطوّر"],
+  en: ["Discover", "Diagnose", "Design", "Deliver", "Evolve"],
+};
 
 const DURATION = 3000;
 
@@ -85,7 +89,7 @@ function finish(): void {
   window.dispatchEvent(new Event("intro:done"));
 }
 
-export function initPreloader(): void {
+export function initPreloader(locale?: string): void {
   if (typeof document === "undefined" || window.__introDone) {
     return;
   }
@@ -93,6 +97,19 @@ export function initPreloader(): void {
   if (document.querySelector(".pl")) {
     return;
   }
+
+  const effectiveLocale =
+    locale ||
+    (typeof document !== "undefined" ? document.documentElement.lang : "") ||
+    "fr";
+  const stepsList = STEPS_BY_LOCALE[effectiveLocale] ??
+    STEPS_BY_LOCALE.fr ?? [
+      "Découvrir",
+      "Diagnostiquer",
+      "Concevoir",
+      "Délivrer",
+      "Évoluer",
+    ];
 
   const style = document.createElement("style");
   style.textContent = CSS;
@@ -108,14 +125,16 @@ export function initPreloader(): void {
     </div>
 
     <ul class="pl-steps">
-      ${STEPS.map(
-        (step) => `
+      ${stepsList
+        .map(
+          (step) => `
           <li>
             <i></i>
             <span>${step}</span>
           </li>
         `,
-      ).join("")}
+        )
+        .join("")}
     </ul>
   `;
 

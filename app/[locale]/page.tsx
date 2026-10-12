@@ -25,7 +25,7 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const tHome = await getTranslations("home");
+  const tHome = await getTranslations({ locale, namespace: "home" });
   const supabase = await createClient();
 
   let publicCourses = {
@@ -110,7 +110,7 @@ export default async function HomePage({
 
   return (
     <main className="min-h-dvh bg-transparent text-white">
-      <IntroPreloader />
+      <IntroPreloader locale={locale} />
 
       <IntroGate>
         <Navbar />

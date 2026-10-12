@@ -180,9 +180,6 @@ export default async function CommunityPage({ params, searchParams }: Props) {
             technologies={technologies}
           />
 
-          {/* Project Creator Submission Section */}
-          <CommunitySubmitSection locale={locale} />
-
           {/* Projects Gallery */}
           <section className="mt-16">
             <div className="flex items-center justify-between mb-8">
@@ -247,6 +244,11 @@ export default async function CommunityPage({ params, searchParams }: Props) {
                 />
               </>
             )}
+          </section>
+
+          {/* Project Creator Submission Section */}
+          <section className="mt-16">
+            <CommunitySubmitSection locale={locale} />
           </section>
 
           {/* Back link */}

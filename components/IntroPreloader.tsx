@@ -3,11 +3,10 @@
 import { useEffect } from "react";
 import { initPreloader } from "@/lib/intro/preloader";
 
-export default function IntroPreloader() {
+export default function IntroPreloader({ locale }: { locale?: string } = {}) {
   useEffect(() => {
-    console.log("PRELOADER STARTED");
-    initPreloader();
-  }, []);
+    initPreloader(locale);
+  }, [locale]);
 
   return null;
 }
